@@ -11,7 +11,7 @@ const Nav = () => {
     const [showNavbar, setShowNavbar] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
 
-    const navItems = ["Home", "About", "Services", "Contact"];
+    const navItems = ["Home", "About", "Services", "Contact", "Login"];
 
     const toggleDrawer = state => () => {
         setOpen(state);
@@ -81,7 +81,6 @@ const Nav = () => {
                         {navItems.map((item) => (
                             <Button
                                 key={item}
-                                href={`#${item.toLowerCase()}`}
                                 sx={{
                                     color: "#ffffff",
                                     fontWeight: 500,
@@ -111,7 +110,12 @@ const Nav = () => {
                                     }
                                 }}
                             >
-                                {item}
+                                <Link
+                                    to={item === "Login" ? "/login" : `/#${item.toLowerCase()}`}
+                                    style={{ color: 'inherit', textDecoration: 'none' }}
+                                >
+                                    {item}
+                                </Link>
                             </Button>
                         ))}
                     </Box>
@@ -178,7 +182,6 @@ const Nav = () => {
                             <ListItem
                                 button
                                 component="a"
-                                href={`#${text.toLowerCase()}`}
                                 key={text}
                                 sx={{
                                     py: 2.5,
@@ -197,12 +200,19 @@ const Nav = () => {
                                 }}
                             >
                                 <ListItemText
-                                    primary={text}
-                                    sx={{
-                                        fontWeight: 500,
-                                        fontSize: '1.1rem',
-                                        color: '#ffffff'
-                                    }}
+                                    primary={
+                                        <Link
+                                            to={text === "Login" ? "/login" : `/#${text.toLowerCase()}`}
+                                            style={{
+                                                fontWeight: 500,
+                                                fontSize: '1.1rem',
+                                                color: '#ffffff',
+                                                textDecoration: 'none'
+                                            }}
+                                        >
+                                            {text}
+                                        </Link>
+                                    }
                                 />
                             </ListItem>
                         ))}

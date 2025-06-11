@@ -4,17 +4,28 @@ import Home from "./components/Home.jsx";
 import AboutUs from "./components/AboutUs.jsx";
 import Services from "./components/Services.jsx";
 import ContactUs from "./components/ContactUs.jsx";
+import Login from "./components/Login.jsx";
 import { Route, Routes } from "react-router";
+import ScrollHandler from "./utils/ScrollHandler.jsx";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
     return (
         <React.Fragment>
+            <ToastContainer position="top-right" autoClose={3000} />
+            <ScrollHandler />
             <Nav/>
             <Routes>
-                <Route path="/" element={ <Home/> } />
+                <Route path="/" element={
+                    <>
+                        <Home/>,
+                        <AboutUs/>,
+                        <Services/>
+                    </>
+                } />
+                <Route path="/login" element={ <Login/>} />
             </Routes>
-            <AboutUs/>
-            <Services/>
             <ContactUs/>
         </React.Fragment>
     );
