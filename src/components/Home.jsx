@@ -1,7 +1,11 @@
 import { Handyman, Star, Phone, Schedule } from "@mui/icons-material";
 import { Box, Typography, Button, Container, Grid, Card, CardContent } from "@mui/material";
+import { useHomeQuery } from "../reducers/homeApi.js";
 
 const Home = () => {
+
+    const { home } = useHomeQuery();
+
     const features = [
         {
             icon: <Star sx={{ fontSize: 40, color: '#4fc3f7' }} />,
