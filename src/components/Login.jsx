@@ -6,6 +6,7 @@ import { PersonOutline, LockOutlined, Visibility, VisibilityOff } from '@mui/ico
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { useLoginMutation } from '../reducers/authApi.js';
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     marginBottom: '24px',
@@ -102,6 +103,7 @@ const validationSchema = Yup.object().shape({
 
 const Login = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const [login] = useLoginMutation();
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -109,10 +111,14 @@ const Login = () => {
 
     const navigate = useNavigate();
 
-    const handleLogin = values => {
-        toast.success("Login successful");
-        console.log("values: ", values);
-        navigate('/');
+    const handleLogin = async values => {
+        try {
+            const response = await login(values).unwrap();
+            toast.success("Login successful");
+            navigate('/');
+        } catch (error) {
+            toast.error(error?.data?.message || "Login failed");
+        }
     }
 
     return (
