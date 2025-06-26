@@ -9,6 +9,7 @@ import { Route, Routes } from "react-router";
 import ScrollHandler from "./utils/ScrollHandler.jsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Register from "./components/Register.jsx";
 
 const App = () => {
     return (
@@ -24,7 +25,8 @@ const App = () => {
                         <Services/>
                     </>
                 } />
-                <Route path="/login" element={ <Login/>} />
+                <Route path="/login" element={ <Login/> } />
+                <Route path="/customer-register" element={ <Register/> } />
             </Routes>
             <ContactUs/>
         </React.Fragment>

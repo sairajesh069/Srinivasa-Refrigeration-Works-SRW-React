@@ -1,96 +1,13 @@
-import {Box, Button, TextField, Typography, Paper, InputAdornment, IconButton} from "@mui/material";
+import {Box, Button, Typography, Paper, InputAdornment, IconButton} from "@mui/material";
 import * as Yup from "yup";
 import {Form, Formik} from "formik";
-import { styled } from '@mui/material/styles';
 import { PersonOutline, LockOutlined, Visibility, VisibilityOff } from '@mui/icons-material';
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import StyledLink from "./form-styling/StyledLink.jsx";
+import StyledTextField from "./form-styling/StyledTextField.jsx";
 import { useLoginMutation } from '../reducers/authApi.js';
-
-const StyledTextField = styled(TextField)(({ theme }) => ({
-    marginBottom: '24px',
-    '& .MuiInputLabel-root': {
-        color: '#7f8c8d',
-        fontSize: '14px',
-        fontWeight: 500,
-        '&.Mui-focused': {
-            color: '#4fc3f7',
-        },
-    },
-    '& .MuiOutlinedInput-root': {
-        borderRadius: '12px',
-        backgroundColor: '#f8f9fa',
-        transition: 'all 0.3s ease',
-        '& fieldset': {
-            borderColor: '#e9ecef',
-            borderWidth: '1px',
-        },
-        '&:hover': {
-            backgroundColor: '#ffffff',
-            '& fieldset': {
-                borderColor: '#4fc3f7',
-            },
-        },
-        '&.Mui-focused': {
-            backgroundColor: '#ffffff',
-            boxShadow: '0 0 0 3px rgba(79, 195, 247, 0.1)',
-            '& fieldset': {
-                borderColor: '#4fc3f7',
-                borderWidth: '2px',
-            },
-        },
-    },
-    '& .MuiInputBase-input': {
-        color: '#2c3e50',
-        fontSize: '16px',
-        padding: '16px 14px',
-        '&:-webkit-autofill': {
-            WebkitBoxShadow: '0 0 0 1000px #f8f9fa inset !important',
-            WebkitTextFillColor: '#2c3e50 !important',
-            borderRadius: '12px !important',
-            transition: 'background-color 5000s ease-in-out 0s !important',
-        },
-        '&:-webkit-autofill:hover': {
-            WebkitBoxShadow: '0 0 0 1000px #ffffff inset !important',
-            WebkitTextFillColor: '#2c3e50 !important',
-        },
-        '&:-webkit-autofill:focus': {
-            WebkitBoxShadow: '0 0 0 1000px #ffffff inset !important',
-            WebkitTextFillColor: '#2c3e50 !important',
-        },
-        '&:-webkit-autofill:active': {
-            WebkitBoxShadow: '0 0 0 1000px #ffffff inset !important',
-            WebkitTextFillColor: '#2c3e50 !important',
-        }
-    },
-    '& .MuiFormHelperText-root': {
-        color: '#e74c3c',
-        fontSize: '12px',
-        marginLeft: '4px',
-        marginTop: '6px',
-    },
-}));
-
-const StyledLink = styled(Link)({
-    color: '#4fc3f7',
-    textDecoration: 'none',
-    fontSize: '14px',
-    fontWeight: 500,
-    transition: 'all 0.3s ease',
-    padding: '4px 8px',
-    borderRadius: '6px',
-    display: 'inline-block',
-    position: 'relative',
-    '&:hover': {
-        color: '#29b6f6',
-        backgroundColor: 'rgba(79, 195, 247, 0.05)',
-        transform: 'translateY(-1px)',
-    },
-    '&:active': {
-        transform: 'translateY(0px)',
-    },
-});
 
 const validationSchema = Yup.object().shape({
     username: Yup.string()
@@ -114,10 +31,10 @@ const Login = () => {
     const handleLogin = async values => {
         try {
             const response = await login(values).unwrap();
-            toast.success("Login successful");
+            toast.success(response.message);
             navigate('/');
         } catch (error) {
-            toast.error(error?.data?.message || "Login failed");
+            toast.error('Login failed');
         }
     }
 
@@ -203,6 +120,7 @@ const Login = () => {
                                error={Boolean((touched.username || values.username) && errors.username)}
                                helperText={(touched.username || values.username) && errors.username}
                                variant="outlined"
+                               placeholder="Enter your username or email"
                                InputProps={{
                                    startAdornment: (
                                        <InputAdornment position="start">
@@ -211,7 +129,6 @@ const Login = () => {
                                    ),
                                }}
                            />
-
                            <StyledTextField
                                fullWidth
                                label="Password"
@@ -222,6 +139,7 @@ const Login = () => {
                                error={Boolean((touched.password || values.password) && errors.password)}
                                helperText={(touched.password || values.password) && errors.password}
                                variant="outlined"
+                               placeholder="Enter your password"
                                InputProps={{
                                    startAdornment: (
                                        <InputAdornment position="start">
@@ -241,6 +159,21 @@ const Login = () => {
                                    ),
                                }}
                            />
+                           <StyledLink
+                               style={{
+                                   float: 'left',
+                                   marginBottom: '20px',
+                                   fontSize: '13px',
+                                   color: '#7f8c8d',
+                                   '&:hover': {
+                                       color: '#4fc3f7',
+                                       backgroundColor: 'rgba(79, 195, 247, 0.05)',
+                                   },
+                               }}
+                               to='/forgot-username'
+                           >
+                               Username Recovery
+                           </StyledLink>
                            <StyledLink
                                style={{
                                    float: 'right',
@@ -303,7 +236,7 @@ const Login = () => {
                                        boxShadow: '0 4px 12px rgba(79, 195, 247, 0.15)'
                                    }
                                }}
-                               to='/create-account'
+                               to='/customer-register'
                            >
                                New User? Register
                            </StyledLink>

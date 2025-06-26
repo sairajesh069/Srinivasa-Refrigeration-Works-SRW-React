@@ -5,14 +5,12 @@ const ScrollHandler = () => {
     const { hash, pathname } = useLocation();
 
     useEffect(() => {
-        const handleClick = () => {
-            if (pathname) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        };
+        if (!hash) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, [pathname]);
 
-        window.addEventListener('click', handleClick);
-
+    useEffect(() => {
         if (hash) {
             const id = hash.replace('#', '');
             const element = document.getElementById(id);
@@ -20,11 +18,7 @@ const ScrollHandler = () => {
                 element.scrollIntoView({ behavior: 'smooth' });
             }
         }
-
-        return () => {
-            window.removeEventListener('click', handleClick);
-        };
-    }, [hash, pathname]);
+    }, [hash]);
 
     return null;
 };
