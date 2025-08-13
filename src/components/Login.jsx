@@ -140,6 +140,12 @@ const Login = () => {
                                helperText={(touched.password || values.password) && errors.password}
                                variant="outlined"
                                placeholder="Enter your password"
+                               autoComplete="off"
+                               inputProps={{
+                                   autoComplete: 'off',
+                                   'data-lpignore': 'true',
+                                   'data-form-type': 'other'
+                               }}
                                InputProps={{
                                    startAdornment: (
                                        <InputAdornment position="start">

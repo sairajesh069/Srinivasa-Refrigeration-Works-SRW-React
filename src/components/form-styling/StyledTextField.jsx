@@ -1,5 +1,5 @@
-import {styled} from "@mui/material/styles";
-import {TextField} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { TextField } from "@mui/material";
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     marginBottom: '24px',
@@ -62,6 +62,22 @@ const StyledTextField = styled(TextField)(({ theme }) => ({
         fontSize: '12px',
         marginLeft: '4px',
         marginTop: '6px',
+    },
+    // Custom styling for the Select dropdown
+    '& .MuiSelect-select': {
+        color: '#2c3e50',
+        fontSize: '16px',
+        padding: '16px 14px',
+        backgroundColor: 'transparent',
+    },
+    '& .MuiSelect-icon': {
+        color: '#7f8c8d',
+        fontSize: '24px',
+        transition: 'transform 0.3s ease',
+    },
+    '& .Mui-focused .MuiSelect-icon': {
+        color: '#4fc3f7',
+        transform: 'rotate(180deg)',
     },
 }));
 

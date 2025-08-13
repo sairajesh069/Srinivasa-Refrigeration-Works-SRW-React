@@ -1,12 +1,14 @@
-import {Box, Button, Typography, Paper, InputAdornment, IconButton} from "@mui/material";
+import {Box, Button, Typography, Paper, InputAdornment, IconButton, MenuItem} from "@mui/material";
 import * as Yup from "yup";
 import {Form, Formik} from "formik";
 import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, LocationOn, Wc } from '@mui/icons-material';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import StyledLink from "./form-styling/StyledLink.jsx";
 import StyledTextField from "./form-styling/StyledTextField.jsx";
+import { useCustomerMutation } from "../reducers/registerApi.js";
+import StyledMenuProps from "./form-styling/StyledSelectMenu.jsx";
 
 const validationSchema = Yup.object().shape({
     firstName: Yup.string()
@@ -31,7 +33,7 @@ const validationSchema = Yup.object().shape({
         .min(3, 'Username must be at least 3 characters')
         .required('Username is required'),
     password: Yup.string()
-        .min(6, 'Password must be at least 8 characters')
+        .min(6, 'Password must be at least 6 characters')
         .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number')
         .required('Password is required'),
     confirmPassword: Yup.string()
@@ -47,14 +49,56 @@ const Register = () => {
     };
 
     const navigate = useNavigate();
+    const location = useLocation();
 
-    const handleRegister = async values => {
+    const [customer, { isLoading }] = useCustomerMutation();
+
+    const uniqueFields = {
+        "email address": "email",
+        "phone number": "phoneNumber",
+        "username": "username"
+    }
+
+    const handleRegister = async (values, { setFieldError }) => {
+        const userCredentialDTO = {
+            username: values.username.toLowerCase(),
+            password: values.password,
+            phoneNumber: values.phoneNumber,
+            email: values.email.toLowerCase()
+        }
+
         try {
-            console.log("User details: ", values);
+            if(location.pathname === '/customer-register') {
+                const customerCredentialDTO = {
+                    customerDTO: {
+                        firstName: values.firstName,
+                        lastName: values.lastName,
+                        gender: values.gender,
+                        phoneNumber: values.phoneNumber,
+                        email: values.email.toLowerCase(),
+                        address: values.address
+                    },
+                    userCredentialDTO: userCredentialDTO
+                };
+                let response = await customer(customerCredentialDTO).unwrap();
+            }
             toast.success("Registration successful. Please login");
             navigate('/login');
         } catch (error) {
-            toast.error("Registration failed");
+            if(error.status === 409) {
+                const errorMessage = error.data.message;
+                if(!errorMessage.startsWith("Duplicate value")) {
+                    const duplicateField = errorMessage.slice(10).trim();
+                    if(uniqueFields[duplicateField]) {
+                        const fieldName = uniqueFields[duplicateField];
+                        setFieldError(fieldName, `${duplicateField.charAt(0).toUpperCase() + duplicateField.slice(1)} already exists`);
+                    }
+                }
+                toast.error(errorMessage);
+            }
+            else{
+                toast.error("Registration failed. Please try again.");
+            }
         }
     }
 
@@ -139,7 +183,7 @@ const Register = () => {
                     validateOnBlur={true}
                     validateOnMount={true}
                 >
-                    {({ values, handleChange, errors, touched }) => (
+                    {({ values, handleChange, errors, touched, setFieldError }) => (
                         <Form>
                             <Typography sx={{
                                 color: '#2c3e50',
@@ -199,7 +243,8 @@ const Register = () => {
                                 helperText={(touched.gender || values.gender) && errors.gender}
                                 variant="outlined"
                                 SelectProps={{
-                                    native: true,
+                                    displayEmpty: true,
+                                    MenuProps: StyledMenuProps
                                 }}
                                 InputProps={{
                                     startAdornment: (
@@ -209,11 +254,11 @@ const Register = () => {
                                     ),
                                 }}
                             >
-                                <option value="">Select Gender</option>
-                                <option value="male">Male</option>
-                                <option value="female">Female</option>
-                                <option value="other">Other</option>
-                                <option value="prefer-not-to-say">Prefer not to say</option>
+                                <MenuItem value="">--select--</MenuItem>
+                                <MenuItem value="male">Male</MenuItem>
+                                <MenuItem value="female">Female</MenuItem>
+                                <MenuItem value="other">Other</MenuItem>
+                                <MenuItem value="prefer-not-to-say">Prefer not to say</MenuItem>
                             </StyledTextField>
                             <StyledTextField
                                 fullWidth
@@ -294,6 +339,12 @@ const Register = () => {
                                 helperText={(touched.username || values.username) && errors.username}
                                 variant="outlined"
                                 placeholder="Enter your username"
+                                autoComplete="off"
+                                inputProps={{
+                                    autoComplete: 'off',
+                                    'data-lpignore': 'true',
+                                    'data-form-type': 'other'
+                                }}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -314,6 +365,12 @@ const Register = () => {
                                 helperText={(touched.password || values.password) && errors.password}
                                 variant="outlined"
                                 placeholder="Enter your new password"
+                                autoComplete="off"
+                                inputProps={{
+                                    autoComplete: 'off',
+                                    'data-lpignore': 'true',
+                                    'data-form-type': 'other'
+                                }}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -368,6 +425,7 @@ const Register = () => {
                                 type="submit"
                                 variant="contained"
                                 size="large"
+                                disabled={isLoading}
                                 sx={{
                                     marginTop: '8px',
                                     padding: '16px 24px',
@@ -388,7 +446,7 @@ const Register = () => {
                                         transform: 'translateY(0px)',
                                     },
                                 }}>
-                                Create Account
+                                {isLoading ? 'Creating Account...' : 'Create Account'}
                             </Button>
                             <StyledLink
                                 style={{
