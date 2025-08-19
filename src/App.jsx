@@ -11,6 +11,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Register from "./components/Register.jsx";
 import AuthGuard from "./utils/AuthGuard.jsx";
+import PageNotFound from "./components/PageNotFound.jsx";
 
 const App = () => {
     return (
@@ -52,6 +53,8 @@ const App = () => {
                         <Register />
                     </AuthGuard>
                 } />
+
+                <Route path="*" element={ <PageNotFound /> } />
             </Routes>
             <ContactUs/>
         </React.Fragment>
