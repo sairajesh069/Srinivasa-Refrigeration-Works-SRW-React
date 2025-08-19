@@ -10,11 +10,27 @@ import ScrollHandler from "./utils/ScrollHandler.jsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Register from "./components/Register.jsx";
+import AuthGuard from "./utils/AuthGuard.jsx";
 
 const App = () => {
     return (
         <React.Fragment>
-            <ToastContainer position="top-right" autoClose={3000} />
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                toastStyle={{
+                    borderRadius: '12px',
+                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+                }}
+            />
             <ScrollHandler />
             <Nav/>
             <Routes>
@@ -25,8 +41,17 @@ const App = () => {
                         <Services/>
                     </>
                 } />
-                <Route path="/login" element={ <Login/> } />
-                <Route path="/customer-register" element={ <Register/> } />
+                <Route path="/login" element={
+                    <AuthGuard requireAuth={false}>
+                        <Login />
+                    </AuthGuard>
+                } />
+
+                <Route path="/customer-register" element={
+                    <AuthGuard requireAuth={false}>
+                        <Register />
+                    </AuthGuard>
+                } />
             </Routes>
             <ContactUs/>
         </React.Fragment>

@@ -1,21 +1,29 @@
 import {
-    AppBar, Toolbar, Button, Box, IconButton,
-    Drawer, List, ListItem, ListItemText
-} from "@mui/material";
-import { Menu } from "@mui/icons-material";
+    AppBar, Toolbar, Typography, Button, Box,
+    Menu, MenuItem, Avatar, IconButton, Divider,
+    Drawer, List, ListItem, ListItemIcon, ListItemText,
+    useMediaQuery, useTheme, Collapse
+} from '@mui/material';
+import {
+    ExitToApp, Menu as MenuIcon,
+    Home, Info, Build, ContactMail, ExpandLess, ExpandMore
+} from '@mui/icons-material';
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import useAuth from '../utils/useAuth.jsx';
 
 const Nav = () => {
-    const [open, setOpen] = useState(false);
+    const [anchorEl, setAnchorEl] = useState(null);
+    const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+
+    const { isAuthenticated, user, isLoggingOut, logout } = useAuth();
+
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
     const [showNavbar, setShowNavbar] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
-
-    const navItems = ["Home", "About", "Services", "Contact", "Login"];
-
-    const toggleDrawer = state => () => {
-        setOpen(state);
-    };
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -27,6 +35,131 @@ const Nav = () => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, [lastScrollY]);
+
+    // Menu handlers
+    const handleProfileMenuOpen = event => {
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleProfileMenuClose = () => {
+        setAnchorEl(null);
+    };
+
+    const handleMobileMenuClose = () => {
+        setOpen(false);
+    };
+
+    const toggleDrawer = newOpen => () => {
+        setOpen(newOpen);
+    };
+
+    const handleLogout = async () => {
+        handleProfileMenuClose();
+        handleMobileMenuClose();
+        await logout();
+    };
+
+    // User display helpers
+    const getDisplayName = () => {
+        if (user?.username) return user.username;
+        if (user?.email) return user.email;
+        return 'User';
+    };
+
+    const getUserInitials = () => {
+        const name = getDisplayName();
+        return name.slice(0, 2).toUpperCase();
+    };
+
+    const isMenuOpen = Boolean(anchorEl);
+
+    const navigationItems = [
+        { label: 'Home', path: '/#home', icon: <Home /> },
+        { label: 'About', path: '/#about', icon: <Info /> },
+        { label: 'Services', path: '/#services', icon: <Build /> },
+        { label: 'Contact', path: '/#contact', icon: <ContactMail /> },
+    ];
+
+    // Desktop Profile Menu
+    const renderProfileMenu = (
+        <Menu
+            anchorEl={anchorEl}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+            id="profile-menu"
+            keepMounted
+            transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+            open={isMenuOpen}
+            onClose={handleProfileMenuClose}
+            slotProps={{
+                paper: {
+                    sx: {
+                        mt: 1,
+                        minWidth: 200,
+                        borderRadius: 2,
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                        border: '1px solid rgba(255, 255, 255, 0.2)',
+                        backgroundColor: '#051120',
+                        color: '#ffffff'
+                    }
+                }
+            }}
+        >
+            <Box sx={{ px: 2, py: 1 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, color: '#ffffff' }}>
+                    {getDisplayName()}
+                </Typography>
+                <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    {user?.userType?.toLowerCase() || 'user'}
+                </Typography>
+            </Box>
+            <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
+
+            <MenuItem
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                sx={{
+                    py: 1.5,
+                    color: '#e74c3c',
+                    '&:hover': {
+                        backgroundColor: 'rgba(231, 76, 60, 0.08)'
+                    }
+                }}
+            >
+                <ExitToApp sx={{ mr: 2, fontSize: 20 }} />
+                {isLoggingOut ? 'Logging out...' : 'Logout'}
+            </MenuItem>
+        </Menu>
+    );
+
+    // Shared button styles for consistency
+    const navButtonStyles = {
+        color: "#ffffff",
+        fontWeight: 500,
+        textTransform: "capitalize",
+        px: 3,
+        py: 1,
+        borderRadius: 2,
+        transition: "all 0.3s ease",
+        position: "relative",
+        '&:hover': {
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            transform: "translateY(-2px)"
+        },
+        '&:before': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: '50%',
+            width: 0,
+            height: '2px',
+            backgroundColor: '#4fc3f7',
+            transition: 'all 0.3s ease',
+            transform: 'translateX(-50%)'
+        },
+        '&:hover:before': {
+            width: '80%'
+        }
+    };
 
     return (
         <>
@@ -52,6 +185,7 @@ const Nav = () => {
                     minHeight: { xs: 64, sm: 70 },
                     height: { xs: 64, sm: 70 }
                 }}>
+                    {/* Logo */}
                     <Box sx={{
                         display: 'flex',
                         alignItems: 'center',
@@ -67,59 +201,78 @@ const Nav = () => {
                                 src="/srw-logo-2.png"
                                 alt="SRW Logo"
                                 style={{
-                                    height: "85px",
-                                    width: "275px",
-                                    transition: 'transform 0.2s ease'
+                                    height: isMobile ? "60px" : "85px",
+                                    width: isMobile ? "auto" : "275px",
+                                    maxWidth: isMobile ? "250px" : "275px",
+                                    transition: 'all 0.3s ease'
                                 }}
-                                onMouseOver={event => event.target.style.transform = 'scale(1.05)'}
-                                onMouseOut={event => event.target.style.transform = 'scale(1)'}
+                                onMouseOver={event => !isMobile && (event.target.style.transform = 'scale(1.05)')}
+                                onMouseOut={event => !isMobile && (event.target.style.transform = 'scale(1)')}
                             />
                         </Link>
                     </Box>
 
-                    <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 1, mr: 3 }}>
-                        {navItems.map((item) => (
-                            <Button
-                                key={item}
-                                sx={{
-                                    color: "#ffffff",
-                                    fontWeight: 500,
-                                    textTransform: "capitalize",
-                                    px: 3,
-                                    py: 1,
-                                    borderRadius: 2,
-                                    transition: "all 0.3s ease",
-                                    position: "relative",
-                                    '&:hover': {
-                                        backgroundColor: "rgba(255, 255, 255, 0.1)",
-                                        transform: "translateY(-2px)"
-                                    },
-                                    '&:before': {
-                                        content: '""',
-                                        position: 'absolute',
-                                        bottom: 0,
-                                        left: '50%',
-                                        width: 0,
-                                        height: '2px',
-                                        backgroundColor: '#4fc3f7',
-                                        transition: 'all 0.3s ease',
-                                        transform: 'translateX(-50%)'
-                                    },
-                                    '&:hover:before': {
-                                        width: '80%'
-                                    }
-                                }}
-                            >
+                    {/* Desktop Navigation */}
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 1, mr: 3 }}>
+                        {/* Navigation Items */}
+                        {navigationItems.map((item) => (
+                            <Button key={item.label} sx={navButtonStyles}>
                                 <Link
-                                    to={item === "Login" ? "/login" : `/#${item.toLowerCase()}`}
+                                    to={item.path}
                                     style={{ color: 'inherit', textDecoration: 'none' }}
                                 >
-                                    {item}
+                                    {item.label}
                                 </Link>
                             </Button>
                         ))}
+
+                        {/* Authentication Section */}
+                        {!isAuthenticated ? (
+                            <>
+                                <Button sx={navButtonStyles}>
+                                    <Link to="/login" style={{ color: 'inherit', textDecoration: 'none' }}>
+                                        Login
+                                    </Link>
+                                </Button>
+                                <Button sx={navButtonStyles}>
+                                    <Link to="/customer-register" style={{ color: 'inherit', textDecoration: 'none' }}>
+                                        Register
+                                    </Link>
+                                </Button>
+                            </>
+                        ) : (
+                            <IconButton
+                                size="large"
+                                edge="end"
+                                aria-label="account of current user"
+                                aria-controls="profile-menu"
+                                aria-haspopup="true"
+                                onClick={handleProfileMenuOpen}
+                                sx={{
+                                    color: 'white',
+                                    mr: 3,
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                }}
+                            >
+                                <Avatar
+                                    sx={{
+                                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                        color: 'white',
+                                        width: 32,
+                                        height: 32,
+                                        fontSize: '14px',
+                                        fontWeight: 600
+                                    }}
+                                >
+                                    {getUserInitials()}
+                                </Avatar>
+                            </IconButton>
+                        )}
                     </Box>
 
+                    {/* Mobile Menu Button */}
                     <Box sx={{
                         display: { xs: 'flex', md: 'none' },
                         alignItems: 'center',
@@ -153,36 +306,37 @@ const Nav = () => {
                             role="button"
                             tabIndex={0}
                         >
-                            <Menu sx={{ fontSize: 24 }} />
+                            <MenuIcon sx={{ fontSize: 24 }} />
                         </IconButton>
                     </Box>
                 </Toolbar>
             </AppBar>
 
+            {/* Mobile Drawer */}
             <Drawer
                 anchor="right"
                 open={open}
                 onClose={toggleDrawer(false)}
-                PaperProps={{
-                    sx: {
-                        backgroundColor: "#051120",
-                        color: "#ffffff",
-                        width: 280
+                slotProps={{
+                    paper: {
+                        sx: {
+                            backgroundColor: "#051120",
+                            color: "#ffffff",
+                            width: 280
+                        }
                     }
                 }}
             >
-                <Box
-                    sx={{ width: '100%', pt: 3 }}
-                    role="presentation"
-                    onClick={toggleDrawer(false)}
-                    onKeyDown={toggleDrawer(false)}
-                >
+                <Box sx={{ width: '100%', pt: 3 }} role="presentation">
+                    {/* Navigation Items */}
                     <List sx={{ px: 2 }}>
-                        {navItems.map(text => (
+                        {navigationItems.map((item) => (
                             <ListItem
                                 button
-                                component="a"
-                                key={text}
+                                component={Link}
+                                to={item.path}
+                                key={item.label}
+                                onClick={toggleDrawer(false)}
                                 sx={{
                                     py: 2.5,
                                     px: 3,
@@ -199,26 +353,152 @@ const Nav = () => {
                                     }
                                 }}
                             >
+                                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}>
+                                    {item.icon}
+                                </ListItemIcon>
                                 <ListItemText
-                                    primary={
-                                        <Link
-                                            to={text === "Login" ? "/login" : `/#${text.toLowerCase()}`}
-                                            style={{
-                                                fontWeight: 500,
-                                                fontSize: '1.1rem',
-                                                color: '#ffffff',
-                                                textDecoration: 'none'
-                                            }}
-                                        >
-                                            {text}
-                                        </Link>
-                                    }
+                                    primary={item.label}
+                                    sx={{
+                                        '& .MuiListItemText-primary': {
+                                            fontWeight: 500,
+                                            fontSize: '1.1rem',
+                                            color: 'rgba(255, 255, 255, 0.7)'
+                                        }
+                                    }}
                                 />
                             </ListItem>
                         ))}
                     </List>
+
+                    <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', my: 1 }} />
+
+                    {/* Authentication Section */}
+                    {isAuthenticated ? (
+                        <Box>
+                            <ListItem
+                                button
+                                onClick={() => setProfileMenuOpen(!profileMenuOpen)}
+                                sx={{
+                                    py: 1.5,
+                                    mx: 2,
+                                    borderRadius: 2,
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                }}
+                            >
+                                <ListItemIcon sx={{ color: 'white', minWidth: 40 }}>
+                                    <Avatar
+                                        sx={{
+                                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                            color: 'white',
+                                            width: 24,
+                                            height: 24,
+                                            fontSize: '12px',
+                                            fontWeight: 600
+                                        }}
+                                    >
+                                        {getUserInitials()}
+                                    </Avatar>
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={getDisplayName()}
+                                    secondary={user?.userType?.toLowerCase() || 'user'}
+                                    slotProps={{
+                                        secondary: {
+                                            sx: {color: 'rgba(255, 255, 255, 0.7)'}
+                                        }
+                                    }}
+                                />
+                                {profileMenuOpen ? <ExpandLess /> : <ExpandMore />}
+                            </ListItem>
+
+                            <Collapse in={profileMenuOpen} timeout="auto" unmountOnExit>
+                                <List component="div" disablePadding>
+                                    <ListItem
+                                        button
+                                        onClick={handleLogout}
+                                        disabled={isLoggingOut}
+                                        sx={{
+                                            pl: 4,
+                                            py: 1,
+                                            mx: 2,
+                                            borderRadius: 2,
+                                            color: '#e74c3c',
+                                            '&:hover': {
+                                                backgroundColor: 'rgba(231, 76, 60, 0.1)'
+                                            }
+                                        }}
+                                    >
+                                        <ListItemIcon sx={{ color: '#e74c3c', minWidth: 40 }}>
+                                            <ExitToApp />
+                                        </ListItemIcon>
+                                        <ListItemText primary={isLoggingOut ? 'Logging out...' : 'Logout'} />
+                                    </ListItem>
+                                </List>
+                            </Collapse>
+                        </Box>
+                    ) : (
+                        <List sx={{ px: 2 }}>
+                            <ListItem
+                                button
+                                component={Link}
+                                to="/login"
+                                onClick={toggleDrawer(false)}
+                                sx={{
+                                    py: 1.5,
+                                    mb: 1,
+                                    borderRadius: 2,
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
+                                    }
+                                }}
+                            >
+                                <ListItemText
+                                    primary="Login"
+                                    sx={{
+                                        textAlign: 'center',
+                                        color: 'rgba(255, 255, 255, 0.7)',
+                                        '& .MuiListItemText-primary': {
+                                            fontWeight: 500,
+                                            fontSize: '1.1rem'
+                                        }
+                                    }}
+                                />
+                            </ListItem>
+                            <ListItem
+                                button
+                                component={Link}
+                                to="/customer-register"
+                                onClick={toggleDrawer(false)}
+                                sx={{
+                                    py: 1.5,
+                                    borderRadius: 2,
+                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                                    }
+                                }}
+                            >
+                                <ListItemText
+                                    primary="Register"
+                                    sx={{
+                                        textAlign: 'center',
+                                        color: 'rgba(255, 255, 255, 0.7)',
+                                        '& .MuiListItemText-primary': {
+                                            fontWeight: 500,
+                                            fontSize: '1.1rem'
+                                        }
+                                    }}
+                                />
+                            </ListItem>
+                        </List>
+                    )}
                 </Box>
             </Drawer>
+
+            {/* Desktop Profile Menu */}
+            {renderProfileMenu}
         </>
     );
 };

@@ -6,10 +6,18 @@ import {registerApi} from "./reducers/registerApi.js";
 const store = configureStore({
     reducer: {
         [homeApi.reducerPath]: homeApi.reducer,
-        [authApi.reducerPath]: authApi.reducer
+        [authApi.reducerPath]: authApi.reducer,
+        [registerApi.reducerPath]: registerApi.reducer
     },
     middleware: getDefaultMiddleware => {
-        return getDefaultMiddleware()
+        return getDefaultMiddleware({
+            serializableCheck: {
+                ignoredActions: [
+                    'persist/PERSIST',
+                    'persist/REHYDRATE'
+                ],
+            },
+        })
             .concat(homeApi.middleware)
             .concat(authApi.middleware)
             .concat(registerApi.middleware);
