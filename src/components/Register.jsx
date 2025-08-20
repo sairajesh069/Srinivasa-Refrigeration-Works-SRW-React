@@ -1,57 +1,72 @@
 import {Box, Button, Typography, Paper, InputAdornment, IconButton, MenuItem} from "@mui/material";
 import * as Yup from "yup";
 import {Form, Formik} from "formik";
-import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, LocationOn, Wc } from '@mui/icons-material';
+import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, LocationOn, Wc, CalendarToday } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import StyledLink from "./form-styling/StyledLink.jsx";
 import StyledTextField from "./form-styling/StyledTextField.jsx";
-import { useCustomerMutation } from "../reducers/registerApi.js";
+import { useCustomerMutation, useOwnerMutation } from "../reducers/registerApi.js";
 import StyledMenuProps from "./form-styling/StyledSelectMenu.jsx";
-
-const validationSchema = Yup.object().shape({
-    firstName: Yup.string()
-        .min(2, 'First name must be at least 2 characters')
-        .required('First name is required'),
-    lastName: Yup.string()
-        .min(2, 'Last name must be at least 2 characters')
-        .required('Last name is required'),
-    gender: Yup.string()
-        .oneOf(['male', 'female', 'other', 'prefer-not-to-say'], 'Please select a valid gender')
-        .required('Gender is required'),
-    phoneNumber: Yup.string()
-        .matches(/^\d{10}$/, 'Phone number must be 10 digits')
-        .required('Phone number is required'),
-    email: Yup.string()
-        .email('Invalid email address')
-        .required('Email is required'),
-    address: Yup.string()
-        .min(10, 'Address must be at least 10 characters')
-        .required('Address is required'),
-    username: Yup.string()
-        .min(3, 'Username must be at least 3 characters')
-        .required('Username is required'),
-    password: Yup.string()
-        .min(8, 'Password must be at least 8 characters')
-        .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number')
-        .required('Password is required'),
-    confirmPassword: Yup.string()
-        .oneOf([Yup.ref('password')], 'Passwords must match')
-        .required('Please confirm your password')
-});
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
+    const location = useLocation();
+    const navigate = useNavigate();
+
+    // Check if this is owner registration
+    const isOwnerRegistration = location.pathname === '/owner-register';
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
     };
 
-    const navigate = useNavigate();
-    const location = useLocation();
+    const [customer, { isLoading: isCustomerLoading }] = useCustomerMutation();
+    const [owner, { isLoading: isOwnerLoading }] = useOwnerMutation();
 
-    const [customer, { isLoading }] = useCustomerMutation();
+    // Dynamic validation schema based on registration type
+    const getValidationSchema = () => {
+        const baseSchema = {
+            firstName: Yup.string()
+                .min(2, 'First name must be at least 2 characters')
+                .required('First name is required'),
+            lastName: Yup.string()
+                .min(2, 'Last name must be at least 2 characters')
+                .required('Last name is required'),
+            gender: Yup.string()
+                .oneOf(['male', 'female', 'other', 'prefer-not-to-say'], 'Please select a valid gender')
+                .required('Gender is required'),
+            phoneNumber: Yup.string()
+                .matches(/^\d{10}$/, 'Phone number must be 10 digits')
+                .required('Phone number is required'),
+            email: Yup.string()
+                .email('Invalid email address')
+                .required('Email is required'),
+            address: Yup.string()
+                .min(10, 'Address must be at least 10 characters')
+                .required('Address is required'),
+            username: Yup.string()
+                .min(3, 'Username must be at least 3 characters')
+                .required('Username is required'),
+            password: Yup.string()
+                .min(8, 'Password must be at least 8 characters')
+                .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number')
+                .required('Password is required'),
+            confirmPassword: Yup.string()
+                .oneOf([Yup.ref('password')], 'Passwords must match')
+                .required('Please confirm your password')
+        };
+
+        // Add dateOfBirth validation only for owner registration
+        if (isOwnerRegistration) {
+            baseSchema.dateOfBirth = Yup.date()
+                .max(new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000), 'Must be at least 18 years old')
+                .required('Date of birth is required');
+        }
+
+        return Yup.object().shape(baseSchema);
+    };
 
     const uniqueFields = {
         "email address": "email",
@@ -80,8 +95,25 @@ const Register = () => {
                     },
                     userCredentialDTO: userCredentialDTO
                 };
-                let response = await customer(customerCredentialDTO).unwrap();
+                await customer(customerCredentialDTO).unwrap();
             }
+
+            if(location.pathname === '/owner-register') {
+                const ownerCredentialDTO = {
+                    ownerDTO: {
+                        firstName: values.firstName,
+                        lastName: values.lastName,
+                        dateOfBirth: values.dateOfBirth,
+                        gender: values.gender,
+                        phoneNumber: values.phoneNumber,
+                        email: values.email.toLowerCase(),
+                        address: values.address
+                    },
+                    userCredentialDTO: userCredentialDTO
+                };
+                await owner(ownerCredentialDTO).unwrap();
+            }
+
             toast.success("Registration successful. Please login");
             navigate('/login');
         } catch (error) {
@@ -101,6 +133,28 @@ const Register = () => {
             }
         }
     }
+
+    // Dynamic initial values based on registration type
+    const getInitialValues = () => {
+        const baseValues = {
+            firstName: '',
+            lastName: '',
+            gender: '',
+            phoneNumber: '',
+            email: '',
+            address: '',
+            username: '',
+            password: '',
+            confirmPassword: ''
+        };
+
+        // Add dateOfBirth only for owner registration
+        if (isOwnerRegistration) {
+            baseValues.dateOfBirth = '';
+        }
+
+        return baseValues;
+    };
 
     return(
         <Box sx={{
@@ -162,22 +216,12 @@ const Register = () => {
                         fontSize: '16px',
                         fontWeight: 400,
                     }}>
-                        Get started with your new account
+                        Get started with your new {isOwnerRegistration ? 'owner' : 'customer'} account
                     </Typography>
                 </Box>
                 <Formik
-                    initialValues={{
-                        firstName: '',
-                        lastName: '',
-                        gender: '',
-                        phoneNumber: '',
-                        email: '',
-                        address: '',
-                        username: '',
-                        password: '',
-                        confirmPassword: ''
-                    }}
-                    validationSchema={validationSchema}
+                    initialValues={getInitialValues()}
+                    validationSchema={getValidationSchema()}
                     onSubmit={handleRegister}
                     validateOnChange={true}
                     validateOnBlur={true}
@@ -232,6 +276,32 @@ const Register = () => {
                                     ),
                                 }}
                             />
+
+                            {/* Date of Birth field - only for owner registration */}
+                            {isOwnerRegistration && (
+                                <StyledTextField
+                                    fullWidth
+                                    label="Date of Birth"
+                                    name="dateOfBirth"
+                                    type="date"
+                                    value={values.dateOfBirth}
+                                    onChange={handleChange}
+                                    error={Boolean((touched.dateOfBirth || values.dateOfBirth) && errors.dateOfBirth)}
+                                    helperText={(touched.dateOfBirth || values.dateOfBirth) && errors.dateOfBirth}
+                                    variant="outlined"
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <CalendarToday sx={{ color: '#7f8c8d', fontSize: '20px' }} />
+                                            </InputAdornment>
+                                        ),
+                                    }}
+                                />
+                            )}
+
                             <StyledTextField
                                 fullWidth
                                 select
@@ -425,7 +495,7 @@ const Register = () => {
                                 type="submit"
                                 variant="contained"
                                 size="large"
-                                disabled={isLoading}
+                                disabled={isCustomerLoading || isOwnerLoading}
                                 sx={{
                                     marginTop: '8px',
                                     padding: '16px 24px',
@@ -446,7 +516,7 @@ const Register = () => {
                                         transform: 'translateY(0px)',
                                     },
                                 }}>
-                                {isLoading ? 'Creating Account...' : 'Create Account'}
+                                {isCustomerLoading || isOwnerLoading ? 'Creating Account...' : 'Create Account'}
                             </Button>
                             <StyledLink
                                 style={{

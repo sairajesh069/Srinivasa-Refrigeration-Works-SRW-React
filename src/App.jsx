@@ -12,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Register from "./components/Register.jsx";
 import AuthGuard from "./utils/AuthGuard.jsx";
 import PageNotFound from "./components/PageNotFound.jsx";
+import Unauthorized from "./components/Unauthorized.jsx";
 
 const App = () => {
     return (
@@ -53,6 +54,18 @@ const App = () => {
                         <Register />
                     </AuthGuard>
                 } />
+
+                <Route path="/owner-register" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <Register />
+                    </AuthGuard>
+                } />
+
+                <Route path="/unauthorized" element={ <Unauthorized /> } />
 
                 <Route path="*" element={ <PageNotFound /> } />
             </Routes>

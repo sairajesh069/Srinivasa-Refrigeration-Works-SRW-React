@@ -19,21 +19,39 @@ const AuthLoader = () => (
     </Box>
 );
 
-const AuthGuard = ({ children, requireAuth = true, fallback = '/login' }) => {
-    const [authState, setAuthState] = useState({ isLoading: true, isAuthenticated: false });
+const AuthGuard = ({
+                       children,
+                       requireAuth = true,
+                       allowedRoles = [],
+                       fallback = '/login',
+                       unauthorizedFallback = '/unauthorized'
+                   }) => {
+    const [authState, setAuthState] = useState({
+        isLoading: true,
+        isAuthenticated: false,
+        userRole: null
+    });
     const location = useLocation();
 
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                // Small delay to prevent flash
                 await new Promise(resolve => setTimeout(resolve, 50));
 
                 const isAuthenticated = AuthUtils.isAuthenticated();
-                setAuthState({ isLoading: false, isAuthenticated });
+                const userRole = isAuthenticated ? AuthUtils.getUserData().userType : null;
+
+                setAuthState({
+                    isLoading: false,
+                    isAuthenticated,
+                    userRole
+                });
             } catch (error) {
-                console.error('Auth check error:', error);
-                setAuthState({ isLoading: false, isAuthenticated: false });
+                setAuthState({
+                    isLoading: false,
+                    isAuthenticated: false,
+                    userRole: null
+                });
             }
         };
 
@@ -50,6 +68,14 @@ const AuthGuard = ({ children, requireAuth = true, fallback = '/login' }) => {
 
     if (!requireAuth && authState.isAuthenticated) {
         return <Navigate to="/" replace />;
+    }
+
+    if (requireAuth && authState.isAuthenticated && allowedRoles.length > 0) {
+        const hasRequiredRole = allowedRoles.includes(authState.userRole);
+
+        if (!hasRequiredRole) {
+            return <Navigate to={unauthorizedFallback} state={{ from: location }} replace />;
+        }
     }
 
     return children;
