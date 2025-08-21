@@ -33,9 +33,16 @@ export const registerApi = createApi({
                     method: 'POST',
                     body: ownerData
                 })
+            }),
+            employee: builder.mutation({
+                query: employeeData => ({
+                    url: '/srw/employee/register',
+                    method: 'POST',
+                    body: employeeData
+                })
             })
         }
     }
 });
 
-export const { useCustomerMutation, useOwnerMutation } = registerApi;
+export const { useCustomerMutation, useOwnerMutation, useEmployeeMutation } = registerApi;

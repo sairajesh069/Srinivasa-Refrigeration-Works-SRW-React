@@ -1,10 +1,14 @@
 import { Handyman, Star, Phone, Schedule } from "@mui/icons-material";
 import { Box, Typography, Button, Container, Grid, Card, CardContent } from "@mui/material";
 import { useHomeQuery } from "../reducers/homeApi.js";
+import AuthUtils from "../utils/AuthUtils.jsx";
 
 const Home = () => {
 
     const { home } = useHomeQuery();
+
+    const isAuthenticated = AuthUtils.isAuthenticated();
+    const username =  isAuthenticated ? AuthUtils.getUserData().username : null;
 
     const features = [
         {
@@ -73,7 +77,7 @@ const Home = () => {
                                         fontSize: { xs: '0.9rem', md: '1.1rem' }
                                     }}
                                 >
-                                    Professional Refrigeration Services
+                                    Srinivasa Refrigeration Works
                                 </Typography>
 
                                 <Typography
@@ -92,7 +96,7 @@ const Home = () => {
                                         mx: 'auto'
                                     }}
                                 >
-                                    Expert AC & Refrigerator Solutions
+                                    {isAuthenticated ? `Welcome back, ${username}.` : `Welcome! We’re glad to have you here.`}
                                 </Typography>
 
                                 <Typography
@@ -108,8 +112,7 @@ const Home = () => {
                                         px: { xs: 1, md: 0 }
                                     }}
                                 >
-                                    Professional repair, maintenance & installation services you can trust.
-                                    Quick response, quality work, fair pricing.
+                                    Expert AC & Refrigerator repair, maintenance, and installation with fast service, quality work, and fair pricing.
                                 </Typography>
 
                                 <Box sx={{

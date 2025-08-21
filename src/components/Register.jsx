@@ -1,14 +1,15 @@
 import {Box, Button, Typography, Paper, InputAdornment, IconButton, MenuItem} from "@mui/material";
 import * as Yup from "yup";
 import {Form, Formik} from "formik";
-import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, LocationOn, Wc, CalendarToday } from '@mui/icons-material';
+import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, LocationOn, Wc, CalendarToday, Badge, WorkOutline, CurrencyRupee } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import StyledLink from "./form-styling/StyledLink.jsx";
 import StyledTextField from "./form-styling/StyledTextField.jsx";
-import { useCustomerMutation, useOwnerMutation } from "../reducers/registerApi.js";
+import {useCustomerMutation, useEmployeeMutation, useOwnerMutation} from "../reducers/registerApi.js";
 import StyledMenuProps from "./form-styling/StyledSelectMenu.jsx";
+import AuthUtils from "../utils/AuthUtils.jsx";
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -17,6 +18,7 @@ const Register = () => {
 
     // Check if this is owner registration
     const isOwnerRegistration = location.pathname === '/owner-register';
+    const isEmployeeRegistration = location.pathname === '/employee-register';
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -24,6 +26,7 @@ const Register = () => {
 
     const [customer, { isLoading: isCustomerLoading }] = useCustomerMutation();
     const [owner, { isLoading: isOwnerLoading }] = useOwnerMutation();
+    const [employee, { isLoading: isEmployeeLoading }] = useEmployeeMutation();
 
     // Dynamic validation schema based on registration type
     const getValidationSchema = () => {
@@ -48,6 +51,7 @@ const Register = () => {
                 .required('Address is required'),
             username: Yup.string()
                 .min(3, 'Username must be at least 3 characters')
+                .matches(/^[a-zA-Z0-9]+$/, 'Username can only contain letters and numbers')
                 .required('Username is required'),
             password: Yup.string()
                 .min(8, 'Password must be at least 8 characters')
@@ -59,10 +63,37 @@ const Register = () => {
         };
 
         // Add dateOfBirth validation only for owner registration
-        if (isOwnerRegistration) {
+        if (isOwnerRegistration || isEmployeeRegistration) {
             baseSchema.dateOfBirth = Yup.date()
-                .max(new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000), 'Must be at least 18 years old')
+                .test('is-past', 'Date must be in the past', function (value) {
+                    if (!value) return false;
+                    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
+                    return value <= yesterday;
+                })
+                .test('min-age', 'Must be at least 18 years old', function (value) {
+                    if (!value) return false;
+                    const eighteenYearsAgo = new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000);
+                    return value <= eighteenYearsAgo;
+                })
+                .test('max-age', 'Age cannot exceed 100 years', function (value) {
+                    if (!value) return false;
+                    const oneHundredTwentyYearsAgo = new Date(Date.now() - 100 * 365 * 24 * 60 * 60 * 1000);
+                    return value >= oneHundredTwentyYearsAgo;
+                })
                 .required('Date of birth is required');
+
+            baseSchema.nationalIdNumber = Yup.string()
+                .matches(/^([A-Z]{5}[0-9]{4}[A-Z]{1}|\d{12})$/, 'National id number must be 10 or 12 digits')
+                .required('National id number is required');
+        }
+
+        if (isEmployeeRegistration) {
+            baseSchema.designation = Yup.string()
+                .min(3, 'Designation must be at least 3 characters')
+                .required('Designation is required');
+            baseSchema.salary = Yup.string()
+                .matches(/^[0-9]+$/, 'Salary must be a number')
+                .required('Salary is required');
         }
 
         return Yup.object().shape(baseSchema);
@@ -71,7 +102,8 @@ const Register = () => {
     const uniqueFields = {
         "email address": "email",
         "phone number": "phoneNumber",
-        "username": "username"
+        "username": "username",
+        "national id number": "nationalIdNumber"
     }
 
     const handleRegister = async (values, { setFieldError }) => {
@@ -107,14 +139,34 @@ const Register = () => {
                         gender: values.gender,
                         phoneNumber: values.phoneNumber,
                         email: values.email.toLowerCase(),
-                        address: values.address
+                        address: values.address,
+                        nationalIdNumber: values.nationalIdNumber,
                     },
                     userCredentialDTO: userCredentialDTO
                 };
                 await owner(ownerCredentialDTO).unwrap();
             }
 
-            toast.success("Registration successful. Please login");
+            if(location.pathname === '/employee-register') {
+                const employeeCredentialDTO = {
+                    employeeDTO: {
+                        firstName: values.firstName,
+                        lastName: values.lastName,
+                        dateOfBirth: values.dateOfBirth,
+                        gender: values.gender,
+                        phoneNumber: values.phoneNumber,
+                        email: values.email.toLowerCase(),
+                        address: values.address,
+                        nationalIdNumber: values.nationalIdNumber,
+                        designation: values.designation,
+                        salary: values.salary
+                    },
+                    userCredentialDTO: userCredentialDTO
+                };
+                await employee(employeeCredentialDTO).unwrap();
+            }
+
+            toast.success(AuthUtils.isAuthenticated() ? "Registration successful." : "Registration successful. Please login");
             navigate('/login');
         } catch (error) {
             if(error.status === 409) {
@@ -149,12 +201,22 @@ const Register = () => {
         };
 
         // Add dateOfBirth only for owner registration
-        if (isOwnerRegistration) {
+        if (isOwnerRegistration || isEmployeeRegistration) {
             baseValues.dateOfBirth = '';
+            baseValues.nationalIdNumber = '';
+        }
+
+        if (isEmployeeRegistration) {
+            baseValues.designation = '';
+            baseValues.salary = '';
         }
 
         return baseValues;
     };
+
+    const accessedBy = isOwnerRegistration ? 'owner' :
+        isEmployeeRegistration ? 'employee' :
+            'customer';
 
     return(
         <Box sx={{
@@ -216,7 +278,7 @@ const Register = () => {
                         fontSize: '16px',
                         fontWeight: 400,
                     }}>
-                        Get started with your new {isOwnerRegistration ? 'owner' : 'customer'} account
+                        Get started with your new { accessedBy } account
                     </Typography>
                 </Box>
                 <Formik
@@ -278,28 +340,49 @@ const Register = () => {
                             />
 
                             {/* Date of Birth field - only for owner registration */}
-                            {isOwnerRegistration && (
-                                <StyledTextField
-                                    fullWidth
-                                    label="Date of Birth"
-                                    name="dateOfBirth"
-                                    type="date"
-                                    value={values.dateOfBirth}
-                                    onChange={handleChange}
-                                    error={Boolean((touched.dateOfBirth || values.dateOfBirth) && errors.dateOfBirth)}
-                                    helperText={(touched.dateOfBirth || values.dateOfBirth) && errors.dateOfBirth}
-                                    variant="outlined"
-                                    InputLabelProps={{
-                                        shrink: true,
-                                    }}
-                                    InputProps={{
-                                        startAdornment: (
-                                            <InputAdornment position="start">
-                                                <CalendarToday sx={{ color: '#7f8c8d', fontSize: '20px' }} />
-                                            </InputAdornment>
-                                        ),
-                                    }}
-                                />
+                            {(isOwnerRegistration || isEmployeeRegistration) && (
+                                <>
+                                    <StyledTextField
+                                        fullWidth
+                                        label="Date of Birth"
+                                        name="dateOfBirth"
+                                        type="date"
+                                        value={values.dateOfBirth}
+                                        onChange={handleChange}
+                                        error={Boolean((touched.dateOfBirth || values.dateOfBirth) && errors.dateOfBirth)}
+                                        helperText={(touched.dateOfBirth || values.dateOfBirth) && errors.dateOfBirth}
+                                        variant="outlined"
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <CalendarToday sx={{ color: '#7f8c8d', fontSize: '20px' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+
+                                    <StyledTextField
+                                        fullWidth
+                                        label="Aadhar or PAN Number"
+                                        name="nationalIdNumber"
+                                        value={values.nationalIdNumber}
+                                        onChange={handleChange}
+                                        error={Boolean((touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber)}
+                                        helperText={(touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber}
+                                        variant="outlined"
+                                        placeholder="Enter your Aadhar or PAN number"
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <Badge sx={{ color: '#7f8c8d', fontSize: '20px' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </>
                             )}
 
                             <StyledTextField
@@ -386,6 +469,48 @@ const Register = () => {
                                     ),
                                 }}
                             />
+
+                            {isEmployeeRegistration && (
+                                <>
+                                    <StyledTextField
+                                        fullWidth
+                                        label="Designation"
+                                        name="designation"
+                                        value={values.designation}
+                                        onChange={handleChange}
+                                        error={Boolean((touched.designation || values.designation) && errors.designation)}
+                                        helperText={(touched.designation || values.designation) && errors.designation}
+                                        variant="outlined"
+                                        placeholder="Enter designation"
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <WorkOutline sx={{ color: '#7f8c8d', fontSize: '20px' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+
+                                    <StyledTextField
+                                        fullWidth
+                                        label="Salary"
+                                        name="salary"
+                                        value={values.salary}
+                                        onChange={handleChange}
+                                        error={Boolean((touched.salary || values.salary) && errors.salary)}
+                                        helperText={(touched.salary || values.salary) && errors.salary}
+                                        variant="outlined"
+                                        placeholder="Enter salary"
+                                        InputProps={{
+                                            startAdornment: (
+                                                <InputAdornment position="start">
+                                                    <CurrencyRupee sx={{ color: '#7f8c8d', fontSize: '20px' }} />
+                                                </InputAdornment>
+                                            ),
+                                        }}
+                                    />
+                                </>
+                            )}
 
                             <Typography sx={{
                                 color: '#2c3e50',
@@ -495,7 +620,7 @@ const Register = () => {
                                 type="submit"
                                 variant="contained"
                                 size="large"
-                                disabled={isCustomerLoading || isOwnerLoading}
+                                disabled={isCustomerLoading || isOwnerLoading || isEmployeeLoading}
                                 sx={{
                                     marginTop: '8px',
                                     padding: '16px 24px',
@@ -516,7 +641,7 @@ const Register = () => {
                                         transform: 'translateY(0px)',
                                     },
                                 }}>
-                                {isCustomerLoading || isOwnerLoading ? 'Creating Account...' : 'Create Account'}
+                                {isCustomerLoading || isOwnerLoading || isEmployeeLoading ? 'Creating Account...' : 'Create Account'}
                             </Button>
                             <StyledLink
                                 style={{

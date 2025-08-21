@@ -410,7 +410,7 @@ const Nav = () => {
                                         }
                                     }}
                                 />
-                                {profileMenuOpen ? <ExpandLess /> : <ExpandMore />}
+                                {profileMenuOpen ? <ExpandLess sx={{ mr: 3 }}/> : <ExpandMore sx={{ mr: 3 }}/>}
                             </ListItem>
 
                             <Collapse in={profileMenuOpen} timeout="auto" unmountOnExit>
