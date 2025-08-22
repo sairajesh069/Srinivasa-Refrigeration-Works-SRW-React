@@ -13,6 +13,7 @@ import Register from "./components/Register.jsx";
 import AuthGuard from "./utils/AuthGuard.jsx";
 import PageNotFound from "./components/PageNotFound.jsx";
 import Unauthorized from "./components/Unauthorized.jsx";
+import AccountRecovery from "./components/AccountRecovery.jsx";
 
 const App = () => {
     return (
@@ -43,9 +44,26 @@ const App = () => {
                         <Services/>
                     </>
                 } />
+
                 <Route path="/login" element={
                     <AuthGuard requireAuth={false}>
                         <Login />
+                    </AuthGuard>
+                } />
+
+                <Route path="/forgot-username" element={
+                    <AuthGuard requireAuth={false}>
+                        <AccountRecovery />
+                    </AuthGuard>
+                } />
+                <Route path="/validate-user" element={
+                    <AuthGuard requireAuth={false}>
+                        <AccountRecovery />
+                    </AuthGuard>
+                } />
+                <Route path="/forgot-password" element={
+                    <AuthGuard requireAuth={false}>
+                        <AccountRecovery />
                     </AuthGuard>
                 } />
 

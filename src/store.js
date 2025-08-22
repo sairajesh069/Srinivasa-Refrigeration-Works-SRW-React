@@ -2,12 +2,14 @@ import { configureStore } from '@reduxjs/toolkit';
 import { authApi } from './reducers/authApi.js';
 import { homeApi } from "./reducers/homeApi.js";
 import {registerApi} from "./reducers/registerApi.js";
+import {accountRecoveryApi} from "./reducers/accountRecoveryApi.js";
 
 const store = configureStore({
     reducer: {
         [homeApi.reducerPath]: homeApi.reducer,
         [authApi.reducerPath]: authApi.reducer,
-        [registerApi.reducerPath]: registerApi.reducer
+        [registerApi.reducerPath]: registerApi.reducer,
+        [accountRecoveryApi.reducerPath]: accountRecoveryApi.reducer
     },
     middleware: getDefaultMiddleware => {
         return getDefaultMiddleware({
@@ -20,7 +22,8 @@ const store = configureStore({
         })
             .concat(homeApi.middleware)
             .concat(authApi.middleware)
-            .concat(registerApi.middleware);
+            .concat(registerApi.middleware)
+            .concat(accountRecoveryApi.middleware);
     }
 });
 

@@ -16,7 +16,6 @@ const Register = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Check if this is owner registration
     const isOwnerRegistration = location.pathname === '/owner-register';
     const isEmployeeRegistration = location.pathname === '/employee-register';
 
@@ -50,8 +49,8 @@ const Register = () => {
                 .min(10, 'Address must be at least 10 characters')
                 .required('Address is required'),
             username: Yup.string()
-                .min(3, 'Username must be at least 3 characters')
-                .matches(/^[a-zA-Z0-9]+$/, 'Username can only contain letters and numbers')
+                .min(6, 'Username must be at least 6 characters long')
+                .matches(/^[a-zA-Z0-9\-@#.$%&]+$/, 'Username may only contain letters, numbers, and the following characters: - @ # . $ % &')
                 .required('Username is required'),
             password: Yup.string()
                 .min(8, 'Password must be at least 8 characters')
@@ -62,7 +61,6 @@ const Register = () => {
                 .required('Please confirm your password')
         };
 
-        // Add dateOfBirth validation only for owner registration
         if (isOwnerRegistration || isEmployeeRegistration) {
             baseSchema.dateOfBirth = Yup.date()
                 .test('is-past', 'Date must be in the past', function (value) {
@@ -130,7 +128,7 @@ const Register = () => {
                 await customer(customerCredentialDTO).unwrap();
             }
 
-            if(location.pathname === '/owner-register') {
+            else if(isOwnerRegistration) {
                 const ownerCredentialDTO = {
                     ownerDTO: {
                         firstName: values.firstName,
@@ -147,7 +145,7 @@ const Register = () => {
                 await owner(ownerCredentialDTO).unwrap();
             }
 
-            if(location.pathname === '/employee-register') {
+            else if(isEmployeeRegistration) {
                 const employeeCredentialDTO = {
                     employeeDTO: {
                         firstName: values.firstName,
@@ -339,7 +337,6 @@ const Register = () => {
                                 }}
                             />
 
-                            {/* Date of Birth field - only for owner registration */}
                             {(isOwnerRegistration || isEmployeeRegistration) && (
                                 <>
                                     <StyledTextField

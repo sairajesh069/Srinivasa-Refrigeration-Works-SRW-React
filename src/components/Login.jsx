@@ -283,7 +283,7 @@ const Login = () => {
                                         backgroundColor: 'rgba(79, 195, 247, 0.05)',
                                     },
                                 }}
-                                to='/forgot-password'
+                                to='/validate-user'
                             >
                                 Reset Password
                             </StyledLink>
