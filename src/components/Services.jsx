@@ -1,17 +1,6 @@
 import React from 'react';
-import {
-    Box,
-    Typography,
-    Container,
-    Grid,
-    Card,
-    CardContent,
-    Button
-} from "@mui/material";
-import {
-    CheckCircle,
-    Phone
-} from "@mui/icons-material";
+import { Box, Typography, Container, Grid, Card, CardContent, Button } from "@mui/material";
+import { CheckCircle, Phone } from "@mui/icons-material";
 
 const Services = () => {
     const services = [
@@ -51,7 +40,7 @@ const Services = () => {
                 position: "relative",
                 overflow: "hidden",
                 minHeight: "100vh",
-                py: 8
+                py: 5
             }}
         >
             <Box

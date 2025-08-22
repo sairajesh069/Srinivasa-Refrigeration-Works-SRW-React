@@ -1,18 +1,6 @@
 import React from "react";
-import {
-    Box,
-    Typography,
-    Container,
-    Grid,
-    Card,
-    CardContent
-} from "@mui/material";
-import {
-    CheckCircle,
-    Engineering,
-    ThumbUp,
-    Speed
-} from "@mui/icons-material";
+import { Box, Typography, Container, Grid, Card, CardContent } from "@mui/material";
+import { CheckCircle, Engineering, ThumbUp, Speed } from "@mui/icons-material";
 
 const AboutUs = () => {
     const highlights = [
@@ -61,8 +49,8 @@ const AboutUs = () => {
                 }}
             />
 
-            <Container maxWidth="lg" sx={{ py: 8, position: "relative", zIndex: 1 }}>
-                <Box sx={{ textAlign: "center", mb: 8 }}>
+            <Container maxWidth="lg" sx={{ py: 5, position: "relative", zIndex: 1 }}>
+                <Box sx={{ textAlign: "center", mb: 4 }}>
                     <Typography
                         variant="h6"
                         sx={{
@@ -104,7 +92,8 @@ const AboutUs = () => {
                     height: "100%",
                     display: "flex",
                     flexDirection: "column",
-                    justifyContent: "center"
+                    justifyContent: "center",
+                    textAlign: "center"
                 }}>
                     <Typography
                         variant="h4"
@@ -130,17 +119,22 @@ const AboutUs = () => {
                         <strong>Since 1998, Srinivasa Refrigeration Works</strong> has been the cornerstone
                         of refrigeration services in Tuni. Our journey began with a simple mission: to provide
                         reliable, professional, and affordable cooling solutions to every customer.
-                        <br /><br />
+                        <br />
                         What sets us apart is our unwavering commitment to quality workmanship and customer
                         satisfaction. Our team of skilled technicians brings decades of combined experience
                         to every repair, installation, and maintenance service.
-                        <br /><br />
+                        <br />
                         We believe in transparency, fair pricing, and building lasting relationships with our
                         community. When you choose us, you're not just getting a service provider – you're
                         partnering with cooling experts who truly care about your comfort and satisfaction.
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <Grid container spacing={4}
+                          sx={{
+                              textAlign: "center",
+                              justifyContent: "center"
+                          }}
+                    >
                         {highlights.map((highlight, index) => (
                             <Grid item xs={12} sm={6} key={index}>
                                 <Card
