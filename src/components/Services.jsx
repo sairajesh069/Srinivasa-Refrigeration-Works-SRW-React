@@ -106,7 +106,7 @@ const Services = () => {
                         }}
                     >
                         {services.map((service) => (
-                            <Grid item xs={12} md={6} lg={5} key={service.id}>
+                            <Grid xs={12} md={6} lg={5} key={service.id}>
                                 <Card
                                     elevation={0}
                                     sx={{
@@ -212,7 +212,7 @@ const Services = () => {
                                             </Typography>
                                             <Grid container spacing={2}>
                                                 {service.features.map((feature, index) => (
-                                                    <Grid item xs={12} sm={6} key={index}>
+                                                    <Grid xs={12} sm={6} key={index}>
                                                         <Box
                                                             sx={{
                                                                 display: "flex",

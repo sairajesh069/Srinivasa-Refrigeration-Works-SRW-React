@@ -1,3 +1,4 @@
+import React from "react";
 import {
     AppBar, Toolbar, Typography, Button, Box,
     Menu, MenuItem, Avatar, IconButton, Divider,
@@ -5,25 +6,26 @@ import {
     useMediaQuery, useTheme, Collapse
 } from '@mui/material';
 import {
-    ExitToApp, Menu as MenuIcon,
+    ExitToApp, Menu as MenuIcon, Dashboard,
     Home, Info, Build, ContactMail, ExpandLess, ExpandMore
 } from '@mui/icons-material';
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import { useState, useEffect } from "react";
 import useAuth from '../utils/useAuth.jsx';
 
 const Nav = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
+    const [drawerOpen, setDrawerOpen] = useState(false);
 
     const { isAuthenticated, user, isLoggingOut, logout } = useAuth();
 
+    const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
     const [showNavbar, setShowNavbar] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
-    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -36,26 +38,30 @@ const Nav = () => {
         return () => window.removeEventListener("scroll", handleScroll);
     }, [lastScrollY]);
 
-    // Menu handlers
-    const handleProfileMenuOpen = event => {
-        setAnchorEl(event.currentTarget);
+    useEffect(() => {
+        if (!isMobile) {
+            setDrawerOpen(false);
+        }
+    }, [isMobile]);
+
+    // Consolidated menu handlers
+    const handleProfileMenuOpen = event => setAnchorEl(event.currentTarget);
+    const handleProfileMenuClose = () => setAnchorEl(null);
+    const handleDrawerToggle = () => setDrawerOpen(!drawerOpen);
+    const handleDrawerClose = () => {
+        setDrawerOpen(false);
+        setProfileMenuOpen(false);
     };
 
-    const handleProfileMenuClose = () => {
-        setAnchorEl(null);
-    };
-
-    const handleMobileMenuClose = () => {
-        setOpen(false);
-    };
-
-    const toggleDrawer = newOpen => () => {
-        setOpen(newOpen);
+    const handleNavigation = path => {
+        handleProfileMenuClose();
+        handleDrawerClose();
+        navigate(path);
     };
 
     const handleLogout = async () => {
         handleProfileMenuClose();
-        handleMobileMenuClose();
+        handleDrawerClose();
         await logout();
     };
 
@@ -79,6 +85,134 @@ const Nav = () => {
         { label: 'Services', path: '/#services', icon: <Build /> },
         { label: 'Contact', path: '/#contact', icon: <ContactMail /> },
     ];
+
+    const profileItems = [
+        { label: 'Dashboard', path: '/dashboard', icon: <Dashboard />, color: '#4fc3f7' }
+    ];
+
+    // Shared styles
+    const navButtonStyles = {
+        color: "#ffffff",
+        fontWeight: 500,
+        textTransform: "capitalize",
+        px: 3,
+        py: 1,
+        borderRadius: 2,
+        transition: "all 0.3s ease",
+        position: "relative",
+        '&:hover': {
+            backgroundColor: "rgba(255, 255, 255, 0.1)",
+            transform: "translateY(-2px)"
+        },
+        '&:before': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: '50%',
+            width: 0,
+            height: '2px',
+            backgroundColor: '#4fc3f7',
+            transition: 'all 0.3s ease',
+            transform: 'translateX(-50%)'
+        },
+        '&:hover:before': {
+            width: '80%'
+        }
+    };
+
+    const listItemHoverStyles = {
+        '&:hover': {
+            backgroundColor: 'rgba(255, 255, 255, 0.1)'
+        }
+    };
+
+    const drawerPaperStyles = {
+        backgroundColor: "#051120",
+        color: "#ffffff"
+    };
+
+    // Reusable components
+    const UserAvatar = ({ size = 32 }) => (
+        <Avatar
+            sx={{
+                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                color: 'white',
+                width: size,
+                height: size,
+                fontSize: size === 24 ? '12px' : '14px',
+                fontWeight: 600
+            }}
+        >
+            {getUserInitials()}
+        </Avatar>
+    );
+
+    const AuthButtons = ({ variant = 'desktop' }) => (
+        <>
+            {variant === 'desktop' ? (
+                <>
+                    <Button sx={navButtonStyles}>
+                        <Link to="/login" style={{ color: 'inherit', textDecoration: 'none' }}>
+                            Login
+                        </Link>
+                    </Button>
+                    <Button sx={navButtonStyles}>
+                        <Link to="/customer-register" style={{ color: 'inherit', textDecoration: 'none' }}>
+                            Register
+                        </Link>
+                    </Button>
+                </>
+            ) : (
+                <List sx={{ px: 2 }}>
+                    <ListItem
+                        button
+                        component={Link}
+                        to="/login"
+                        onClick={handleDrawerClose}
+                        sx={{ py: 1.5, mb: 1, borderRadius: 2, ...listItemHoverStyles }}
+                    >
+                        <ListItemText
+                            primary="Login"
+                            sx={{
+                                textAlign: 'center',
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                '& .MuiListItemText-primary': {
+                                    fontWeight: 500,
+                                    fontSize: '1.1rem'
+                                }
+                            }}
+                        />
+                    </ListItem>
+                    <ListItem
+                        button
+                        component={Link}
+                        to="/customer-register"
+                        onClick={handleDrawerClose}
+                        sx={{
+                            py: 1.5,
+                            borderRadius: 2,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            '&:hover': {
+                                backgroundColor: 'rgba(255, 255, 255, 0.3)'
+                            }
+                        }}
+                    >
+                        <ListItemText
+                            primary="Register"
+                            sx={{
+                                textAlign: 'center',
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                '& .MuiListItemText-primary': {
+                                    fontWeight: 500,
+                                    fontSize: '1.1rem'
+                                }
+                            }}
+                        />
+                    </ListItem>
+                </List>
+            )}
+        </>
+    );
 
     // Desktop Profile Menu
     const renderProfileMenu = (
@@ -112,6 +246,29 @@ const Nav = () => {
                     {user?.userType?.toLowerCase() || 'user'}
                 </Typography>
             </Box>
+            <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', my: 1 }} />
+
+            {profileItems.map(item => (
+                <MenuItem
+                    key={item.label}
+                    onClick={() => handleNavigation(item.path)}
+                    sx={{
+                        py: 1.5,
+                        '&:hover': {
+                            backgroundColor: `rgba(${item.color === '#4fc3f7' ? '79, 195, 247' : '255, 255, 255'}, 0.08)`
+                        }
+                    }}
+                >
+                    <ListItemIcon sx={{ fontSize: 20, color: item.color }}>
+                        {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                        primary={item.label}
+                        sx={{ fontSize: 20, color: item.color }}
+                    />
+                </MenuItem>
+            ))}
+
             <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
 
             <MenuItem
@@ -130,36 +287,6 @@ const Nav = () => {
             </MenuItem>
         </Menu>
     );
-
-    // Shared button styles for consistency
-    const navButtonStyles = {
-        color: "#ffffff",
-        fontWeight: 500,
-        textTransform: "capitalize",
-        px: 3,
-        py: 1,
-        borderRadius: 2,
-        transition: "all 0.3s ease",
-        position: "relative",
-        '&:hover': {
-            backgroundColor: "rgba(255, 255, 255, 0.1)",
-            transform: "translateY(-2px)"
-        },
-        '&:before': {
-            content: '""',
-            position: 'absolute',
-            bottom: 0,
-            left: '50%',
-            width: 0,
-            height: '2px',
-            backgroundColor: '#4fc3f7',
-            transition: 'all 0.3s ease',
-            transform: 'translateX(-50%)'
-        },
-        '&:hover:before': {
-            width: '80%'
-        }
-    };
 
     return (
         <>
@@ -228,18 +355,7 @@ const Nav = () => {
 
                         {/* Authentication Section */}
                         {!isAuthenticated ? (
-                            <>
-                                <Button sx={navButtonStyles}>
-                                    <Link to="/login" style={{ color: 'inherit', textDecoration: 'none' }}>
-                                        Login
-                                    </Link>
-                                </Button>
-                                <Button sx={navButtonStyles}>
-                                    <Link to="/customer-register" style={{ color: 'inherit', textDecoration: 'none' }}>
-                                        Register
-                                    </Link>
-                                </Button>
-                            </>
+                            <AuthButtons variant="desktop" />
                         ) : (
                             <IconButton
                                 size="large"
@@ -256,18 +372,7 @@ const Nav = () => {
                                     }
                                 }}
                             >
-                                <Avatar
-                                    sx={{
-                                        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                        color: 'white',
-                                        width: 32,
-                                        height: 32,
-                                        fontSize: '14px',
-                                        fontWeight: 600
-                                    }}
-                                >
-                                    {getUserInitials()}
-                                </Avatar>
+                                <UserAvatar />
                             </IconButton>
                         )}
                     </Box>
@@ -300,9 +405,9 @@ const Nav = () => {
                                 },
                                 mr: 3
                             }}
-                            onClick={toggleDrawer(true)}
+                            onClick={handleDrawerToggle}
                             aria-label="Open navigation menu"
-                            aria-expanded={open}
+                            aria-expanded={drawerOpen}
                             role="button"
                             tabIndex={0}
                         >
@@ -315,13 +420,12 @@ const Nav = () => {
             {/* Mobile Drawer */}
             <Drawer
                 anchor="right"
-                open={open}
-                onClose={toggleDrawer(false)}
+                open={drawerOpen}
+                onClose={handleDrawerClose}
                 slotProps={{
                     paper: {
                         sx: {
-                            backgroundColor: "#051120",
-                            color: "#ffffff",
+                            ...drawerPaperStyles,
                             width: 280
                         }
                     }
@@ -336,7 +440,7 @@ const Nav = () => {
                                 component={Link}
                                 to={item.path}
                                 key={item.label}
-                                onClick={toggleDrawer(false)}
+                                onClick={handleDrawerClose}
                                 sx={{
                                     py: 2.5,
                                     px: 3,
@@ -382,24 +486,11 @@ const Nav = () => {
                                     py: 1.5,
                                     mx: 2,
                                     borderRadius: 2,
-                                    '&:hover': {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                                    }
+                                    ...listItemHoverStyles
                                 }}
                             >
                                 <ListItemIcon sx={{ color: 'white', minWidth: 40 }}>
-                                    <Avatar
-                                        sx={{
-                                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                            color: 'white',
-                                            width: 24,
-                                            height: 24,
-                                            fontSize: '12px',
-                                            fontWeight: 600
-                                        }}
-                                    >
-                                        {getUserInitials()}
-                                    </Avatar>
+                                    <UserAvatar size={24} />
                                 </ListItemIcon>
                                 <ListItemText
                                     primary={getDisplayName()}
@@ -439,65 +530,11 @@ const Nav = () => {
                             </Collapse>
                         </Box>
                     ) : (
-                        <List sx={{ px: 2 }}>
-                            <ListItem
-                                button
-                                component={Link}
-                                to="/login"
-                                onClick={toggleDrawer(false)}
-                                sx={{
-                                    py: 1.5,
-                                    mb: 1,
-                                    borderRadius: 2,
-                                    '&:hover': {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                                    }
-                                }}
-                            >
-                                <ListItemText
-                                    primary="Login"
-                                    sx={{
-                                        textAlign: 'center',
-                                        color: 'rgba(255, 255, 255, 0.7)',
-                                        '& .MuiListItemText-primary': {
-                                            fontWeight: 500,
-                                            fontSize: '1.1rem'
-                                        }
-                                    }}
-                                />
-                            </ListItem>
-                            <ListItem
-                                button
-                                component={Link}
-                                to="/customer-register"
-                                onClick={toggleDrawer(false)}
-                                sx={{
-                                    py: 1.5,
-                                    borderRadius: 2,
-                                    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                    '&:hover': {
-                                        backgroundColor: 'rgba(255, 255, 255, 0.3)'
-                                    }
-                                }}
-                            >
-                                <ListItemText
-                                    primary="Register"
-                                    sx={{
-                                        textAlign: 'center',
-                                        color: 'rgba(255, 255, 255, 0.7)',
-                                        '& .MuiListItemText-primary': {
-                                            fontWeight: 500,
-                                            fontSize: '1.1rem'
-                                        }
-                                    }}
-                                />
-                            </ListItem>
-                        </List>
+                        <AuthButtons variant="mobile" />
                     )}
                 </Box>
             </Drawer>
 
-            {/* Desktop Profile Menu */}
             {renderProfileMenu}
         </>
     );

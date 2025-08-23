@@ -54,13 +54,17 @@ const Home = () => {
                         right: 0,
                         bottom: 0,
                         background: 'radial-gradient(circle at 20% 80%, rgba(79, 195, 247, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(79, 195, 247, 0.05) 0%, transparent 50%)',
+                        '@keyframes pulse': {
+                            '0%': { opacity: 0.4 },
+                            '100%': { opacity: 0.8 }
+                        },
                         animation: 'pulse 4s ease-in-out infinite alternate'
                     }}
                 />
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
                     <Grid container spacing={4} alignItems="center" justifyContent="center">
-                        <Grid item xs={12} lg={10} xl={8}>
+                        <Grid xs={12} lg={10} xl={8}>
                             <Box sx={{
                                 textAlign: 'center',
                                 px: { xs: 2, md: 4 },
@@ -96,7 +100,7 @@ const Home = () => {
                                         mx: 'auto'
                                     }}
                                 >
-                                    {isAuthenticated ? `Welcome back, ${username}.` : `Welcome! We’re glad to have you here.`}
+                                    {isAuthenticated ? `Welcome back, ${username}.` : `Welcome! We're glad to have you here.`}
                                 </Typography>
 
                                 <Typography
@@ -206,7 +210,7 @@ const Home = () => {
                 <Container maxWidth="lg">
                     <Grid container spacing={{ xs: 3, md: 4 }} justifyContent="center">
                         {features.map((feature, index) => (
-                            <Grid item xs={12} sm={6} md={4} key={index}>
+                            <Grid xs={12} sm={6} md={4} key={index}>
                                 <Card
                                     elevation={0}
                                     sx={{
@@ -273,13 +277,6 @@ const Home = () => {
                     </Grid>
                 </Container>
             </Box>
-
-            <style jsx>{`
-                @keyframes pulse {
-                    0% { opacity: 0.4; }
-                    100% { opacity: 0.8; }
-                }
-            `}</style>
         </Box>
     );
 };

@@ -220,7 +220,7 @@ const ContactUs = () => {
                         }}
                     >
                         {contactMethods.map((method, index) => (
-                            <Grid item xs={12} sm={6} lg={4} key={index}>
+                            <Grid xs={12} sm={6} lg={4} key={index}>
                                 <Card
                                     component="a"
                                     href={method.href}
@@ -399,7 +399,7 @@ const ContactUs = () => {
                         }}
                     >
                         {businessInfo.map((info, index) => (
-                            <Grid item xs={12} md={4} key={index}>
+                            <Grid xs={12} md={4} key={index}>
                                 <Box
                                     sx={{
                                         display: "flex",

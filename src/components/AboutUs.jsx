@@ -136,7 +136,7 @@ const AboutUs = () => {
                           }}
                     >
                         {highlights.map((highlight, index) => (
-                            <Grid item xs={12} sm={6} key={index}>
+                            <Grid xs={12} sm={6} key={index}>
                                 <Card
                                     elevation={0}
                                     sx={{

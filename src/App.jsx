@@ -14,6 +14,7 @@ import AuthGuard from "./utils/AuthGuard.jsx";
 import PageNotFound from "./components/PageNotFound.jsx";
 import Unauthorized from "./components/Unauthorized.jsx";
 import AccountRecovery from "./components/AccountRecovery.jsx";
+import Dashboard from "./components/Dashboard.jsx";
 
 const App = () => {
     return (
@@ -90,6 +91,16 @@ const App = () => {
                         unauthorizedFallback="/unauthorized"
                     >
                         <Register />
+                    </AuthGuard>
+                } />
+
+                <Route path="/dashboard" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <Dashboard />
                     </AuthGuard>
                 } />
 
