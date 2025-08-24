@@ -1,11 +1,13 @@
 import React from 'react';
-import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button } from '@mui/material';
+import {Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button, CircularProgress} from '@mui/material';
 import { Dashboard as DashboardIcon, Person, Security, AccessTime, AccountBox, Edit, Report, List,
     TrackChanges, Feedback, Settings, Notifications, ArrowForward } from '@mui/icons-material';
 import useAuth from '../utils/useAuth.jsx';
+import {useNavigate} from "react-router-dom";
 
 const Dashboard = () => {
     const { user } = useAuth();
+    const navigate = useNavigate();
 
     const formatDate = (timestamp) => {
         if (!timestamp) return 'N/A';
@@ -45,6 +47,7 @@ const Dashboard = () => {
             id: 'profile',
             title: 'View Profile',
             description: 'View your account details and information',
+            path: '/profile',
             icon: <AccountBox />,
             color: '#4fc3f7',
             bgColor: '#e3f2fd'
@@ -107,10 +110,11 @@ const Dashboard = () => {
         }
     ];
 
-    const handleActionClick = (actionId) => {
-        // Handle navigation or action based on actionId
-        console.log(`Clicked on: ${actionId}`);
-        // You can add navigation logic here
+    const handleActionClick = actionId => {
+        const action = accountActions.find(a => a.id === actionId);
+        if (action?.path) {
+            navigate(action.path);
+        }
     };
 
     return (
