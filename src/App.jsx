@@ -17,6 +17,7 @@ import AccountRecovery from "./components/AccountRecovery.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import UserProfile from "./components/UserProfile.jsx";
 import UpdateUserProfile from "./components/UpdateUserProfile.jsx";
+import AccountSettings from "./components/AccountSettings.jsx";
 
 const App = () => {
     return (
@@ -123,6 +124,16 @@ const App = () => {
                         unauthorizedFallback="/unauthorized"
                     >
                         <UpdateUserProfile />
+                    </AuthGuard>
+                } />
+
+                <Route path="/account-settings" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <AccountSettings />
                     </AuthGuard>
                 } />
 

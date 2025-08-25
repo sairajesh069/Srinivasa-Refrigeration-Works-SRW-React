@@ -10,21 +10,6 @@ const Dashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
-    const getTimeUntilExpiry = (expiresIn, timestamp) => {
-        if (!expiresIn || !timestamp) return 'N/A';
-        const loginTime = new Date(timestamp).getTime();
-        const expiryTime = loginTime + expiresIn;
-        const currentTime = Date.now();
-        const timeLeft = expiryTime - currentTime;
-
-        if (timeLeft <= 0) return 'Expired';
-
-        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
-        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-
-        return `${hours}h ${minutes}m`;
-    };
-
     const accountActions = [
         {
             id: 'profile',
@@ -88,6 +73,7 @@ const Dashboard = () => {
             id: 'account-settings',
             title: 'Account Settings',
             description: 'Manage security and account preferences',
+            path: '/account-settings',
             icon: <Settings />,
             color: '#78909c',
             bgColor: '#eceff1'
@@ -213,7 +199,7 @@ const Dashboard = () => {
                                             Session Expires
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#7f8c8d' }}>
-                                            {getTimeUntilExpiry(user?.expiresIn, user?.timeStamp)}
+                                            {ProfileUtils.getTimeUntilExpiry(user?.expiresIn, user?.timeStamp)}
                                         </Typography>
                                     </Box>
                                 </Box>

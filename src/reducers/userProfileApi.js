@@ -75,9 +75,24 @@ export const userProfileApi = createApi({
                     { type: "userProfile", id: `employee-${employeeId}` },
                 ]
             })
+        }),
+        fetchUsername: builder.query({
+            query: userId => ({
+                url: '/srw/user/fetch-username',
+                method: 'GET',
+                params: {userId}
+            })
+        }),
+        changePassword: builder.mutation({
+            query: changePasswordData => ({
+                url: '/srw/user/change-password',
+                method: 'POST',
+                body: changePasswordData
+            })
         })
     })
 });
 
 export const { useCustomerProfileQuery, useOwnerProfileQuery, useEmployeeProfileQuery,
-    useUpdateCustomerProfileMutation, useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation } = userProfileApi;
+    useUpdateCustomerProfileMutation, useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation,
+    useFetchUsernameQuery, useChangePasswordMutation } = userProfileApi;

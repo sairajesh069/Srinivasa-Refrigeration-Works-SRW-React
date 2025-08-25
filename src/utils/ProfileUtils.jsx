@@ -34,13 +34,18 @@ const ProfileUtils = {
             baseSchema.username = Yup.string()
                 .transform((value) => (value ? value.trim() : value))
                 .min(6, 'Username must be at least 6 characters long')
-                .matches(/^[a-zA-Z0-9\-@#.$%&]+$/, 'Username may only contain letters, numbers, and the following characters: - @ # . $ % &')
+                .matches(
+                    /^[a-zA-Z0-9\-@#!?*$.%&]+$/,
+                    'Username may only contain letters, numbers, and the following characters: - @ # ! . * ? $ % &')
                 .required('Username is required');
 
             baseSchema.password = Yup.string()
                 .transform((value) => (value ? value.trim() : value))
                 .min(8, 'Password must be at least 8 characters')
-                .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number')
+                .matches(
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%.*?&])[A-Za-z\d@$!%*.?&]/,
+                    'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character'
+                )
                 .required('Password is required');
 
             baseSchema.confirmPassword = Yup.string()
@@ -204,6 +209,21 @@ const ProfileUtils = {
             }
         }
         toast.error(errorMessage);
+    },
+
+    getTimeUntilExpiry: (expiresIn, timestamp) => {
+        if (!expiresIn || !timestamp) return 'N/A';
+        const loginTime = new Date(timestamp).getTime();
+        const expiryTime = loginTime + expiresIn;
+        const currentTime = Date.now();
+        const timeLeft = expiryTime - currentTime;
+
+        if (timeLeft <= 0) return 'Expired';
+
+        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+
+        return `${hours}h ${minutes}m`;
     }
 };
 
