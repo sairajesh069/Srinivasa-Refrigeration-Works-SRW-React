@@ -1,32 +1,17 @@
-import React, { useState } from 'react';
-import { Box, Typography, Paper, Grid, Avatar, Chip, Divider, Button,
-    IconButton, Tooltip, Alert, CircularProgress } from '@mui/material';
-import { Person, Edit, Email, Phone, Home, Badge, CalendarToday, Work, AccountBalance, Visibility,
-    Security, CheckCircle, Cancel, Male, Female, Transgender } from '@mui/icons-material';
+import React from 'react';
+import { Box, Typography, Paper, Grid, Avatar, Chip, IconButton, Tooltip, Alert } from '@mui/material';
+import { Person, Edit, Email, Phone, Home, Badge, CalendarToday, Work, AccountBalance,
+    Dashboard, Security, Male, Female, Transgender } from '@mui/icons-material';
 import useAuth from '../utils/useAuth.jsx';
-import {useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery} from "../reducers/fetchProfileApi.js";
+import ProfileUtils from "../utils/ProfileUtils.jsx";
+import {useNavigate} from "react-router-dom";
+import { useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery } from "../reducers/userProfileApi.js";
 
 const UserProfile = () => {
     const { user } = useAuth();
-    const [viewMode, setViewMode] = useState('view');
+    const navigate = useNavigate();
     const userId = user.userId;
     const userType = user.userType;
-
-    const profileLoader = () => (
-        <Box sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '100vh',
-            gap: 2
-        }}>
-            <CircularProgress size={60} sx={{ color: '#4fc3f7' }} />
-            <Typography variant="h6" sx={{ color: '#7f8c8d' }}>
-                Fetching {user.username}'s details...
-            </Typography>
-        </Box>
-    );
 
     const hooks = {
         CUSTOMER: useCustomerProfileQuery,
@@ -35,10 +20,12 @@ const UserProfile = () => {
     };
 
     const useProfileQuery = hooks[userType];
-    const { data: profile, isLoading } = useProfileQuery(userId);
+    const { data: profile, isLoading } = useProfileQuery(userId, {
+        refetchOnMountOrArgChange: true
+    });
 
     if (isLoading) {
-        profileLoader();
+        ProfileUtils.profileLoader(`Fetching ${user.username}'s details...`);
     }
 
     const userData = {
@@ -46,7 +33,7 @@ const UserProfile = () => {
         userType: userType || 'USER',
         firstName: profile?.userDTO?.firstName || 'User',
         lastName: profile?.userDTO?.lastName || 'N/A',
-        gender: profile?.userDTO?.gender || 'Other',
+        gender: profile?.userDTO?.gender || 'other',
         phoneNumber: profile?.userDTO?.phoneNumber || 'N/A',
         email: profile?.userDTO?.email || 'N/A',
         address: profile?.userDTO?.address || 'N/A',
@@ -63,53 +50,6 @@ const UserProfile = () => {
         salary: profile?.userDTO?.salary || '000'
     };
 
-    const formatDate = dateString => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
-
-    const formatDateTime = dateString => {
-        if (!dateString) return 'N/A';
-        return new Date(dateString).toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
-    const formatSalary = amount => {
-        if (!amount) return 'N/A';
-        return new Intl.NumberFormat('en-US', {
-            style: 'currency',
-            currency: 'INR'
-        }).format(amount);
-    };
-
-    const getUserTypeColor = userType => {
-        switch (userType?.toUpperCase()) {
-            case 'CUSTOMER':
-                return { color: '#4fc3f7', bgColor: '#e3f2fd' };
-            case 'OWNER':
-                return { color: '#f44336', bgColor: '#ffebee' };
-            case 'EMPLOYEE':
-                return { color: '#ff9800', bgColor: '#fff3e0' };
-            default:
-                return { color: '#9e9e9e', bgColor: '#f5f5f5' };
-        }
-    };
-
-    const getStatusColor = status => {
-        return status?.toLowerCase() === 'active'
-            ? { color: '#4caf50', bgColor: '#e8f5e8', icon: <CheckCircle /> }
-            : { color: '#f44336', bgColor: '#ffebee', icon: <Cancel /> };
-    };
-
     const getGenderIcon = gender => {
         switch (gender?.toLowerCase()) {
             case 'male':
@@ -121,8 +61,7 @@ const UserProfile = () => {
         }
     };
 
-    const userTypeColors = getUserTypeColor(userType);
-    const statusColors = getStatusColor(userData.userStatus);
+    const statusColors = ProfileUtils.getStatusColor(userData.userStatus);
 
     const InfoCard = ({ icon, label, value, fullWidth = false }) => (
         <Grid xs={12} sm={fullWidth ? 12 : 6} md={fullWidth ? 12 : 4}>
@@ -192,20 +131,23 @@ const UserProfile = () => {
                             top: 20,
                             right: 20,
                             display: 'flex',
-                            gap: 1
+                            gap: 2
                         }}>
-                            <Tooltip title="View Mode">
+                            <Tooltip title="Dashboard">
                                 <IconButton
                                     sx={{
                                         color: 'white',
                                         backgroundColor: 'rgba(255, 255, 255, 0.2)',
                                         '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.3)' }
                                     }}
-                                    onClick={() => setViewMode('view')}
+                                    onClick={() => {
+                                        navigate('/dashboard');
+                                    }}
                                 >
-                                    <Visibility />
+                                    <Dashboard />
                                 </IconButton>
                             </Tooltip>
+
                             <Tooltip title="Edit Profile">
                                 <IconButton
                                     sx={{
@@ -213,7 +155,9 @@ const UserProfile = () => {
                                         backgroundColor: 'rgba(255, 255, 255, 0.2)',
                                         '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.3)' }
                                     }}
-                                    onClick={() => setViewMode('edit')}
+                                    onClick={() => {
+                                        navigate('/update-profile');
+                                    }}
                                 >
                                     <Edit />
                                 </IconButton>
@@ -278,19 +222,38 @@ const UserProfile = () => {
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
                     p: 4
                 }}>
-                    <Typography variant="h4" sx={{
-                        fontWeight: 700,
-                        marginBottom: '8px',
-                        color: '#2c3e50'
+                    <Box sx={{
+                        textAlign: 'center',
+                        marginBottom: '40px',
+                        position: 'relative'
                     }}>
-                        Profile Information
-                    </Typography>
-                    <Typography variant="body1" sx={{
-                        color: '#6c757d',
-                        marginBottom: '32px'
-                    }}>
-                        Personal details and account information
-                    </Typography>
+                        <Typography variant="h4" sx={{
+                            fontWeight: 800,
+                            background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
+                            backgroundClip: 'text',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                            marginBottom: '12px',
+                            letterSpacing: '-0.02em'
+                        }}>
+                            Profile Information
+                        </Typography>
+                        <Box sx={{
+                            width: '60px',
+                            height: '4px',
+                            background: 'linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%)',
+                            borderRadius: '2px',
+                            margin: '0 auto',
+                            marginBottom: '8px'
+                        }} />
+                        <Typography variant="body1" sx={{
+                            color: '#7f8c8d',
+                            maxWidth: '500px',
+                            margin: '0 auto'
+                        }}>
+                            Personal details and account information
+                        </Typography>
+                    </Box>
 
                     {/* Basic Information - Common for all users */}
                     <Box sx={{ marginBottom: '40px' }}>
@@ -375,7 +338,7 @@ const UserProfile = () => {
                                 <InfoCard
                                     icon={<CalendarToday sx={{ color: '#20c997' }} />}
                                     label="Date of Birth"
-                                    value={formatDate(userData.dateOfBirth)}
+                                    value={ProfileUtils.formatDate(userData.dateOfBirth)}
                                 />
                                 <InfoCard
                                     icon={<Badge sx={{ color: '#6610f2' }} />}
@@ -404,7 +367,7 @@ const UserProfile = () => {
                                 <InfoCard
                                     icon={<CalendarToday sx={{ color: '#28a745' }} />}
                                     label="Date of Hire"
-                                    value={formatDate(userData.dateOfHire)}
+                                    value={ProfileUtils.formatDate(userData.dateOfHire)}
                                 />
                                 <InfoCard
                                     icon={<Work sx={{ color: '#ff6b35' }} />}
@@ -414,12 +377,12 @@ const UserProfile = () => {
                                 <InfoCard
                                     icon={<AccountBalance sx={{ color: '#ffc107' }} />}
                                     label="Salary"
-                                    value={formatSalary(userData.salary)}
+                                    value={ProfileUtils.formatSalary(userData.salary)}
                                 />
                                 <InfoCard
                                     icon={<CalendarToday sx={{ color: userData.dateOfExit ? '#dc3545' : '#6c757d' }} />}
                                     label="Date of Exit"
-                                    value={userData.dateOfExit ? formatDate(userData.dateOfExit) : 'Currently Active'}
+                                    value={userData.dateOfExit ? ProfileUtils.formatDate(userData.dateOfExit) : 'Currently Active'}
                                 />
                             </Grid>
                         </Box>
@@ -442,41 +405,14 @@ const UserProfile = () => {
                             <InfoCard
                                 icon={<CalendarToday sx={{ color: '#17a2b8' }} />}
                                 label={userData.userType === 'EMPLOYEE' ? 'Date Joined' : 'Account Created'}
-                                value={userData.userType === 'EMPLOYEE' ? formatDateTime(userData.dateOfHire) : formatDateTime(userData.createdAt)}
+                                value={userData.userType === 'EMPLOYEE' ? ProfileUtils.formatDateTime(userData.dateOfHire) : ProfileUtils.formatDateTime(userData.createdAt)}
                             />
                             <InfoCard
                                 icon={<CalendarToday sx={{ color: '#6c757d' }} />}
                                 label="Last Updated"
-                                value={formatDateTime(userData.updatedAt)}
+                                value={ProfileUtils.formatDateTime(userData.updatedAt)}
                             />
                         </Grid>
-                    </Box>
-
-                    {/* Action Buttons */}
-                    <Divider sx={{ my: 4 }} />
-                    <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-end' }}>
-                        <Button
-                            variant="outlined"
-                            startIcon={<Edit />}
-                            sx={{
-                                borderRadius: '12px',
-                                textTransform: 'none',
-                                fontWeight: 600
-                            }}
-                        >
-                            Edit Profile
-                        </Button>
-                        <Button
-                            variant="contained"
-                            sx={{
-                                borderRadius: '12px',
-                                textTransform: 'none',
-                                fontWeight: 600,
-                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-                            }}
-                        >
-                            Save Changes
-                        </Button>
                     </Box>
                 </Paper>
 

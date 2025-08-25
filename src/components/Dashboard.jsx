@@ -1,18 +1,14 @@
 import React from 'react';
-import {Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button, CircularProgress} from '@mui/material';
+import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button } from '@mui/material';
 import { Dashboard as DashboardIcon, Person, Security, AccessTime, AccountBox, Edit, Report, List,
     TrackChanges, Feedback, Settings, Notifications, ArrowForward } from '@mui/icons-material';
 import useAuth from '../utils/useAuth.jsx';
 import {useNavigate} from "react-router-dom";
+import ProfileUtils from "../utils/ProfileUtils.jsx";
 
 const Dashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
-
-    const formatDate = (timestamp) => {
-        if (!timestamp) return 'N/A';
-        return new Date(timestamp).toLocaleString();
-    };
 
     const getTimeUntilExpiry = (expiresIn, timestamp) => {
         if (!expiresIn || !timestamp) return 'N/A';
@@ -29,19 +25,6 @@ const Dashboard = () => {
         return `${hours}h ${minutes}m`;
     };
 
-    const getUserTypeColor = userType => {
-        switch (userType?.toUpperCase()) {
-            case 'CUSTOMER':
-                return '#4fc3f7';
-            case 'OWNER':
-                return '#f44336';
-            case 'EMPLOYEE':
-                return '#ff9800';
-            default:
-                return '#9e9e9e';
-        }
-    };
-
     const accountActions = [
         {
             id: 'profile',
@@ -56,6 +39,7 @@ const Dashboard = () => {
             id: 'update-profile',
             title: 'Update Profile',
             description: 'Edit your personal information and preferences',
+            path: '/update-profile',
             icon: <Edit />,
             color: '#66bb6a',
             bgColor: '#e8f5e8'
@@ -195,7 +179,7 @@ const Dashboard = () => {
                         }}>
                             <CardContent sx={{ padding: '24px' }}>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <Security sx={{ fontSize: '32px', color: getUserTypeColor(user?.userType) }} />
+                                    <Security sx={{ fontSize: '32px', color: ProfileUtils.getUserTypeColor(user?.userType) }} />
                                     <Box>
                                         <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
                                             User Type
@@ -204,8 +188,8 @@ const Dashboard = () => {
                                             label={user?.userType || 'N/A'}
                                             size="small"
                                             sx={{
-                                                backgroundColor: `${getUserTypeColor(user?.userType)}15`,
-                                                color: getUserTypeColor(user?.userType),
+                                                backgroundColor: `${ProfileUtils.getUserTypeColor(user?.userType)}15`,
+                                                color: ProfileUtils.getUserTypeColor(user?.userType),
                                                 fontWeight: 600
                                             }}
                                         />
@@ -251,7 +235,7 @@ const Dashboard = () => {
                                             Last Login
                                         </Typography>
                                         <Typography variant="body2" sx={{ color: '#7f8c8d' }}>
-                                            {formatDate(user?.timeStamp)}
+                                            {ProfileUtils.formatDate(user?.timeStamp)}
                                         </Typography>
                                     </Box>
                                 </Box>

@@ -16,6 +16,7 @@ import Unauthorized from "./components/Unauthorized.jsx";
 import AccountRecovery from "./components/AccountRecovery.jsx";
 import Dashboard from "./components/Dashboard.jsx";
 import UserProfile from "./components/UserProfile.jsx";
+import UpdateUserProfile from "./components/UpdateUserProfile.jsx";
 
 const App = () => {
     return (
@@ -112,6 +113,16 @@ const App = () => {
                         unauthorizedFallback="/unauthorized"
                     >
                         <UserProfile />
+                    </AuthGuard>
+                } />
+
+                <Route path="/update-profile" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <UpdateUserProfile />
                     </AuthGuard>
                 } />
 

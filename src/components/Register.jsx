@@ -1,5 +1,4 @@
 import {Box, Button, Typography, Paper, InputAdornment, IconButton, MenuItem} from "@mui/material";
-import * as Yup from "yup";
 import {Form, Formik} from "formik";
 import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, LocationOn, Wc, CalendarToday, Badge, WorkOutline, CurrencyRupee } from '@mui/icons-material';
 import { useState } from 'react';
@@ -10,6 +9,7 @@ import StyledTextField from "./form-styling/StyledTextField.jsx";
 import {useCustomerMutation, useEmployeeMutation, useOwnerMutation} from "../reducers/registerApi.js";
 import StyledMenuProps from "./form-styling/StyledSelectMenu.jsx";
 import AuthUtils from "../utils/AuthUtils.jsx";
+import ProfileUtils from "../utils/ProfileUtils.jsx";
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -26,83 +26,6 @@ const Register = () => {
     const [customer, { isLoading: isCustomerLoading }] = useCustomerMutation();
     const [owner, { isLoading: isOwnerLoading }] = useOwnerMutation();
     const [employee, { isLoading: isEmployeeLoading }] = useEmployeeMutation();
-
-    // Dynamic validation schema based on registration type
-    const getValidationSchema = () => {
-        const baseSchema = {
-            firstName: Yup.string()
-                .min(2, 'First name must be at least 2 characters')
-                .required('First name is required'),
-            lastName: Yup.string()
-                .min(2, 'Last name must be at least 2 characters')
-                .required('Last name is required'),
-            gender: Yup.string()
-                .oneOf(['male', 'female', 'other', 'prefer-not-to-say'], 'Please select a valid gender')
-                .required('Gender is required'),
-            phoneNumber: Yup.string()
-                .matches(/^\d{10}$/, 'Phone number must be 10 digits')
-                .required('Phone number is required'),
-            email: Yup.string()
-                .email('Invalid email address')
-                .required('Email is required'),
-            address: Yup.string()
-                .min(10, 'Address must be at least 10 characters')
-                .required('Address is required'),
-            username: Yup.string()
-                .min(6, 'Username must be at least 6 characters long')
-                .matches(/^[a-zA-Z0-9\-@#.$%&]+$/, 'Username may only contain letters, numbers, and the following characters: - @ # . $ % &')
-                .required('Username is required'),
-            password: Yup.string()
-                .min(8, 'Password must be at least 8 characters')
-                .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain at least one uppercase letter, one lowercase letter, and one number')
-                .required('Password is required'),
-            confirmPassword: Yup.string()
-                .oneOf([Yup.ref('password')], 'Passwords must match')
-                .required('Please confirm your password')
-        };
-
-        if (isOwnerRegistration || isEmployeeRegistration) {
-            baseSchema.dateOfBirth = Yup.date()
-                .test('is-past', 'Date must be in the past', function (value) {
-                    if (!value) return false;
-                    const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000);
-                    return value <= yesterday;
-                })
-                .test('min-age', 'Must be at least 18 years old', function (value) {
-                    if (!value) return false;
-                    const eighteenYearsAgo = new Date(Date.now() - 18 * 365 * 24 * 60 * 60 * 1000);
-                    return value <= eighteenYearsAgo;
-                })
-                .test('max-age', 'Age cannot exceed 100 years', function (value) {
-                    if (!value) return false;
-                    const oneHundredTwentyYearsAgo = new Date(Date.now() - 100 * 365 * 24 * 60 * 60 * 1000);
-                    return value >= oneHundredTwentyYearsAgo;
-                })
-                .required('Date of birth is required');
-
-            baseSchema.nationalIdNumber = Yup.string()
-                .matches(/^([A-Z]{5}[0-9]{4}[A-Z]{1}|\d{12})$/, 'National id number must be 10 or 12 digits')
-                .required('National id number is required');
-        }
-
-        if (isEmployeeRegistration) {
-            baseSchema.designation = Yup.string()
-                .min(3, 'Designation must be at least 3 characters')
-                .required('Designation is required');
-            baseSchema.salary = Yup.string()
-                .matches(/^[0-9]+$/, 'Salary must be a number')
-                .required('Salary is required');
-        }
-
-        return Yup.object().shape(baseSchema);
-    };
-
-    const uniqueFields = {
-        "email address": "email",
-        "phone number": "phoneNumber",
-        "username": "username",
-        "national id number": "nationalIdNumber"
-    }
 
     const handleRegister = async (values, { setFieldError }) => {
         const userCredentialDTO = {
@@ -167,54 +90,17 @@ const Register = () => {
             toast.success(AuthUtils.isAuthenticated() ? "Registration successful." : "Registration successful. Please login");
             navigate('/login');
         } catch (error) {
-            if(error.status === 409) {
-                const errorMessage = error.data.message;
-                if(!errorMessage.startsWith("Duplicate value")) {
-                    const duplicateField = errorMessage.slice(10).trim();
-                    if(uniqueFields[duplicateField]) {
-                        const fieldName = uniqueFields[duplicateField];
-                        setFieldError(fieldName, `${duplicateField.charAt(0).toUpperCase() + duplicateField.slice(1)} already exists`);
-                    }
-                }
-                toast.error(errorMessage);
-            }
-            else{
-                toast.error("Registration failed. Please try again.");
-            }
+            error.status === 409
+                ? ProfileUtils.handleDuplicateFieldError(error, setFieldError)
+                : toast.error("Registration failed. Please try again.");
         }
     }
-
-    // Dynamic initial values based on registration type
-    const getInitialValues = () => {
-        const baseValues = {
-            firstName: '',
-            lastName: '',
-            gender: '',
-            phoneNumber: '',
-            email: '',
-            address: '',
-            username: '',
-            password: '',
-            confirmPassword: ''
-        };
-
-        // Add dateOfBirth only for owner registration
-        if (isOwnerRegistration || isEmployeeRegistration) {
-            baseValues.dateOfBirth = '';
-            baseValues.nationalIdNumber = '';
-        }
-
-        if (isEmployeeRegistration) {
-            baseValues.designation = '';
-            baseValues.salary = '';
-        }
-
-        return baseValues;
-    };
 
     const accessedBy = isOwnerRegistration ? 'owner' :
         isEmployeeRegistration ? 'employee' :
             'customer';
+    const initialValues = ProfileUtils.getInitialValues(accessedBy, null, false);
+    const validationSchema = ProfileUtils.getValidationSchema(accessedBy, false);
 
     return(
         <Box sx={{
@@ -280,8 +166,8 @@ const Register = () => {
                     </Typography>
                 </Box>
                 <Formik
-                    initialValues={getInitialValues()}
-                    validationSchema={getValidationSchema()}
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
                     onSubmit={handleRegister}
                     validateOnChange={true}
                     validateOnBlur={true}
@@ -405,9 +291,10 @@ const Register = () => {
                                 }}
                             >
                                 <MenuItem value="">--select--</MenuItem>
-                                <MenuItem value="male">Male</MenuItem>
-                                <MenuItem value="female">Female</MenuItem>
-                                <MenuItem value="other">Other</MenuItem>
+                                <MenuItem value="Male">Male</MenuItem>
+                                <MenuItem value="Female">Female</MenuItem>
+                                <MenuItem value="Transgender">Transgender</MenuItem>
+                                <MenuItem value="Other">Other</MenuItem>
                                 <MenuItem value="prefer-not-to-say">Prefer not to say</MenuItem>
                             </StyledTextField>
                             <StyledTextField
