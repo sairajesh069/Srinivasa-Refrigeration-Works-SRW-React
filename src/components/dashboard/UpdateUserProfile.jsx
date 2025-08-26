@@ -6,12 +6,12 @@ import { Person, Email, Phone, Badge, CalendarToday, Work, Save, Cancel,
 import { Form, Formik } from 'formik';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../utils/useAuth.jsx';
-import StyledTextField from "./form-styling/StyledTextField.jsx";
-import StyledMenuProps from "./form-styling/StyledSelectMenu.jsx";
-import ProfileUtils from "../utils/ProfileUtils.jsx";
+import useAuth from '../../utils/useAuth.jsx';
+import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
+import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
+import ProfileUtils from "../../utils/ProfileUtils.jsx";
 import { useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery, useUpdateCustomerProfileMutation,
-    useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation } from "../reducers/userProfileApi.js";
+    useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation } from "../../reducers/userProfileApi.js";
 
 const UpdateUserProfile = () => {
     const { user } = useAuth();
@@ -319,7 +319,7 @@ const UpdateUserProfile = () => {
                                     </Typography>
 
                                     <Grid container spacing={3}>
-                                        <Grid xs={12} sm={6} md={4}>
+                                        <Grid size={{xs:12, sm:6, md:4}}>
                                             <StyledTextField
                                                 fullWidth
                                                 label="First Name"
@@ -351,7 +351,7 @@ const UpdateUserProfile = () => {
                                                 }}
                                             />
                                         </Grid>
-                                        <Grid xs={12} sm={6} md={4}>
+                                        <Grid size={{xs:12, sm:6, md:4}}>
                                             <StyledTextField
                                                 fullWidth
                                                 label="Last Name"
@@ -383,7 +383,7 @@ const UpdateUserProfile = () => {
                                                 }}
                                             />
                                         </Grid>
-                                        <Grid xs={12} sm={6} md={4}>
+                                        <Grid size={{xs:12, sm:6, md:4}}>
                                             <StyledTextField
                                                 fullWidth
                                                 select
@@ -429,7 +429,7 @@ const UpdateUserProfile = () => {
 
                                         {/* Date of Birth for Owner/Employee */}
                                         {(userType === 'OWNER' || userType === 'EMPLOYEE') && (
-                                            <Grid xs={12} sm={6} md={4}>
+                                            <Grid size={{xs:12, sm:6, md:4}}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Date of Birth"
@@ -468,7 +468,7 @@ const UpdateUserProfile = () => {
 
                                         {/* National ID for Owner/Employee */}
                                         {(userType === 'OWNER' || userType === 'EMPLOYEE') && (
-                                            <Grid xs={12} sm={6} md={4}>
+                                            <Grid size={{xs:12, sm:6, md:4}}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Aadhar or PAN Number"
@@ -524,7 +524,7 @@ const UpdateUserProfile = () => {
                                     </Typography>
 
                                     <Grid container spacing={3}>
-                                        <Grid xs={12} sm={6}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <StyledTextField
                                                 fullWidth
                                                 label="Phone Number"
@@ -556,7 +556,7 @@ const UpdateUserProfile = () => {
                                                 }}
                                             />
                                         </Grid>
-                                        <Grid xs={12} sm={6}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <StyledTextField
                                                 fullWidth
                                                 label="Email"
@@ -588,7 +588,7 @@ const UpdateUserProfile = () => {
                                                 }}
                                             />
                                         </Grid>
-                                        <Grid xs={12}>
+                                        <Grid size={{xs:12}}>
                                             <StyledTextField
                                                 fullWidth
                                                 label="Address"
@@ -641,7 +641,7 @@ const UpdateUserProfile = () => {
                                         </Typography>
 
                                         <Grid container spacing={3}>
-                                            <Grid xs={12} sm={6}>
+                                            <Grid size={{xs:12, sm:6}}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Designation"
@@ -678,7 +678,7 @@ const UpdateUserProfile = () => {
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid xs={12} sm={6}>
+                                            <Grid size={{xs:12, sm:6}}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Salary"

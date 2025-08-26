@@ -1,11 +1,11 @@
 import * as Yup from "yup";
 import {Box, Button, IconButton, InputAdornment, Paper, Typography} from "@mui/material";
 import {Form, Formik} from "formik";
-import StyledTextField from "./form-styling/StyledTextField.jsx";
+import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import {LockOutlined, PersonOutline, Phone, Visibility, VisibilityOff} from "@mui/icons-material";
-import StyledLink from "./form-styling/StyledLink.jsx";
+import StyledLink from "../../utils/form-styling/StyledLink.jsx";
 import {useState} from "react";
-import {useUsernameRecoveryMutation, useUserValidationMutation, usePasswordResetMutation} from "../reducers/accountRecoveryApi.js";
+import {useUsernameRecoveryMutation, useUserValidationMutation, usePasswordResetMutation} from "../../reducers/accountRecoveryApi.js";
 import {toast} from "react-toastify";
 import {useNavigate, useLocation} from "react-router-dom";
 

@@ -5,10 +5,10 @@ import { PersonOutline, LockOutlined, Visibility, VisibilityOff } from '@mui/ico
 import { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import StyledLink from "./form-styling/StyledLink.jsx";
-import StyledTextField from "./form-styling/StyledTextField.jsx";
-import { useLoginMutation } from '../reducers/authApi.js';
-import AuthUtils from "../utils/AuthUtils.jsx";
+import StyledLink from "../../utils/form-styling/StyledLink.jsx";
+import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
+import { useLoginMutation } from '../../reducers/authApi.js';
+import AuthUtils from "../../utils/AuthUtils.jsx";
 
 const validationSchema = Yup.object().shape({
     loginId: Yup.string()

@@ -7,10 +7,10 @@ import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../utils/useAuth.jsx';
-import StyledTextField from "./form-styling/StyledTextField.jsx";
-import ProfileUtils from "../utils/ProfileUtils.jsx";
-import { useFetchUsernameQuery, useChangePasswordMutation } from "../reducers/userProfileApi.js";
+import useAuth from '../../utils/useAuth.jsx';
+import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
+import ProfileUtils from "../../utils/ProfileUtils.jsx";
+import { useFetchUsernameQuery, useChangePasswordMutation } from "../../reducers/userProfileApi.js";
 
 const AccountSettings = () => {
     const { user, isLoggingOut, logout } = useAuth();
@@ -170,7 +170,7 @@ const AccountSettings = () => {
 
                 {/* Account Overview Cards */}
                 <Grid container spacing={3} sx={{ marginBottom: '30px' }}>
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -194,7 +194,7 @@ const AccountSettings = () => {
                         </Card>
                     </Grid>
 
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -218,7 +218,7 @@ const AccountSettings = () => {
                         </Card>
                     </Grid>
 
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -240,7 +240,7 @@ const AccountSettings = () => {
                         </Card>
                     </Grid>
 
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -262,7 +262,7 @@ const AccountSettings = () => {
                         </Card>
                     </Grid>
 
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -356,7 +356,7 @@ const AccountSettings = () => {
                                     </Typography>
 
                                     <Grid container spacing={3}>
-                                        <Grid item xs={12}>
+                                        <Grid size={{xs:12}}>
                                             <StyledTextField
                                                 fullWidth
                                                 label="Current Password"
@@ -400,7 +400,7 @@ const AccountSettings = () => {
                                             />
                                         </Grid>
 
-                                        <Grid item xs={12} sm={6}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <StyledTextField
                                                 fullWidth
                                                 label="New Password"
@@ -444,7 +444,7 @@ const AccountSettings = () => {
                                             />
                                         </Grid>
 
-                                        <Grid item xs={12} sm={6}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <StyledTextField
                                                 fullWidth
                                                 label="Confirm New Password"

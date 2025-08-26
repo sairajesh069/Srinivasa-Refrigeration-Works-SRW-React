@@ -2,10 +2,10 @@ import React from 'react';
 import { Box, Typography, Paper, Grid, Avatar, Chip, IconButton, Tooltip, Alert } from '@mui/material';
 import { Person, Edit, Email, Phone, Home, Badge, CalendarToday, Work, AccountBalance,
     Dashboard, Security, Male, Female, Transgender } from '@mui/icons-material';
-import useAuth from '../utils/useAuth.jsx';
-import ProfileUtils from "../utils/ProfileUtils.jsx";
+import useAuth from '../../utils/useAuth.jsx';
+import ProfileUtils from "../../utils/ProfileUtils.jsx";
 import {useNavigate} from "react-router-dom";
-import { useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery } from "../reducers/userProfileApi.js";
+import { useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery } from "../../reducers/userProfileApi.js";
 
 const UserProfile = () => {
     const { user } = useAuth();
@@ -64,7 +64,13 @@ const UserProfile = () => {
     const statusColors = ProfileUtils.getStatusColor(userData.userStatus);
 
     const InfoCard = ({ icon, label, value, fullWidth = false }) => (
-        <Grid xs={12} sm={fullWidth ? 12 : 6} md={fullWidth ? 12 : 4}>
+        <Grid
+            size={{
+                xs:12,
+                sm: fullWidth ? 12 : 6,
+                md:fullWidth ? 12 : 4
+            }}
+        >
             <Paper sx={{
                 p: 2.5,
                 borderRadius: '12px',

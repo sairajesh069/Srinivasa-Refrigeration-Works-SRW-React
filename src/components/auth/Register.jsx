@@ -4,12 +4,12 @@ import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, L
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import StyledLink from "./form-styling/StyledLink.jsx";
-import StyledTextField from "./form-styling/StyledTextField.jsx";
-import {useCustomerMutation, useEmployeeMutation, useOwnerMutation} from "../reducers/registerApi.js";
-import StyledMenuProps from "./form-styling/StyledSelectMenu.jsx";
-import AuthUtils from "../utils/AuthUtils.jsx";
-import ProfileUtils from "../utils/ProfileUtils.jsx";
+import StyledLink from "../../utils/form-styling/StyledLink.jsx";
+import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
+import {useCustomerMutation, useEmployeeMutation, useOwnerMutation} from "../../reducers/registerApi.js";
+import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
+import AuthUtils from "../../utils/AuthUtils.jsx";
+import ProfileUtils from "../../utils/ProfileUtils.jsx";
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);

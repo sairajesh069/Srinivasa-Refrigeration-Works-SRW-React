@@ -1,23 +1,23 @@
 import React from "react";
 import Nav from "./components/Nav.jsx";
-import Home from "./components/Home.jsx";
-import AboutUs from "./components/AboutUs.jsx";
-import Services from "./components/Services.jsx";
+import Home from "./components/home/Home.jsx";
+import AboutUs from "./components/home/AboutUs.jsx";
+import Services from "./components/home/Services.jsx";
 import ContactUs from "./components/ContactUs.jsx";
-import Login from "./components/Login.jsx";
+import Login from "./components/auth/Login.jsx";
 import { Route, Routes } from "react-router";
 import ScrollHandler from "./utils/ScrollHandler.jsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Register from "./components/Register.jsx";
+import Register from "./components/auth/Register.jsx";
 import AuthGuard from "./utils/AuthGuard.jsx";
-import PageNotFound from "./components/PageNotFound.jsx";
-import Unauthorized from "./components/Unauthorized.jsx";
-import AccountRecovery from "./components/AccountRecovery.jsx";
-import Dashboard from "./components/Dashboard.jsx";
-import UserProfile from "./components/UserProfile.jsx";
-import UpdateUserProfile from "./components/UpdateUserProfile.jsx";
-import AccountSettings from "./components/AccountSettings.jsx";
+import PageNotFound from "./components/exceptions/PageNotFound.jsx";
+import Unauthorized from "./components/exceptions/Unauthorized.jsx";
+import AccountRecovery from "./components/auth/AccountRecovery.jsx";
+import Dashboard from "./components/dashboard/Dashboard.jsx";
+import UserProfile from "./components/dashboard/UserProfile.jsx";
+import UpdateUserProfile from "./components/dashboard/UpdateUserProfile.jsx";
+import AccountSettings from "./components/dashboard/AccountSettings.jsx";
 
 const App = () => {
     return (

@@ -1,7 +1,7 @@
 import { Handyman, Star, Phone, Schedule } from "@mui/icons-material";
 import { Box, Typography, Button, Container, Grid, Card, CardContent } from "@mui/material";
-import { useHomeQuery } from "../reducers/homeApi.js";
-import AuthUtils from "../utils/AuthUtils.jsx";
+import { useHomeQuery } from "../../reducers/homeApi.js";
+import AuthUtils from "../../utils/AuthUtils.jsx";
 
 const Home = () => {
 
@@ -64,7 +64,7 @@ const Home = () => {
 
                 <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
                     <Grid container spacing={4} alignItems="center" justifyContent="center">
-                        <Grid xs={12} lg={10} xl={8}>
+                        <Grid size={{xs:12, lg:10, xl:8 }}>
                             <Box sx={{
                                 textAlign: 'center',
                                 px: { xs: 2, md: 4 },
@@ -210,7 +210,7 @@ const Home = () => {
                 <Container maxWidth="lg">
                     <Grid container spacing={{ xs: 3, md: 4 }} justifyContent="center">
                         {features.map((feature, index) => (
-                            <Grid xs={12} sm={6} md={4} key={index}>
+                            <Grid size={{xs:12, sm:6, md:4 }} key={index}>
                                 <Card
                                     elevation={0}
                                     sx={{

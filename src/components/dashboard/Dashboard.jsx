@@ -2,9 +2,9 @@ import React from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button } from '@mui/material';
 import { Dashboard as DashboardIcon, Person, Security, AccessTime, AccountBox, Edit, Report, List,
     TrackChanges, Feedback, Settings, Notifications, ArrowForward } from '@mui/icons-material';
-import useAuth from '../utils/useAuth.jsx';
+import useAuth from '../../utils/useAuth.jsx';
 import {useNavigate} from "react-router-dom";
-import ProfileUtils from "../utils/ProfileUtils.jsx";
+import ProfileUtils from "../../utils/ProfileUtils.jsx";
 
 const Dashboard = () => {
     const { user } = useAuth();
@@ -133,7 +133,7 @@ const Dashboard = () => {
 
                 {/* User Info Cards */}
                 <Grid container spacing={3} sx={{ marginBottom: '40px' }}>
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -157,7 +157,7 @@ const Dashboard = () => {
                         </Card>
                     </Grid>
 
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -185,7 +185,7 @@ const Dashboard = () => {
                         </Card>
                     </Grid>
 
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -207,7 +207,7 @@ const Dashboard = () => {
                         </Card>
                     </Grid>
 
-                    <Grid item xs={12} md={6} lg={3}>
+                    <Grid size={{xs:12, md:6, lg:3}}>
                         <Card sx={{
                             borderRadius: '16px',
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
@@ -274,7 +274,7 @@ const Dashboard = () => {
                     {/* Action Cards Grid */}
                     <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
                         {accountActions.map((action) => (
-                            <Grid item xs={12} sm={6} md={4} lg={3} key={action.id}>
+                            <Grid size={{xs:12, sm:6, md:4, lg:3}} key={action.id}>
                                 <Card sx={{
                                     borderRadius: '16px',
                                     boxShadow: '0 6px 25px rgba(0, 0, 0, 0.08)',
