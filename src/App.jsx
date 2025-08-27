@@ -18,26 +18,12 @@ import Dashboard from "./components/dashboard/Dashboard.jsx";
 import UserProfile from "./components/dashboard/UserProfile.jsx";
 import UpdateUserProfile from "./components/dashboard/UpdateUserProfile.jsx";
 import AccountSettings from "./components/dashboard/AccountSettings.jsx";
+import CustomToast from "./utils/CustomToast.jsx";
 
 const App = () => {
     return (
         <React.Fragment>
-            <ToastContainer
-                position="top-right"
-                autoClose={3000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-                toastStyle={{
-                    borderRadius: '12px',
-                    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
-                }}
-            />
+            <CustomToast />
             <ScrollHandler />
             <Nav/>
             <Routes>

@@ -40,7 +40,7 @@ const Services = () => {
                 position: "relative",
                 overflow: "hidden",
                 minHeight: "100vh",
-                py: 5
+                py: { xs: 5, md: 8 }
             }}
         >
             <Box
@@ -56,8 +56,8 @@ const Services = () => {
                 }}
             />
 
-            <Container maxWidth="lg" sx={{ position: "relative", zIndex: 1 }}>
-                <Box sx={{ textAlign: "center", mb: 8 }}>
+            <Container maxWidth="xl" sx={{ position: "relative", zIndex: 1, width: '100%' }}>
+                <Box sx={{ textAlign: "center", mb: { xs: 8, md: 12 }, maxWidth: '1400px', mx: 'auto' }}>
                     <Typography
                         variant="h6"
                         sx={{
@@ -65,7 +65,8 @@ const Services = () => {
                             fontWeight: 600,
                             mb: 2,
                             textTransform: 'uppercase',
-                            letterSpacing: 2
+                            letterSpacing: 2,
+                            fontSize: { xs: '1rem', md: '1.2rem' }
                         }}
                     >
                         Our Services
@@ -76,7 +77,7 @@ const Services = () => {
                             fontWeight: 800,
                             color: "#051120",
                             mb: 3,
-                            fontSize: { xs: '2rem', md: '3rem' }
+                            fontSize: { xs: '2rem', md: '3.5rem' }
                         }}
                     >
                         Professional Cooling Solutions
@@ -85,9 +86,10 @@ const Services = () => {
                         variant="h6"
                         sx={{
                             color: "#64748b",
-                            maxWidth: "600px",
+                            maxWidth: { xs: "100%", md: "800px" },
                             mx: "auto",
-                            lineHeight: 1.6
+                            lineHeight: 1.6,
+                            fontSize: { xs: '1.1rem', md: '1.4rem' }
                         }}
                     >
                         Comprehensive repair and maintenance services for all your
@@ -95,18 +97,19 @@ const Services = () => {
                     </Typography>
                 </Box>
 
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 8 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: { xs: 8, md: 12 } }}>
                     <Grid
                         container
-                        spacing={4}
+                        spacing={{ xs: 4, md: 6 }}
                         sx={{
-                            maxWidth: '1200px',
+                            maxWidth: '1400px',
                             justifyContent: 'center',
-                            alignItems: 'stretch'
+                            alignItems: 'stretch',
+                            width: '100%'
                         }}
                     >
                         {services.map((service) => (
-                            <Grid size={{xs:12, md:6, lg:5}} key={service.id}>
+                            <Grid size={{xs:12, md:6}} key={service.id}>
                                 <Card
                                     elevation={0}
                                     sx={{
@@ -118,7 +121,7 @@ const Services = () => {
                                         height: "100%",
                                         display: "flex",
                                         flexDirection: "column",
-                                        maxWidth: '500px',
+                                        maxWidth: '650px',
                                         mx: 'auto',
                                         '&:hover': {
                                             transform: "translateY(-8px)",
@@ -131,7 +134,7 @@ const Services = () => {
                                         sx={{
                                             position: "relative",
                                             width: "100%",
-                                            height: 450,
+                                            height: { xs: 400, md: 500 },
                                             backgroundImage: `url(${service.image})`,
                                             backgroundSize: "cover",
                                             backgroundPosition: "center",
@@ -157,7 +160,7 @@ const Services = () => {
                                                 zIndex: 2,
                                                 textAlign: "center",
                                                 color: "white",
-                                                px: 4
+                                                px: { xs: 4, md: 6 }
                                             }}
                                         >
                                             <Typography
@@ -166,7 +169,7 @@ const Services = () => {
                                                     fontWeight: 800,
                                                     mb: 1,
                                                     textShadow: "2px 2px 4px rgba(0,0,0,0.5)",
-                                                    fontSize: { xs: '1.8rem', md: '2.2rem' }
+                                                    fontSize: { xs: '1.8rem', md: '2.5rem' }
                                                 }}
                                             >
                                                 {service.title}
@@ -177,7 +180,8 @@ const Services = () => {
                                                     fontWeight: 600,
                                                     color: "#4fc3f7",
                                                     textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
-                                                    mb: 2
+                                                    mb: 2,
+                                                    fontSize: { xs: '1.1rem', md: '1.3rem' }
                                                 }}
                                             >
                                                 {service.subtitle}
@@ -185,11 +189,11 @@ const Services = () => {
                                             <Typography
                                                 variant="body1"
                                                 sx={{
-                                                    maxWidth: "400px",
+                                                    maxWidth: "500px",
                                                     mx: "auto",
                                                     lineHeight: 1.6,
                                                     textShadow: "1px 1px 2px rgba(0,0,0,0.5)",
-                                                    fontSize: { xs: '0.9rem', md: '1rem' }
+                                                    fontSize: { xs: '0.9rem', md: '1.1rem' }
                                                 }}
                                             >
                                                 {service.description}
@@ -197,29 +201,29 @@ const Services = () => {
                                         </Box>
                                     </Box>
 
-                                    <CardContent sx={{ p: 4, flex: 1, display: "flex", flexDirection: "column" }}>
-                                        <Box sx={{ mb: 3, flex: 1 }}>
+                                    <CardContent sx={{ p: { xs: 4, md: 6 }, flex: 1, display: "flex", flexDirection: "column" }}>
+                                        <Box sx={{ mb: 4, flex: 1 }}>
                                             <Typography
                                                 variant="h6"
                                                 sx={{
                                                     fontWeight: 700,
                                                     color: "#051120",
                                                     mb: 3,
-                                                    textAlign: "center"
+                                                    textAlign: "center",
+                                                    fontSize: { xs: '1.2rem', md: '1.4rem' }
                                                 }}
                                             >
                                                 What We Offer:
                                             </Typography>
-                                            <Grid container spacing={2}>
+                                            <Grid container spacing={{ xs: 2, md: 3 }}>
                                                 {service.features.map((feature, index) => (
                                                     <Grid size={{xs:12, sm:6}} key={index}>
                                                         <Box
                                                             sx={{
                                                                 display: "flex",
                                                                 alignItems: "center",
-                                                                justifyContent: "space-evenly",
                                                                 gap: 1.5,
-                                                                p: 1.5,
+                                                                p: { xs: 1.5, md: 2 },
                                                                 backgroundColor: "rgba(79, 195, 247, 0.05)",
                                                                 borderRadius: 2,
                                                                 border: "1px solid rgba(79, 195, 247, 0.1)",
@@ -232,7 +236,7 @@ const Services = () => {
                                                         >
                                                             <CheckCircle
                                                                 sx={{
-                                                                    fontSize: 20,
+                                                                    fontSize: { xs: 20, md: 24 },
                                                                     color: "#4fc3f7",
                                                                     flexShrink: 0
                                                                 }}
@@ -241,7 +245,10 @@ const Services = () => {
                                                                 variant="body2"
                                                                 sx={{
                                                                     color: "#64748b",
-                                                                    fontWeight: 450
+                                                                    fontWeight: 450,
+                                                                    lineHeight: 1.25,
+                                                                    flex: 1,
+                                                                    fontSize: { xs: '0.9rem', md: '1rem' }
                                                                 }}
                                                             >
                                                                 {feature}
@@ -262,11 +269,11 @@ const Services = () => {
                                                     backgroundColor: "#4fc3f7",
                                                     color: "#051120",
                                                     fontWeight: 700,
-                                                    px: 4,
-                                                    py: 2,
+                                                    px: { xs: 4, md: 6 },
+                                                    py: { xs: 2, md: 2.5 },
                                                     borderRadius: 3,
                                                     textTransform: "none",
-                                                    fontSize: "1.1rem",
+                                                    fontSize: { xs: "1.1rem", md: "1.2rem" },
                                                     boxShadow: "0 8px 32px rgba(79, 195, 247, 0.3)",
                                                     transition: "all 0.3s ease",
                                                     '&:hover': {
@@ -287,13 +294,14 @@ const Services = () => {
                     </Grid>
                 </Box>
 
-                <Box sx={{ textAlign: "center", mt: 8 }}>
+                <Box sx={{ textAlign: "center", mt: { xs: 8, md: 12 }, maxWidth: '1000px', mx: 'auto' }}>
                     <Typography
                         variant="h5"
                         sx={{
                             fontWeight: 600,
                             color: "#051120",
-                            mb: 3
+                            mb: 3,
+                            fontSize: { xs: '1.5rem', md: '2rem' }
                         }}
                     >
                         Need Emergency Repair Service?
@@ -303,8 +311,9 @@ const Services = () => {
                         sx={{
                             color: "#64748b",
                             mb: 4,
-                            maxWidth: "500px",
-                            mx: "auto"
+                            maxWidth: "600px",
+                            mx: "auto",
+                            fontSize: { xs: '1.1rem', md: '1.2rem' }
                         }}
                     >
                         Don't let a broken appliance disrupt your day. Contact us now for
@@ -319,9 +328,9 @@ const Services = () => {
                             backgroundColor: "#4fc3f7",
                             color: "#051120",
                             fontWeight: 700,
-                            fontSize: "1.1rem",
-                            px: 4,
-                            py: 2,
+                            fontSize: { xs: "1.1rem", md: "1.3rem" },
+                            px: { xs: 4, md: 6 },
+                            py: { xs: 2, md: 2.5 },
                             borderRadius: 3,
                             textTransform: "none",
                             boxShadow: "0 8px 32px rgba(79, 195, 247, 0.3)",

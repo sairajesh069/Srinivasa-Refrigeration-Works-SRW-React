@@ -62,13 +62,20 @@ const Home = () => {
                     }}
                 />
 
-                <Container maxWidth="lg" sx={{ position: 'relative', zIndex: 2 }}>
+                <Container maxWidth="xl" sx={{ position: 'relative', zIndex: 2, width: '100%', px: { xs: '0 !important', sm: '16px !important' } }}>
                     <Grid container spacing={4} alignItems="center" justifyContent="center">
-                        <Grid size={{xs:12, lg:10, xl:8 }}>
+                        <Grid size={{xs:12, lg:12}} sx={{ width: '100%' }}>
                             <Box sx={{
                                 textAlign: 'center',
-                                px: { xs: 2, md: 4 },
-                                py: { xs: 4, md: 6 }
+                                px: { xs: 0.5, sm: 1, md: 6, lg: 8 },
+                                py: { xs: 4, md: 6 },
+                                maxWidth: '1400px',
+                                mx: 'auto',
+                                width: '100%',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center'
                             }}>
                                 <Typography
                                     variant="h6"
@@ -78,7 +85,21 @@ const Home = () => {
                                         mb: 3,
                                         textTransform: 'uppercase',
                                         letterSpacing: 2,
-                                        fontSize: { xs: '0.9rem', md: '1.1rem' }
+                                        fontSize: { xs: '0.9rem', md: '1.1rem' },
+                                        textAlign: 'center',
+                                        width: '100%',
+                                        '@keyframes fadeInUp': {
+                                            '0%': {
+                                                opacity: 0,
+                                                transform: 'translateY(30px)'
+                                            },
+                                            '100%': {
+                                                opacity: 1,
+                                                transform: 'translateY(0)'
+                                            }
+                                        },
+                                        animation: 'fadeInUp 1s ease-out 0.3s both',
+                                        textShadow: "0 0 20px rgba(79, 195, 247, 0.5)"
                                     }}
                                 >
                                     Srinivasa Refrigeration Works
@@ -87,20 +108,31 @@ const Home = () => {
                                 <Typography
                                     variant="h1"
                                     sx={{
-                                        fontWeight: 800,
+                                        fontWeight: 650,
                                         mb: 4,
-                                        fontSize: { xs: '2.2rem', sm: '3rem', md: '3.8rem', lg: '4.5rem' },
-                                        lineHeight: { xs: 1.1, md: 1.2 },
+                                        fontSize: { xs: '1.3rem', sm: '1.8rem', md: '4.5rem' },
+                                        lineHeight: { xs: 1.3, sm: 1.2, md: 1.2 },
                                         textShadow: "3px 3px 6px rgba(0, 0, 0, 0.3)",
                                         background: 'linear-gradient(45deg, #ffffff 30%, #4fc3f7 90%)',
                                         WebkitBackgroundClip: 'text',
                                         WebkitTextFillColor: 'transparent',
                                         backgroundClip: 'text',
-                                        maxWidth: { xs: '100%', md: '900px' },
-                                        mx: 'auto'
+                                        maxWidth: '100%',
+                                        mx: 'auto',
+                                        textAlign: 'center',
+                                        width: '100%',
+                                        wordWrap: 'break-word',
+                                        overflowWrap: 'break-word',
+                                        wordBreak: 'break-word',
+                                        hyphens: 'auto',
+                                        px: 0,
+                                        animation: 'fadeInUp 1s ease-out 0.6s both'
                                     }}
                                 >
-                                    {isAuthenticated ? `Welcome back, ${username}.` : `Welcome! We're glad to have you here.`}
+                                    {isAuthenticated
+                                        ? <>Welcome back, {username}.</>
+                                        : <>Welcome! We're glad <br /> to have you here.</>
+                                    }
                                 </Typography>
 
                                 <Typography
@@ -109,14 +141,32 @@ const Home = () => {
                                         mb: 5,
                                         opacity: 0.9,
                                         fontWeight: 400,
-                                        fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.5rem' },
-                                        maxWidth: { xs: '100%', md: '700px' },
+                                        fontSize: { xs: '1.1rem', sm: '1.3rem', md: '1.8rem' },
+                                        maxWidth: { xs: '100%', sm: '100%', md: '900px' },
                                         mx: 'auto',
-                                        lineHeight: 1.4,
-                                        px: { xs: 1, md: 0 }
+                                        lineHeight: 1.6,
+                                        px: { xs: 0, sm: 0, md: 2 },
+                                        textAlign: 'center',
+                                        width: '100%',
+                                        color: 'rgba(255, 255, 255, 0.95)',
+                                        textShadow: "2px 2px 4px rgba(0, 0, 0, 0.3)",
+                                        animation: 'fadeInUp 1s ease-out 0.9s both',
+                                        position: 'relative',
+                                        boxSizing: 'border-box',
+                                        '&::before': {
+                                            content: '""',
+                                            position: 'absolute',
+                                            bottom: '-10px',
+                                            left: '50%',
+                                            transform: 'translateX(-50%)',
+                                            width: '60px',
+                                            height: '3px',
+                                            background: 'linear-gradient(90deg, transparent, #4fc3f7, transparent)',
+                                            borderRadius: '2px'
+                                        }
                                     }}
                                 >
-                                    Expert AC & Refrigerator repair, maintenance, and installation with fast service, quality work, and fair pricing.
+                                    Expert AC & Refrigerator repair, maintenance, and installation <br/> with fast service, quality work, and fair pricing.
                                 </Typography>
 
                                 <Box sx={{
@@ -125,8 +175,9 @@ const Home = () => {
                                     flexDirection: { xs: 'column', sm: 'row' },
                                     justifyContent: 'center',
                                     alignItems: 'center',
-                                    maxWidth: '600px',
-                                    mx: 'auto'
+                                    maxWidth: '700px',
+                                    mx: 'auto',
+                                    animation: 'fadeInUp 1s ease-out 1.2s both'
                                 }}>
                                     <Button
                                         variant="contained"
@@ -137,9 +188,9 @@ const Home = () => {
                                             backgroundColor: "#4fc3f7",
                                             color: "#051120",
                                             fontWeight: 700,
-                                            fontSize: { xs: '1rem', md: '1.1rem' },
-                                            px: { xs: 3, md: 4 },
-                                            py: { xs: 1.5, md: 2 },
+                                            fontSize: { xs: '1rem', md: '1.2rem' },
+                                            px: { xs: 3, md: 5 },
+                                            py: { xs: 1.5, md: 2.5 },
                                             borderRadius: 3,
                                             textTransform: "none",
                                             boxShadow: "0 8px 32px rgba(79, 195, 247, 0.3)",
@@ -167,9 +218,9 @@ const Home = () => {
                                             color: "#ffffff",
                                             borderColor: "rgba(255, 255, 255, 0.5)",
                                             fontWeight: 600,
-                                            fontSize: { xs: '1rem', md: '1.1rem' },
-                                            px: { xs: 3, md: 4 },
-                                            py: { xs: 1.5, md: 2 },
+                                            fontSize: { xs: '1rem', md: '1.2rem' },
+                                            px: { xs: 3, md: 5 },
+                                            py: { xs: 1.5, md: 2.5 },
                                             borderRadius: 3,
                                             textTransform: "none",
                                             borderWidth: 2,
@@ -194,7 +245,7 @@ const Home = () => {
             <Box
                 sx={{
                     backgroundColor: "#051120",
-                    py: { xs: 6, md: 8 },
+                    py: { xs: 6, md: 10 },
                     position: 'relative',
                     '&:before': {
                         content: '""',
@@ -207,10 +258,10 @@ const Home = () => {
                     }
                 }}
             >
-                <Container maxWidth="lg">
-                    <Grid container spacing={{ xs: 3, md: 4 }} justifyContent="center">
+                <Container maxWidth="xl" sx={{ width: '100%' }}>
+                    <Grid container spacing={{ xs: 3, md: 4 }} justifyContent="center" sx={{ maxWidth: '1400px', mx: 'auto' }}>
                         {features.map((feature, index) => (
-                            <Grid size={{xs:12, sm:6, md:4 }} key={index}>
+                            <Grid size={{xs:6, md:4 }} key={index}>
                                 <Card
                                     elevation={0}
                                     sx={{
@@ -232,7 +283,7 @@ const Home = () => {
                                 >
                                     <CardContent sx={{
                                         textAlign: 'center',
-                                        py: { xs: 4, md: 5 },
+                                        py: { xs: 4, md: 6 },
                                         px: { xs: 3, md: 4 },
                                         width: '100%',
                                         display: 'flex',
@@ -254,7 +305,7 @@ const Home = () => {
                                                 color: '#ffffff',
                                                 fontWeight: 700,
                                                 mb: 1.5,
-                                                fontSize: { xs: '1.8rem', md: '2.125rem' }
+                                                fontSize: { xs: '1.8rem', md: '2.5rem' }
                                             }}
                                         >
                                             {feature.title}
@@ -264,7 +315,7 @@ const Home = () => {
                                             sx={{
                                                 color: 'rgba(255, 255, 255, 0.8)',
                                                 fontWeight: 500,
-                                                fontSize: { xs: '0.95rem', md: '1rem' },
+                                                fontSize: { xs: '0.95rem', md: '1.1rem' },
                                                 lineHeight: 1.4
                                             }}
                                         >

@@ -91,23 +91,25 @@ const Dashboard = () => {
         <Box sx={{
             minHeight: '100vh',
             backgroundColor: '#f8f9fa',
-            padding: '100px 20px 20px',
+            padding: { xs: '80px 12px 12px', sm: '90px 16px 16px', md: '100px 20px 20px' },
         }}>
             <Box sx={{ maxWidth: '1200px', margin: '0 auto' }}>
                 {/* Header */}
                 <Box sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    marginBottom: '40px',
-                    gap: 2
+                    marginBottom: { xs: '24px', md: '40px' },
+                    gap: { xs: 1.5, md: 2 },
+                    flexDirection: { xs: 'column', sm: 'row' },
+                    textAlign: { xs: 'center', sm: 'left' }
                 }}>
                     <Avatar sx={{
                         backgroundColor: '#4fc3f7',
-                        width: 64,
-                        height: 64,
+                        width: { xs: 48, md: 64 },
+                        height: { xs: 48, md: 64 },
                         boxShadow: '0 8px 24px rgba(79, 195, 247, 0.3)'
                     }}>
-                        <DashboardIcon sx={{ fontSize: '32px' }} />
+                        <DashboardIcon sx={{ fontSize: { xs: '24px', md: '32px' } }} />
                     </Avatar>
                     <Box>
                         <Typography variant="h3" sx={{
@@ -117,14 +119,16 @@ const Dashboard = () => {
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             marginBottom: '8px',
-                            letterSpacing: '-0.02em'
+                            letterSpacing: '-0.02em',
+                            fontSize: { xs: '1.75rem', sm: '2.5rem', md: '3rem' }
                         }}>
                             Dashboard
                         </Typography>
                         <Typography variant="h6" sx={{
                             color: '#7f8c8d',
                             fontWeight: 400,
-                            opacity: 0.8
+                            opacity: 0.8,
+                            fontSize: { xs: '1rem', md: '1.25rem' }
                         }}>
                             Welcome back, {user?.username || 'User'}!
                         </Typography>
@@ -132,23 +136,31 @@ const Dashboard = () => {
                 </Box>
 
                 {/* User Info Cards */}
-                <Grid container spacing={3} sx={{ marginBottom: '40px' }}>
-                    <Grid size={{xs:12, md:6, lg:3}}>
+                <Grid container spacing={{ xs: 2, md: 3 }} sx={{ marginBottom: { xs: '24px', md: '40px' } }}>
+                    <Grid size={{xs:12, sm:6, md:6, lg:3}}>
                         <Card sx={{
-                            borderRadius: '16px',
+                            borderRadius: { xs: '12px', md: '16px' },
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
                             border: '1px solid rgba(255, 255, 255, 0.2)',
                             background: 'linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%)',
-                            color: 'white'
+                            color: 'white',
+                            height: '100%'
                         }}>
-                            <CardContent sx={{ padding: '24px' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <Person sx={{ fontSize: '32px', opacity: 0.9 }} />
-                                    <Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                            <CardContent sx={{ padding: { xs: '16px', md: '24px' } }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
+                                    <Person sx={{ fontSize: { xs: '24px', md: '32px' }, opacity: 0.9 }} />
+                                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                                        <Typography variant="h6" sx={{
+                                            fontWeight: 600,
+                                            fontSize: { xs: '1rem', md: '1.25rem' }
+                                        }}>
                                             User ID
                                         </Typography>
-                                        <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                                        <Typography variant="body2" sx={{
+                                            opacity: 0.9,
+                                            fontSize: { xs: '0.8rem', md: '0.875rem' },
+                                            wordBreak: 'break-all'
+                                        }}>
                                             {user?.userId || 'N/A'}
                                         </Typography>
                                     </Box>
@@ -157,17 +169,22 @@ const Dashboard = () => {
                         </Card>
                     </Grid>
 
-                    <Grid size={{xs:12, md:6, lg:3}}>
+                    <Grid size={{xs:12, sm:6, md:6, lg:3}}>
                         <Card sx={{
-                            borderRadius: '16px',
+                            borderRadius: { xs: '12px', md: '16px' },
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            height: '100%'
                         }}>
-                            <CardContent sx={{ padding: '24px' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <Security sx={{ fontSize: '32px', color: ProfileUtils.getUserTypeColor(user?.userType) }} />
-                                    <Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                            <CardContent sx={{ padding: { xs: '16px', md: '24px' } }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
+                                    <Security sx={{ fontSize: { xs: '24px', md: '32px' }, color: ProfileUtils.getUserTypeColor(user?.userType) }} />
+                                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                                        <Typography variant="h6" sx={{
+                                            fontWeight: 600,
+                                            color: '#2c3e50',
+                                            fontSize: { xs: '1rem', md: '1.25rem' }
+                                        }}>
                                             User Type
                                         </Typography>
                                         <Chip
@@ -176,7 +193,9 @@ const Dashboard = () => {
                                             sx={{
                                                 backgroundColor: `${ProfileUtils.getUserTypeColor(user?.userType)}15`,
                                                 color: ProfileUtils.getUserTypeColor(user?.userType),
-                                                fontWeight: 600
+                                                fontWeight: 600,
+                                                fontSize: { xs: '0.7rem', md: '0.75rem' },
+                                                height: { xs: '20px', md: '24px' }
                                             }}
                                         />
                                     </Box>
@@ -185,20 +204,29 @@ const Dashboard = () => {
                         </Card>
                     </Grid>
 
-                    <Grid size={{xs:12, md:6, lg:3}}>
+                    <Grid size={{xs:12, sm:6, md:6, lg:3}}>
                         <Card sx={{
-                            borderRadius: '16px',
+                            borderRadius: { xs: '12px', md: '16px' },
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            height: '100%'
                         }}>
-                            <CardContent sx={{ padding: '24px' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <AccessTime sx={{ fontSize: '32px', color: '#27ae60' }} />
-                                    <Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                            <CardContent sx={{ padding: { xs: '16px', md: '24px' } }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
+                                    <AccessTime sx={{ fontSize: { xs: '24px', md: '32px' }, color: '#27ae60' }} />
+                                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                                        <Typography variant="h6" sx={{
+                                            fontWeight: 600,
+                                            color: '#2c3e50',
+                                            fontSize: { xs: '1rem', md: '1.25rem' }
+                                        }}>
                                             Session Expires
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: '#7f8c8d' }}>
+                                        <Typography variant="body2" sx={{
+                                            color: '#7f8c8d',
+                                            fontSize: { xs: '0.8rem', md: '0.875rem' },
+                                            wordBreak: 'break-word'
+                                        }}>
                                             {ProfileUtils.getTimeUntilExpiry(user?.expiresIn, user?.timeStamp)}
                                         </Typography>
                                     </Box>
@@ -207,20 +235,29 @@ const Dashboard = () => {
                         </Card>
                     </Grid>
 
-                    <Grid size={{xs:12, md:6, lg:3}}>
+                    <Grid size={{xs:12, sm:6, md:6, lg:3}}>
                         <Card sx={{
-                            borderRadius: '16px',
+                            borderRadius: { xs: '12px', md: '16px' },
                             boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                            border: '1px solid rgba(255, 255, 255, 0.2)'
+                            border: '1px solid rgba(255, 255, 255, 0.2)',
+                            height: '100%'
                         }}>
-                            <CardContent sx={{ padding: '24px' }}>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <AccessTime sx={{ fontSize: '32px', color: '#f39c12' }} />
-                                    <Box>
-                                        <Typography variant="h6" sx={{ fontWeight: 600, color: '#2c3e50' }}>
+                            <CardContent sx={{ padding: { xs: '16px', md: '24px' } }}>
+                                <Box sx={{ display: 'flex', alignItems: 'center', gap: { xs: 1.5, md: 2 } }}>
+                                    <AccessTime sx={{ fontSize: { xs: '24px', md: '32px' }, color: '#f39c12' }} />
+                                    <Box sx={{ minWidth: 0, flex: 1 }}>
+                                        <Typography variant="h6" sx={{
+                                            fontWeight: 600,
+                                            color: '#2c3e50',
+                                            fontSize: { xs: '1rem', md: '1.25rem' }
+                                        }}>
                                             Last Login
                                         </Typography>
-                                        <Typography variant="body2" sx={{ color: '#7f8c8d' }}>
+                                        <Typography variant="body2" sx={{
+                                            color: '#7f8c8d',
+                                            fontSize: { xs: '0.8rem', md: '0.875rem' },
+                                            wordBreak: 'break-word'
+                                        }}>
                                             {ProfileUtils.formatDate(user?.timeStamp)}
                                         </Typography>
                                     </Box>
@@ -232,15 +269,15 @@ const Dashboard = () => {
 
                 {/* Account Overview Section */}
                 <Paper sx={{
-                    borderRadius: '20px',
+                    borderRadius: { xs: '16px', md: '20px' },
                     boxShadow: '0 12px 40px rgba(0, 0, 0, 0.08)',
                     border: '1px solid rgba(255, 255, 255, 0.2)',
-                    padding: '40px',
+                    padding: { xs: '24px 16px', sm: '32px 24px', md: '40px' },
                     background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%)'
                 }}>
                     <Box sx={{
                         textAlign: 'center',
-                        marginBottom: '40px',
+                        marginBottom: { xs: '24px', md: '40px' },
                         position: 'relative'
                     }}>
                         <Typography variant="h4" sx={{
@@ -250,7 +287,8 @@ const Dashboard = () => {
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             marginBottom: '12px',
-                            letterSpacing: '-0.02em'
+                            letterSpacing: '-0.02em',
+                            fontSize: { xs: '1.75rem', sm: '2.125rem', md: '2.5rem' }
                         }}>
                             Account Overview
                         </Typography>
@@ -265,25 +303,28 @@ const Dashboard = () => {
                         <Typography variant="body1" sx={{
                             color: '#7f8c8d',
                             maxWidth: '500px',
-                            margin: '0 auto'
+                            margin: '0 auto',
+                            fontSize: { xs: '0.9rem', md: '1rem' },
+                            px: { xs: 2, sm: 0 }
                         }}>
                             Access all your account features and manage your complaints efficiently
                         </Typography>
                     </Box>
 
                     {/* Action Cards Grid */}
-                    <Grid container spacing={3} sx={{ justifyContent: 'center' }}>
+                    <Grid container spacing={{ xs: 2, md: 3 }} sx={{ justifyContent: 'center' }}>
                         {accountActions.map((action) => (
                             <Grid size={{xs:12, sm:6, md:4, lg:3}} key={action.id}>
                                 <Card sx={{
-                                    borderRadius: '16px',
+                                    borderRadius: { xs: '12px', md: '16px' },
                                     boxShadow: '0 6px 25px rgba(0, 0, 0, 0.08)',
                                     border: '1px solid rgba(255, 255, 255, 0.2)',
                                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
                                     cursor: 'pointer',
                                     background: 'linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)',
+                                    height: '100%',
                                     '&:hover': {
-                                        transform: 'translateY(-8px)',
+                                        transform: { xs: 'translateY(-4px)', md: 'translateY(-8px)' },
                                         boxShadow: '0 12px 35px rgba(0, 0, 0, 0.15)',
                                         borderColor: action.color,
                                         '& .action-icon': {
@@ -296,26 +337,26 @@ const Dashboard = () => {
                                     }
                                 }} onClick={() => handleActionClick(action.id)}>
                                     <CardContent sx={{
-                                        padding: '24px',
+                                        padding: { xs: '16px', md: '24px' },
                                         display: 'flex',
                                         flexDirection: 'column',
                                         alignItems: 'center',
                                         textAlign: 'center'
                                     }}>
                                         <Box sx={{
-                                            width: 56,
-                                            height: 56,
-                                            borderRadius: '16px',
+                                            width: { xs: 48, md: 56 },
+                                            height: { xs: 48, md: 56 },
+                                            borderRadius: { xs: '12px', md: '16px' },
                                             backgroundColor: action.bgColor,
                                             display: 'flex',
                                             alignItems: 'center',
                                             justifyContent: 'center',
-                                            marginBottom: '20px',
+                                            marginBottom: { xs: '16px', md: '20px' },
                                             transition: 'all 0.3s ease'
                                         }} className="action-icon">
                                             {React.cloneElement(action.icon, {
                                                 sx: {
-                                                    fontSize: '28px',
+                                                    fontSize: { xs: '24px', md: '28px' },
                                                     color: action.color,
                                                     transition: 'color 0.3s ease'
                                                 }
@@ -325,8 +366,12 @@ const Dashboard = () => {
                                         <Typography variant="h6" sx={{
                                             fontWeight: 700,
                                             color: '#2c3e50',
-                                            marginBottom: '12px',
-                                            lineHeight: 1.2
+                                            marginBottom: { xs: '8px', md: '12px' },
+                                            lineHeight: 1.2,
+                                            fontSize: { xs: '1rem', md: '1.25rem' },
+                                            flex: 1,
+                                            display: 'flex',
+                                            alignItems: 'center'
                                         }}>
                                             {action.title}
                                         </Typography>
@@ -334,22 +379,27 @@ const Dashboard = () => {
                                         <Typography variant="body2" sx={{
                                             color: '#7f8c8d',
                                             lineHeight: 1.5,
-                                            marginBottom: '20px'
+                                            marginBottom: { xs: '16px', md: '20px' },
+                                            fontSize: { xs: '0.85rem', md: '0.875rem' },
+                                            flex: 2,
+                                            display: 'flex',
+                                            alignItems: 'center'
                                         }}>
                                             {action.description}
                                         </Typography>
 
                                         <Button
                                             variant="text"
-                                            endIcon={<ArrowForward sx={{ fontSize: '18px' }} />}
+                                            endIcon={<ArrowForward sx={{ fontSize: { xs: '16px', md: '18px' } }} />}
                                             sx={{
                                                 color: action.color,
                                                 fontWeight: 600,
-                                                padding: '10px 16px',
-                                                borderRadius: '12px',
+                                                padding: { xs: '8px 12px', md: '10px 16px' },
+                                                borderRadius: { xs: '8px', md: '12px' },
                                                 textTransform: 'none',
-                                                fontSize: '14px',
+                                                fontSize: { xs: '0.8rem', md: '14px' },
                                                 transition: 'all 0.2s ease',
+                                                minWidth: { xs: '80px', md: 'auto' },
                                                 '&:hover': {
                                                     backgroundColor: `${action.color}10`,
                                                     '& .MuiButton-endIcon': {
@@ -371,10 +421,10 @@ const Dashboard = () => {
 
                     {/* Security Notice */}
                     <Box sx={{
-                        marginTop: '40px',
-                        padding: '24px',
+                        marginTop: { xs: '24px', md: '40px' },
+                        padding: { xs: '16px', md: '24px' },
                         background: 'linear-gradient(135deg, #e8f5e8 0%, #f1f8e9 100%)',
-                        borderRadius: '16px',
+                        borderRadius: { xs: '12px', md: '16px' },
                         border: '1px solid #c8e6c9',
                         position: 'relative',
                         overflow: 'hidden',
@@ -394,17 +444,19 @@ const Dashboard = () => {
                             marginBottom: '8px',
                             display: 'flex',
                             alignItems: 'center',
-                            gap: 1
+                            gap: 1,
+                            fontSize: { xs: '1rem', md: '1.25rem' }
                         }}>
-                            <Security sx={{ fontSize: '20px' }} />
+                            <Security sx={{ fontSize: { xs: '18px', md: '20px' } }} />
                             Security Notice
                         </Typography>
                         <Typography variant="body2" sx={{
                             color: '#388e3c',
-                            lineHeight: 1.6
+                            lineHeight: 1.6,
+                            fontSize: { xs: '0.85rem', md: '0.875rem' }
                         }}>
                             Your account is secured with login protection.
-                            If you’re on a shared computer, remember to log out. For any security issues,
+                            If you're on a shared computer, remember to log out. For any security issues,
                             please contact our support team right away.
                         </Typography>
                     </Box>

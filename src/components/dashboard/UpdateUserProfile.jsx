@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Typography, Paper, Grid, Avatar, Button, Alert, CircularProgress,
-    Divider, InputAdornment, MenuItem, Chip } from '@mui/material';
+    Divider, InputAdornment, MenuItem, Chip, useTheme, useMediaQuery } from '@mui/material';
 import { Person, Email, Phone, Badge, CalendarToday, Work, Save, Cancel,
     LocationOn, CurrencyRupee, WorkOutline, Dashboard, Male, Female, Transgender } from '@mui/icons-material';
 import { Form, Formik } from 'formik';
@@ -16,6 +16,9 @@ import { useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery,
 const UpdateUserProfile = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
     const [isSubmitting, setIsSubmitting] = useState(false);
     const userId = user.userId;
     const userType = user.userType;
@@ -87,7 +90,6 @@ const UpdateUserProfile = () => {
                 }
                 await updateCustomerProfile(customerCredentialDTO).unwrap();
             }
-
             else if(userType === 'OWNER') {
                 const ownerCredentialDTO = {
                     ownerDTO: {
@@ -106,7 +108,6 @@ const UpdateUserProfile = () => {
                 }
                 await updateOwnerProfile(ownerCredentialDTO).unwrap();
             }
-
             else if(userType === 'EMPLOYEE') {
                 const employeeCredentialDTO = {
                     employeeDTO: {
@@ -164,22 +165,50 @@ const UpdateUserProfile = () => {
         <Box sx={{
             minHeight: '100vh',
             backgroundColor: '#f8f9fa',
-            padding: '100px 20px 20px',
+            padding: {
+                xs: '80px 10px 20px',
+                sm: '90px 16px 20px',
+                md: '100px 20px 20px'
+            },
         }}>
-            <Box sx={{ maxWidth: '1200px', margin: '0 auto' }}>
+            <Box sx={{
+                maxWidth: '1200px',
+                margin: '0 auto',
+                width: '100%'
+            }}>
                 {/* Header Section */}
                 <Paper sx={{
-                    borderRadius: '20px',
+                    borderRadius: {
+                        xs: '16px',
+                        md: '20px'
+                    },
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                    marginBottom: '30px',
+                    marginBottom: {
+                        xs: '20px',
+                        md: '30px'
+                    },
                     overflow: 'hidden',
                     background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
                 }}>
-                    <Box sx={{ p: 4, color: 'white', position: 'relative' }}>
+                    <Box sx={{
+                        p: {
+                            xs: 2,
+                            sm: 3,
+                            md: 4
+                        },
+                        color: 'white',
+                        position: 'relative'
+                    }}>
                         <Box sx={{
                             position: 'absolute',
-                            top: 20,
-                            right: 20,
+                            top: {
+                                xs: 12,
+                                md: 20
+                            },
+                            right: {
+                                xs: 12,
+                                md: 20
+                            },
                             display: 'flex',
                             gap: 1
                         }}>
@@ -195,6 +224,14 @@ const UpdateUserProfile = () => {
                                     fontWeight: 600,
                                     borderRadius: '12px',
                                     textTransform: 'none',
+                                    padding: {
+                                        xs: '8px 16px',
+                                        md: '12px 24px'
+                                    },
+                                    fontSize: {
+                                        xs: '0.8rem',
+                                        md: '1rem'
+                                    },
                                     '&:hover': {
                                         backgroundColor: 'rgba(255, 255, 255, 0.2)',
                                         borderColor: 'rgba(255, 255, 255, 0.5)'
@@ -205,50 +242,113 @@ const UpdateUserProfile = () => {
                             </Button>
                         </Box>
 
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 3 }}>
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: {
+                                xs: 2,
+                                md: 3
+                            },
+                            flexDirection: {
+                                xs: 'column',
+                                sm: 'row'
+                            },
+                            textAlign: {
+                                xs: 'center',
+                                sm: 'left'
+                            }
+                        }}>
                             <Avatar sx={{
-                                width: 100,
-                                height: 100,
+                                width: {
+                                    xs: 70,
+                                    sm: 85,
+                                    md: 100
+                                },
+                                height: {
+                                    xs: 70,
+                                    sm: 85,
+                                    md: 100
+                                },
                                 backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                fontSize: '2.5rem',
+                                fontSize: {
+                                    xs: '1.8rem',
+                                    md: '2.5rem'
+                                },
                                 fontWeight: 700,
                                 border: '4px solid rgba(255, 255, 255, 0.3)'
                             }}>
                                 {userData.firstName?.[0]}{userData.lastName?.[0]}
                             </Avatar>
                             <Box sx={{ flex: 1 }}>
-                                <Typography variant="h3" sx={{
+                                <Typography variant={isMobile ? "h4" : "h3"} sx={{
                                     fontWeight: 800,
                                     marginBottom: '8px',
-                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)'
+                                    textShadow: '0 2px 4px rgba(0, 0, 0, 0.3)',
+                                    fontSize: {
+                                        xs: '1.8rem',
+                                        sm: '2.2rem',
+                                        md: '3rem'
+                                    }
                                 }}>
                                     Update Profile
                                 </Typography>
-                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, marginBottom: '16px' }}>
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: {
+                                        xs: 1,
+                                        md: 2
+                                    },
+                                    marginBottom: '16px',
+                                    flexWrap: 'wrap',
+                                    justifyContent: {
+                                        xs: 'center',
+                                        sm: 'flex-start'
+                                    }
+                                }}>
                                     <Chip
                                         label={userData.userType}
-                                        sx={{
-                                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                            color: 'white',
-                                            fontWeight: 600,
-                                            backdropFilter: 'blur(10px)'
-                                        }}
-                                    />
-                                    <Chip
-                                        icon={statusColors.icon}
-                                        label={userData.userStatus.toUpperCase()}
+                                        size={isMobile ? "small" : "medium"}
                                         sx={{
                                             backgroundColor: 'rgba(255, 255, 255, 0.2)',
                                             color: 'white',
                                             fontWeight: 600,
                                             backdropFilter: 'blur(10px)',
-                                            '& .MuiChip-icon': { color: 'white' }
+                                            fontSize: {
+                                                xs: '0.75rem',
+                                                md: '0.875rem'
+                                            }
+                                        }}
+                                    />
+                                    <Chip
+                                        icon={statusColors.icon}
+                                        label={userData.userStatus.toUpperCase()}
+                                        size={isMobile ? "small" : "medium"}
+                                        sx={{
+                                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                                            color: 'white',
+                                            fontWeight: 600,
+                                            backdropFilter: 'blur(10px)',
+                                            '& .MuiChip-icon': {
+                                                color: 'white',
+                                                fontSize: {
+                                                    xs: '16px',
+                                                    md: '20px'
+                                                }
+                                            },
+                                            fontSize: {
+                                                xs: '0.75rem',
+                                                md: '0.875rem'
+                                            }
                                         }}
                                     />
                                 </Box>
                                 <Typography variant="body1" sx={{
                                     opacity: 0.9,
-                                    fontSize: '1.1rem'
+                                    fontSize: {
+                                        xs: '0.95rem',
+                                        md: '1.1rem'
+                                    }
                                 }}>
                                     Edit your personal information and preferences
                                 </Typography>
@@ -259,23 +359,38 @@ const UpdateUserProfile = () => {
 
                 {/* Update Form */}
                 <Paper sx={{
-                    borderRadius: '20px',
+                    borderRadius: {
+                        xs: '16px',
+                        md: '20px'
+                    },
                     boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
-                    p: 4
+                    p: {
+                        xs: 2,
+                        sm: 3,
+                        md: 4
+                    }
                 }}>
                     <Box sx={{
                         textAlign: 'center',
-                        marginBottom: '40px',
+                        marginBottom: {
+                            xs: '24px',
+                            md: '40px'
+                        },
                         position: 'relative'
                     }}>
-                        <Typography variant="h4" sx={{
+                        <Typography variant={isMobile ? "h5" : "h4"} sx={{
                             fontWeight: 800,
                             background: 'linear-gradient(135deg, #2c3e50 0%, #34495e 100%)',
                             backgroundClip: 'text',
                             WebkitBackgroundClip: 'text',
                             WebkitTextFillColor: 'transparent',
                             marginBottom: '12px',
-                            letterSpacing: '-0.02em'
+                            letterSpacing: '-0.02em',
+                            fontSize: {
+                                xs: '1.5rem',
+                                sm: '1.8rem',
+                                md: '2.125rem'
+                            }
                         }}>
                             Profile Information
                         </Typography>
@@ -290,7 +405,15 @@ const UpdateUserProfile = () => {
                         <Typography variant="body1" sx={{
                             color: '#7f8c8d',
                             maxWidth: '500px',
-                            margin: '0 auto'
+                            margin: '0 auto',
+                            fontSize: {
+                                xs: '0.9rem',
+                                md: '1rem'
+                            },
+                            padding: {
+                                xs: '0 16px',
+                                md: '0'
+                            }
                         }}>
                             Update your personal details and account information
                         </Typography>
@@ -305,20 +428,39 @@ const UpdateUserProfile = () => {
                         {({ values, handleChange, errors, touched}) => (
                             <Form>
                                 {/* Basic Information Section */}
-                                <Box sx={{ marginBottom: '40px' }}>
+                                <Box sx={{
+                                    marginBottom: {
+                                        xs: '24px',
+                                        md: '40px'
+                                    }
+                                }}>
                                     <Typography variant="h6" sx={{
                                         fontWeight: 600,
-                                        marginBottom: '20px',
+                                        marginBottom: {
+                                            xs: '16px',
+                                            md: '20px'
+                                        },
                                         color: '#495057',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: 1
+                                        gap: 1,
+                                        fontSize: {
+                                            xs: '1.1rem',
+                                            md: '1.25rem'
+                                        },
+                                        justifyContent: {
+                                            xs: 'center',
+                                            sm: 'flex-start'
+                                        }
                                     }}>
                                         <Person sx={{ color: '#4fc3f7' }} />
                                         Basic Information
                                     </Typography>
 
-                                    <Grid container spacing={3}>
+                                    <Grid container spacing={{
+                                        xs: 2,
+                                        md: 3
+                                    }}>
                                         <Grid size={{xs:12, sm:6, md:4}}>
                                             <StyledTextField
                                                 fullWidth
@@ -332,20 +474,39 @@ const UpdateUserProfile = () => {
                                                 placeholder="Enter your first name"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '12px',
+                                                        borderRadius: {
+                                                            xs: '8px',
+                                                            md: '12px'
+                                                        },
                                                         transition: 'all 0.2s ease',
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        },
                                                         '&:hover': {
                                                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                         },
                                                         '&.Mui-focused': {
                                                             boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
                                                         }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        }
                                                     }
                                                 }}
                                                 InputProps={{
                                                     startAdornment: (
                                                         <InputAdornment position="start">
-                                                            <Person sx={{ color: '#7f8c8d', fontSize: '20px' }} />
+                                                            <Person sx={{
+                                                                color: '#7f8c8d',
+                                                                fontSize: {
+                                                                    xs: '18px',
+                                                                    md: '20px'
+                                                                }
+                                                            }} />
                                                         </InputAdornment>
                                                     ),
                                                 }}
@@ -364,20 +525,39 @@ const UpdateUserProfile = () => {
                                                 placeholder="Enter your last name"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '12px',
+                                                        borderRadius: {
+                                                            xs: '8px',
+                                                            md: '12px'
+                                                        },
                                                         transition: 'all 0.2s ease',
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        },
                                                         '&:hover': {
                                                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                         },
                                                         '&.Mui-focused': {
                                                             boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
                                                         }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        }
                                                     }
                                                 }}
                                                 InputProps={{
                                                     startAdornment: (
                                                         <InputAdornment position="start">
-                                                            <Person sx={{ color: '#7f8c8d', fontSize: '20px' }} />
+                                                            <Person sx={{
+                                                                color: '#7f8c8d',
+                                                                fontSize: {
+                                                                    xs: '18px',
+                                                                    md: '20px'
+                                                                }
+                                                            }} />
                                                         </InputAdornment>
                                                     ),
                                                 }}
@@ -396,13 +576,26 @@ const UpdateUserProfile = () => {
                                                 variant="outlined"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '12px',
+                                                        borderRadius: {
+                                                            xs: '8px',
+                                                            md: '12px'
+                                                        },
                                                         transition: 'all 0.2s ease',
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        },
                                                         '&:hover': {
                                                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                         },
                                                         '&.Mui-focused': {
                                                             boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                        }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
                                                         }
                                                     }
                                                 }}
@@ -442,13 +635,26 @@ const UpdateUserProfile = () => {
                                                     variant="outlined"
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
-                                                            borderRadius: '12px',
+                                                            borderRadius: {
+                                                                xs: '8px',
+                                                                md: '12px'
+                                                            },
                                                             transition: 'all 0.2s ease',
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            },
                                                             '&:hover': {
                                                                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                             },
                                                             '&.Mui-focused': {
                                                                 boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                            }
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
                                                             }
                                                         }
                                                     }}
@@ -458,7 +664,13 @@ const UpdateUserProfile = () => {
                                                     InputProps={{
                                                         startAdornment: (
                                                             <InputAdornment position="start">
-                                                                <CalendarToday sx={{ color: '#20c997', fontSize: '20px' }} />
+                                                                <CalendarToday sx={{
+                                                                    color: '#20c997',
+                                                                    fontSize: {
+                                                                        xs: '18px',
+                                                                        md: '20px'
+                                                                    }
+                                                                }} />
                                                             </InputAdornment>
                                                         ),
                                                     }}
@@ -482,8 +694,15 @@ const UpdateUserProfile = () => {
                                                     disabled={userType !== 'OWNER'}
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
-                                                            borderRadius: '12px',
+                                                            borderRadius: {
+                                                                xs: '8px',
+                                                                md: '12px'
+                                                            },
                                                             transition: 'all 0.2s ease',
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            },
                                                             '&:hover': {
                                                                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                             },
@@ -494,12 +713,24 @@ const UpdateUserProfile = () => {
                                                                 backgroundColor: '#f8f9fa',
                                                                 opacity: 0.7
                                                             }
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            }
                                                         }
                                                     }}
                                                     InputProps={{
                                                         startAdornment: (
                                                             <InputAdornment position="start">
-                                                                <Badge sx={{ color: '#6610f2', fontSize: '20px' }} />
+                                                                <Badge sx={{
+                                                                    color: '#6610f2',
+                                                                    fontSize: {
+                                                                        xs: '18px',
+                                                                        md: '20px'
+                                                                    }
+                                                                }} />
                                                             </InputAdornment>
                                                         ),
                                                     }}
@@ -510,20 +741,39 @@ const UpdateUserProfile = () => {
                                 </Box>
 
                                 {/* Contact Information Section */}
-                                <Box sx={{ marginBottom: '40px' }}>
+                                <Box sx={{
+                                    marginBottom: {
+                                        xs: '24px',
+                                        md: '40px'
+                                    }
+                                }}>
                                     <Typography variant="h6" sx={{
                                         fontWeight: 600,
-                                        marginBottom: '20px',
+                                        marginBottom: {
+                                            xs: '16px',
+                                            md: '20px'
+                                        },
                                         color: '#495057',
                                         display: 'flex',
                                         alignItems: 'center',
-                                        gap: 1
+                                        gap: 1,
+                                        fontSize: {
+                                            xs: '1.1rem',
+                                            md: '1.25rem'
+                                        },
+                                        justifyContent: {
+                                            xs: 'center',
+                                            sm: 'flex-start'
+                                        }
                                     }}>
                                         <Phone sx={{ color: '#28a745' }} />
                                         Contact Information
                                     </Typography>
 
-                                    <Grid container spacing={3}>
+                                    <Grid container spacing={{
+                                        xs: 2,
+                                        md: 3
+                                    }}>
                                         <Grid size={{xs:12, sm:6}}>
                                             <StyledTextField
                                                 fullWidth
@@ -537,20 +787,39 @@ const UpdateUserProfile = () => {
                                                 placeholder="Enter your phone number"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '12px',
+                                                        borderRadius: {
+                                                            xs: '8px',
+                                                            md: '12px'
+                                                        },
                                                         transition: 'all 0.2s ease',
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        },
                                                         '&:hover': {
                                                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                         },
                                                         '&.Mui-focused': {
                                                             boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
                                                         }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        }
                                                     }
                                                 }}
                                                 InputProps={{
                                                     startAdornment: (
                                                         <InputAdornment position="start">
-                                                            <Phone sx={{ color: '#28a745', fontSize: '20px' }} />
+                                                            <Phone sx={{
+                                                                color: '#28a745',
+                                                                fontSize: {
+                                                                    xs: '18px',
+                                                                    md: '20px'
+                                                                }
+                                                            }} />
                                                         </InputAdornment>
                                                     ),
                                                 }}
@@ -569,20 +838,39 @@ const UpdateUserProfile = () => {
                                                 placeholder="Enter your email"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '12px',
+                                                        borderRadius: {
+                                                            xs: '8px',
+                                                            md: '12px'
+                                                        },
                                                         transition: 'all 0.2s ease',
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        },
                                                         '&:hover': {
                                                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                         },
                                                         '&.Mui-focused': {
                                                             boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
                                                         }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        }
                                                     }
                                                 }}
                                                 InputProps={{
                                                     startAdornment: (
                                                         <InputAdornment position="start">
-                                                            <Email sx={{ color: '#dc3545', fontSize: '20px' }} />
+                                                            <Email sx={{
+                                                                color: '#dc3545',
+                                                                fontSize: {
+                                                                    xs: '18px',
+                                                                    md: '20px'
+                                                                }
+                                                            }} />
                                                         </InputAdornment>
                                                     ),
                                                 }}
@@ -603,20 +891,39 @@ const UpdateUserProfile = () => {
                                                 placeholder="Enter your full address"
                                                 sx={{
                                                     '& .MuiOutlinedInput-root': {
-                                                        borderRadius: '12px',
+                                                        borderRadius: {
+                                                            xs: '8px',
+                                                            md: '12px'
+                                                        },
                                                         transition: 'all 0.2s ease',
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        },
                                                         '&:hover': {
                                                             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                         },
                                                         '&.Mui-focused': {
                                                             boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
                                                         }
+                                                    },
+                                                    '& .MuiInputLabel-root': {
+                                                        fontSize: {
+                                                            xs: '14px',
+                                                            md: '16px'
+                                                        }
                                                     }
                                                 }}
                                                 InputProps={{
                                                     startAdornment: (
                                                         <InputAdornment position="start" sx={{ alignSelf: 'flex-start', marginTop: '12px' }}>
-                                                            <LocationOn sx={{ color: '#fd7e14', fontSize: '20px' }} />
+                                                            <LocationOn sx={{
+                                                                color: '#fd7e14',
+                                                                fontSize: {
+                                                                    xs: '18px',
+                                                                    md: '20px'
+                                                                }
+                                                            }} />
                                                         </InputAdornment>
                                                     ),
                                                 }}
@@ -627,20 +934,39 @@ const UpdateUserProfile = () => {
 
                                 {/* Employment Details for Employee */}
                                 {userType === 'EMPLOYEE' && (
-                                    <Box sx={{ marginBottom: '40px' }}>
+                                    <Box sx={{
+                                        marginBottom: {
+                                            xs: '24px',
+                                            md: '40px'
+                                        }
+                                    }}>
                                         <Typography variant="h6" sx={{
                                             fontWeight: 600,
-                                            marginBottom: '20px',
+                                            marginBottom: {
+                                                xs: '16px',
+                                                md: '20px'
+                                            },
                                             color: '#495057',
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: 1
+                                            gap: 1,
+                                            fontSize: {
+                                                xs: '1.1rem',
+                                                md: '1.25rem'
+                                            },
+                                            justifyContent: {
+                                                xs: 'center',
+                                                sm: 'flex-start'
+                                            }
                                         }}>
                                             <Work sx={{ color: '#ff6b35' }} />
                                             Employment Details
                                         </Typography>
 
-                                        <Grid container spacing={3}>
+                                        <Grid container spacing={{
+                                            xs: 2,
+                                            md: 3
+                                        }}>
                                             <Grid size={{xs:12, sm:6}}>
                                                 <StyledTextField
                                                     fullWidth
@@ -655,8 +981,15 @@ const UpdateUserProfile = () => {
                                                     disabled={userType !== 'OWNER'}
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
-                                                            borderRadius: '12px',
+                                                            borderRadius: {
+                                                                xs: '8px',
+                                                                md: '12px'
+                                                            },
                                                             transition: 'all 0.2s ease',
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            },
                                                             '&:hover': {
                                                                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                             },
@@ -667,12 +1000,24 @@ const UpdateUserProfile = () => {
                                                                 backgroundColor: '#f8f9fa',
                                                                 opacity: 0.7
                                                             }
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            }
                                                         }
                                                     }}
                                                     InputProps={{
                                                         startAdornment: (
                                                             <InputAdornment position="start">
-                                                                <WorkOutline sx={{ color: '#ff6b35', fontSize: '20px' }} />
+                                                                <WorkOutline sx={{
+                                                                    color: '#ff6b35',
+                                                                    fontSize: {
+                                                                        xs: '18px',
+                                                                        md: '20px'
+                                                                    }
+                                                                }} />
                                                             </InputAdornment>
                                                         ),
                                                     }}
@@ -692,8 +1037,15 @@ const UpdateUserProfile = () => {
                                                     disabled={userType !== 'OWNER'}
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
-                                                            borderRadius: '12px',
+                                                            borderRadius: {
+                                                                xs: '8px',
+                                                                md: '12px'
+                                                            },
                                                             transition: 'all 0.2s ease',
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            },
                                                             '&:hover': {
                                                                 boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
                                                             },
@@ -704,12 +1056,24 @@ const UpdateUserProfile = () => {
                                                                 backgroundColor: '#f8f9fa',
                                                                 opacity: 0.7
                                                             }
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            }
                                                         }
                                                     }}
                                                     InputProps={{
                                                         startAdornment: (
                                                             <InputAdornment position="start">
-                                                                <CurrencyRupee sx={{ color: '#ffc107', fontSize: '20px' }} />
+                                                                <CurrencyRupee sx={{
+                                                                    color: '#ffc107',
+                                                                    fontSize: {
+                                                                        xs: '18px',
+                                                                        md: '20px'
+                                                                    }
+                                                                }} />
                                                             </InputAdornment>
                                                         ),
                                                     }}
@@ -721,32 +1085,61 @@ const UpdateUserProfile = () => {
 
                                 {/* Action Buttons */}
                                 <Divider sx={{
-                                    my: 4,
+                                    my: {
+                                        xs: 3,
+                                        md: 4
+                                    },
                                     borderColor: 'rgba(0, 0, 0, 0.08)',
                                     borderWidth: '1px'
                                 }} />
 
                                 <Box sx={{
                                     display: 'flex',
-                                    gap: 3,
-                                    justifyContent: 'flex-end',
+                                    gap: {
+                                        xs: 2,
+                                        md: 3
+                                    },
+                                    justifyContent: {
+                                        xs: 'center',
+                                        sm: 'flex-end'
+                                    },
                                     flexWrap: 'wrap',
-                                    marginTop: '32px'
+                                    marginTop: {
+                                        xs: '24px',
+                                        md: '32px'
+                                    },
+                                    flexDirection: {
+                                        xs: 'column',
+                                        sm: 'row'
+                                    }
                                 }}>
                                     <Button
                                         variant="outlined"
                                         startIcon={<Cancel />}
                                         onClick={handleCancel}
                                         disabled={isSubmitting}
+                                        fullWidth={isMobile}
                                         sx={{
-                                            borderRadius: '12px',
+                                            borderRadius: {
+                                                xs: '8px',
+                                                md: '12px'
+                                            },
                                             textTransform: 'none',
                                             fontWeight: 600,
-                                            padding: '14px 32px',
-                                            fontSize: '1rem',
+                                            padding: {
+                                                xs: '12px 24px',
+                                                md: '14px 32px'
+                                            },
+                                            fontSize: {
+                                                xs: '0.9rem',
+                                                md: '1rem'
+                                            },
                                             borderColor: '#dc3545',
                                             color: '#dc3545',
-                                            minWidth: '140px',
+                                            minWidth: {
+                                                xs: 'auto',
+                                                sm: '140px'
+                                            },
                                             transition: 'all 0.2s ease',
                                             '&:hover': {
                                                 borderColor: '#c82333',
@@ -766,13 +1159,26 @@ const UpdateUserProfile = () => {
                                         variant="contained"
                                         startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Save />}
                                         disabled={isSubmitting}
+                                        fullWidth={isMobile}
                                         sx={{
-                                            borderRadius: '12px',
+                                            borderRadius: {
+                                                xs: '8px',
+                                                md: '12px'
+                                            },
                                             textTransform: 'none',
                                             fontWeight: 600,
-                                            padding: '14px 32px',
-                                            fontSize: '1rem',
-                                            minWidth: '180px',
+                                            padding: {
+                                                xs: '12px 24px',
+                                                md: '14px 32px'
+                                            },
+                                            fontSize: {
+                                                xs: '0.9rem',
+                                                md: '1rem'
+                                            },
+                                            minWidth: {
+                                                xs: 'auto',
+                                                sm: '180px'
+                                            },
                                             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                                             boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
                                             transition: 'all 0.2s ease',
@@ -804,11 +1210,17 @@ const UpdateUserProfile = () => {
                     severity="info"
                     sx={{
                         marginTop: '20px',
-                        borderRadius: '12px',
+                        borderRadius: {
+                            xs: '8px',
+                            md: '12px'
+                        },
                         border: '1px solid rgba(33, 150, 243, 0.2)',
                         backgroundColor: 'rgba(33, 150, 243, 0.04)',
                         '& .MuiAlert-icon': {
-                            fontSize: '24px',
+                            fontSize: {
+                                xs: '20px',
+                                md: '24px'
+                            },
                             color: '#1976d2'
                         },
                         '& .MuiAlert-message': {
@@ -818,7 +1230,12 @@ const UpdateUserProfile = () => {
                 >
                     <Typography variant="body2" sx={{
                         fontWeight: 500,
-                        color: '#1565c0'
+                        color: '#1565c0',
+                        fontSize: {
+                            xs: '0.8rem',
+                            md: '0.875rem'
+                        },
+                        lineHeight: 1.5
                     }}>
                         <strong>Update Notice:</strong> Changes to your email or phone number may require verification.
                         Some fields may not be editable based on your user type and company policies.

@@ -33,7 +33,7 @@ const AboutUs = () => {
                 backgroundColor: "#f8fafc",
                 position: "relative",
                 overflow: "hidden",
-                minHeight: "100vh"
+                // Removed minHeight to prevent extra spacing
             }}
         >
             <Box
@@ -49,8 +49,8 @@ const AboutUs = () => {
                 }}
             />
 
-            <Container maxWidth="lg" sx={{ py: 5, position: "relative", zIndex: 1 }}>
-                <Box sx={{ textAlign: "center", mb: 4 }}>
+            <Container maxWidth="xl" sx={{ py: { xs: 5, md: 8 }, position: "relative", zIndex: 1, width: '100%' }}>
+                <Box sx={{ textAlign: "center", mb: { xs: 4, md: 8 }, maxWidth: '1400px', mx: 'auto' }}>
                     <Typography
                         variant="h6"
                         sx={{
@@ -58,7 +58,8 @@ const AboutUs = () => {
                             fontWeight: 600,
                             mb: 2,
                             textTransform: 'uppercase',
-                            letterSpacing: 2
+                            letterSpacing: 2,
+                            fontSize: { xs: '1rem', md: '1.2rem' }
                         }}
                     >
                         About Our Company
@@ -69,7 +70,7 @@ const AboutUs = () => {
                             fontWeight: 800,
                             color: "#051120",
                             mb: 3,
-                            fontSize: { xs: '2rem', md: '3rem' }
+                            fontSize: { xs: '2rem', md: '3.5rem' }
                         }}
                     >
                         Your Trusted Cooling Experts
@@ -78,21 +79,22 @@ const AboutUs = () => {
                         variant="h6"
                         sx={{
                             color: "#64748b",
-                            maxWidth: "600px",
+                            maxWidth: { xs: "100%", md: "800px" },
                             mx: "auto",
-                            lineHeight: 1.6
+                            lineHeight: 1.6,
+                            fontSize: { xs: '1.1rem', md: '1.4rem' }
                         }}
                     >
                         Over 25 years of excellence in refrigeration services,
                         delivering reliable solutions to homes and businesses across Tuni.
                     </Typography>
                 </Box>
+
                 <Box sx={{
-                    pr: { lg: 4 },
-                    height: "100%",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
+                    maxWidth: '1400px',
+                    mx: 'auto',
+                    px: { xs: 2, md: 4 },
+                    // Removed problematic flex properties that were causing spacing issues
                     textAlign: "center"
                 }}>
                     <Typography
@@ -100,8 +102,8 @@ const AboutUs = () => {
                         sx={{
                             fontWeight: 700,
                             color: "#051120",
-                            mb: 3,
-                            fontSize: { xs: '1.8rem', md: '2.2rem' }
+                            mb: 4,
+                            fontSize: { xs: '1.8rem', md: '2.8rem' }
                         }}
                     >
                         Excellence in Every Service Call
@@ -112,47 +114,54 @@ const AboutUs = () => {
                         sx={{
                             color: "#475569",
                             lineHeight: 1.8,
-                            fontSize: "1.1rem",
-                            mb: 4
+                            fontSize: { xs: "1.1rem", md: "1.3rem" },
+                            mb: 6,
+                            maxWidth: '1200px',
+                            mx: 'auto'
                         }}
                     >
                         <strong>Since 1998, Srinivasa Refrigeration Works</strong> has been the cornerstone
                         of refrigeration services in Tuni. Our journey began with a simple mission: to provide
                         reliable, professional, and affordable cooling solutions to every customer.
-                        <br />
+                        <br /><br />
                         What sets us apart is our unwavering commitment to quality workmanship and customer
                         satisfaction. Our team of skilled technicians brings decades of combined experience
                         to every repair, installation, and maintenance service.
-                        <br />
+                        <br /><br />
                         We believe in transparency, fair pricing, and building lasting relationships with our
                         community. When you choose us, you're not just getting a service provider – you're
                         partnering with cooling experts who truly care about your comfort and satisfaction.
                     </Typography>
 
-                    <Grid container spacing={4}
-                          sx={{
-                              textAlign: "center",
-                              justifyContent: "center"
-                          }}
+                    <Grid
+                        container
+                        spacing={{ xs: 3, md: 4 }}
+                        sx={{
+                            textAlign: "center",
+                            justifyContent: "center",
+                            maxWidth: '1400px',
+                            mx: 'auto',
+                            mb: 0
+                        }}
                     >
                         {highlights.map((highlight, index) => (
-                            <Grid size={{xs:12, sm:6}} key={index}>
+                            <Grid size={{xs:6, md:3}} key={index}>
                                 <Card
                                     elevation={0}
                                     sx={{
                                         backgroundColor: "rgba(79, 195, 247, 0.05)",
                                         border: "1px solid rgba(79, 195, 247, 0.2)",
-                                        borderRadius: 2,
+                                        borderRadius: 3,
                                         transition: "all 0.3s ease",
                                         height: "100%",
                                         '&:hover': {
-                                            transform: "translateY(-5px)",
-                                            boxShadow: "0 10px 30px rgba(79, 195, 247, 0.2)"
+                                            transform: "translateY(-8px)",
+                                            boxShadow: "0 15px 40px rgba(79, 195, 247, 0.2)"
                                         }
                                     }}
                                 >
-                                    <CardContent sx={{ p: 3, height: "100%" }}>
-                                        <Box sx={{ mb: 2 }}>
+                                    <CardContent sx={{ p: { xs: 3, md: 4 }, height: "100%" }}>
+                                        <Box sx={{ mb: 3 }}>
                                             {highlight.icon}
                                         </Box>
                                         <Typography
@@ -160,7 +169,8 @@ const AboutUs = () => {
                                             sx={{
                                                 fontWeight: 700,
                                                 color: "#051120",
-                                                mb: 1
+                                                mb: 2,
+                                                fontSize: { xs: '1.1rem', md: '1.3rem' }
                                             }}
                                         >
                                             {highlight.title}
@@ -169,7 +179,8 @@ const AboutUs = () => {
                                             variant="body2"
                                             sx={{
                                                 color: "#64748b",
-                                                lineHeight: 1.5
+                                                lineHeight: 1.6,
+                                                fontSize: { xs: '0.9rem', md: '1rem' }
                                             }}
                                         >
                                             {highlight.description}
