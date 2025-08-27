@@ -18,7 +18,6 @@ const UpdateUserProfile = () => {
     const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
     const [isSubmitting, setIsSubmitting] = useState(false);
     const userId = user.userId;
     const userType = user.userType;
@@ -73,7 +72,6 @@ const UpdateUserProfile = () => {
         }
 
         try {
-            console.log("Values: ", values);
             if(userType === 'CUSTOMER') {
                 const customerCredentialDTO = {
                     customerDTO: {
@@ -163,7 +161,6 @@ const UpdateUserProfile = () => {
 
     return (
         <Box sx={{
-            minHeight: '100vh',
             backgroundColor: '#f8f9fa',
             padding: {
                 xs: '80px 10px 20px',
@@ -468,8 +465,8 @@ const UpdateUserProfile = () => {
                                                 name="firstName"
                                                 value={values.firstName}
                                                 onChange={handleChange}
-                                                error={Boolean(touched.firstName && errors.firstName)}
-                                                helperText={touched.firstName && errors.firstName}
+                                                error={Boolean((touched.firstName || values.firstName) && errors.firstName)}
+                                                helperText={(touched.firstName || values.firstName) && errors.firstName}
                                                 variant="outlined"
                                                 placeholder="Enter your first name"
                                                 sx={{
@@ -519,8 +516,8 @@ const UpdateUserProfile = () => {
                                                 name="lastName"
                                                 value={values.lastName}
                                                 onChange={handleChange}
-                                                error={Boolean(touched.lastName && errors.lastName)}
-                                                helperText={touched.lastName && errors.lastName}
+                                                error={Boolean((touched.lastName || values.lastName) && errors.lastName)}
+                                                helperText={(touched.lastName || values.lastName) && errors.lastName}
                                                 variant="outlined"
                                                 placeholder="Enter your last name"
                                                 sx={{
@@ -687,8 +684,8 @@ const UpdateUserProfile = () => {
                                                     name="nationalIdNumber"
                                                     value={values.nationalIdNumber}
                                                     onChange={handleChange}
-                                                    error={Boolean(touched.nationalIdNumber && errors.nationalIdNumber)}
-                                                    helperText={touched.nationalIdNumber && errors.nationalIdNumber}
+                                                    error={Boolean((touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber)}
+                                                    helperText={(touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber}
                                                     variant="outlined"
                                                     placeholder="Enter your Aadhar or PAN number"
                                                     disabled={userType !== 'OWNER'}
@@ -781,8 +778,8 @@ const UpdateUserProfile = () => {
                                                 name="phoneNumber"
                                                 value={values.phoneNumber}
                                                 onChange={handleChange}
-                                                error={Boolean(touched.phoneNumber && errors.phoneNumber)}
-                                                helperText={touched.phoneNumber && errors.phoneNumber}
+                                                error={Boolean((touched.phoneNumber || values.phoneNumber) && errors.phoneNumber)}
+                                                helperText={(touched.phoneNumber || values.phoneNumber) && errors.phoneNumber}
                                                 variant="outlined"
                                                 placeholder="Enter your phone number"
                                                 sx={{
@@ -832,8 +829,8 @@ const UpdateUserProfile = () => {
                                                 name="email"
                                                 value={values.email}
                                                 onChange={handleChange}
-                                                error={Boolean(touched.email && errors.email)}
-                                                helperText={touched.email && errors.email}
+                                                error={Boolean((touched.email || values.email) && errors.email)}
+                                                helperText={(touched.email || values.email) && errors.email}
                                                 variant="outlined"
                                                 placeholder="Enter your email"
                                                 sx={{
@@ -883,8 +880,8 @@ const UpdateUserProfile = () => {
                                                 name="address"
                                                 value={values.address}
                                                 onChange={handleChange}
-                                                error={Boolean(touched.address && errors.address)}
-                                                helperText={touched.address && errors.address}
+                                                error={Boolean((touched.address || values.address) && errors.address)}
+                                                helperText={(touched.address || values.address) && errors.address}
                                                 variant="outlined"
                                                 multiline
                                                 rows={3}
@@ -974,8 +971,8 @@ const UpdateUserProfile = () => {
                                                     name="designation"
                                                     value={values.designation}
                                                     onChange={handleChange}
-                                                    error={Boolean(touched.designation && errors.designation)}
-                                                    helperText={touched.designation && errors.designation}
+                                                    error={Boolean((touched.designation || values.designation) && errors.designation)}
+                                                    helperText={(touched.designation || values.designation) && errors.designation}
                                                     variant="outlined"
                                                     placeholder="Enter designation"
                                                     disabled={userType !== 'OWNER'}
@@ -1030,8 +1027,8 @@ const UpdateUserProfile = () => {
                                                     name="salary"
                                                     value={values.salary}
                                                     onChange={handleChange}
-                                                    error={Boolean(touched.salary && errors.salary)}
-                                                    helperText={touched.salary && errors.salary}
+                                                    error={Boolean((touched.salary || values.salary) && errors.salary)}
+                                                    helperText={(touched.salary || values.salary) && errors.salary}
                                                     variant="outlined"
                                                     placeholder="Enter salary"
                                                     disabled={userType !== 'OWNER'}

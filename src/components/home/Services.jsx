@@ -1,14 +1,20 @@
 import React from 'react';
 import { Box, Typography, Container, Grid, Card, CardContent, Button } from "@mui/material";
-import { CheckCircle, Phone } from "@mui/icons-material";
+import {CheckCircle, Handyman, Phone} from "@mui/icons-material";
+import {Link} from "react-router-dom";
+import AuthUtils from "../../utils/AuthUtils.jsx";
 
 const Services = () => {
+
+    const isAuthenticated = AuthUtils.isAuthenticated();
+
     const services = [
         {
             id: 1,
             title: "Refrigerator Repair",
             subtitle: "All Brands Serviced",
             image: "/refrigerator-repair-img.jpg",
+            path: "/complaint-register?productType=Refrigerator",
             description: "Expert repair services for all refrigerator brands including Samsung, LG, Whirlpool, Godrej, and more. From cooling issues to compressor problems, we handle it all.",
             features: [
                 "Cooling system repairs",
@@ -22,6 +28,7 @@ const Services = () => {
             title: "Air Conditioner Service",
             subtitle: "All Brands Serviced",
             image: "/ac-repair-img.jpg",
+            path: "/complaint-register?productType=Air Conditioner",
             description: "Complete AC repair and maintenance for all brands including Voltas, Blue Star, Daikin, Carrier, and others. Installation, repair, and regular servicing available.",
             features: [
                 "AC installation & uninstallation",
@@ -263,8 +270,12 @@ const Services = () => {
                                             <Button
                                                 variant="contained"
                                                 size="large"
-                                                endIcon={<Phone />}
-                                                href="#contact"
+                                                endIcon={<Handyman />}
+                                                {...(
+                                                    isAuthenticated
+                                                        ? { component: Link, to: service.path }
+                                                        : { href: "#contact" }
+                                                )}
                                                 sx={{
                                                     backgroundColor: "#4fc3f7",
                                                     color: "#051120",

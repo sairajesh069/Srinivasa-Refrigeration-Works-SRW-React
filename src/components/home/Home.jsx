@@ -2,6 +2,7 @@ import { Handyman, Star, Phone, Schedule } from "@mui/icons-material";
 import { Box, Typography, Button, Container, Grid, Card, CardContent } from "@mui/material";
 import { useHomeQuery } from "../../reducers/homeApi.js";
 import AuthUtils from "../../utils/AuthUtils.jsx";
+import {Link, useNavigate} from "react-router-dom";
 
 const Home = () => {
 
@@ -9,6 +10,8 @@ const Home = () => {
 
     const isAuthenticated = AuthUtils.isAuthenticated();
     const username =  isAuthenticated ? AuthUtils.getUserData().username : null;
+
+    const navigate = useNavigate();
 
     const features = [
         {
@@ -130,7 +133,7 @@ const Home = () => {
                                     }}
                                 >
                                     {isAuthenticated
-                                        ? <>Welcome back, {username}.</>
+                                        ? <>Welcome back, <br/> {username}.</>
                                         : <>Welcome! We're glad <br /> to have you here.</>
                                     }
                                 </Typography>
@@ -182,8 +185,12 @@ const Home = () => {
                                     <Button
                                         variant="contained"
                                         size="large"
-                                        endIcon={<Phone />}
-                                        href="#contact"
+                                        endIcon={<Handyman />}
+                                        {...(
+                                            isAuthenticated
+                                                ? { component: Link, to: "/complaint-register" }
+                                                : { href: "#contact" }
+                                        )}
                                         sx={{
                                             backgroundColor: "#4fc3f7",
                                             color: "#051120",
@@ -206,13 +213,13 @@ const Home = () => {
                                             }
                                         }}
                                     >
-                                        Call Now: +91 85559 76776
+                                        {isAuthenticated ? `Register Complaint` : `Call Now: +91 85559 76776`}
                                     </Button>
 
                                     <Button
                                         variant="outlined"
                                         size="large"
-                                        endIcon={<Handyman />}
+                                        endIcon={<Phone />}
                                         href="#about"
                                         sx={{
                                             color: "#ffffff",

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button } from '@mui/material';
-import { Dashboard as DashboardIcon, Person, Security, AccessTime, AccountBox, Edit, Report, List,
-    TrackChanges, Feedback, Settings, Notifications, ArrowForward } from '@mui/icons-material';
+import { Dashboard as DashboardIcon, Person, Security, AccessTime, AccountBox, Edit, List,
+    TrackChanges, Feedback, Settings, Notifications, ArrowForward, Handyman } from '@mui/icons-material';
 import useAuth from '../../utils/useAuth.jsx';
 import {useNavigate} from "react-router-dom";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
@@ -33,7 +33,8 @@ const Dashboard = () => {
             id: 'register-complaint',
             title: 'Register Complaint',
             description: 'Submit a new complaint or report an issue',
-            icon: <Report />,
+            path: '/complaint-register',
+            icon: <Handyman />,
             color: '#ff7043',
             bgColor: '#fbe9e7'
         },

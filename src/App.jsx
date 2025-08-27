@@ -7,8 +7,6 @@ import ContactUs from "./components/ContactUs.jsx";
 import Login from "./components/auth/Login.jsx";
 import { Route, Routes } from "react-router";
 import ScrollHandler from "./utils/ScrollHandler.jsx";
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import Register from "./components/auth/Register.jsx";
 import AuthGuard from "./utils/AuthGuard.jsx";
 import PageNotFound from "./components/exceptions/PageNotFound.jsx";
@@ -19,6 +17,7 @@ import UserProfile from "./components/dashboard/UserProfile.jsx";
 import UpdateUserProfile from "./components/dashboard/UpdateUserProfile.jsx";
 import AccountSettings from "./components/dashboard/AccountSettings.jsx";
 import CustomToast from "./utils/CustomToast.jsx";
+import ComplaintRegister from "./components/dashboard/ComplaintRegister.jsx";
 
 const App = () => {
     return (
@@ -120,6 +119,16 @@ const App = () => {
                         unauthorizedFallback="/unauthorized"
                     >
                         <AccountSettings />
+                    </AuthGuard>
+                } />
+
+                <Route path="/complaint-register" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <ComplaintRegister />
                     </AuthGuard>
                 } />
 

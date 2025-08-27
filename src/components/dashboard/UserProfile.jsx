@@ -134,7 +134,6 @@ const UserProfile = () => {
 
     return (
         <Box sx={{
-            minHeight: '100vh',
             backgroundColor: '#f8f9fa',
             padding: {
                 xs: '80px 10px 20px',

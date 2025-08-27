@@ -4,6 +4,7 @@ import { homeApi } from "./reducers/homeApi.js";
 import {registerApi} from "./reducers/registerApi.js";
 import {accountRecoveryApi} from "./reducers/accountRecoveryApi.js";
 import {userProfileApi} from "./reducers/userProfileApi.js";
+import {complaintApi} from "./reducers/complaintApi.js";
 
 const store = configureStore({
     reducer: {
@@ -11,7 +12,8 @@ const store = configureStore({
         [authApi.reducerPath]: authApi.reducer,
         [registerApi.reducerPath]: registerApi.reducer,
         [accountRecoveryApi.reducerPath]: accountRecoveryApi.reducer,
-        [userProfileApi.reducerPath]: userProfileApi.reducer
+        [userProfileApi.reducerPath]: userProfileApi.reducer,
+        [complaintApi.reducerPath]: complaintApi.reducer
     },
     middleware: getDefaultMiddleware => {
         return getDefaultMiddleware({
@@ -27,7 +29,8 @@ const store = configureStore({
             .concat(authApi.middleware)
             .concat(registerApi.middleware)
             .concat(accountRecoveryApi.middleware)
-            .concat(userProfileApi.middleware);
+            .concat(userProfileApi.middleware)
+            .concat(complaintApi.middleware);
     }
 });
 
