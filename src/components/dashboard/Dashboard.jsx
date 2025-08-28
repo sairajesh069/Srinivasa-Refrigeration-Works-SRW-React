@@ -42,6 +42,7 @@ const Dashboard = () => {
             id: 'all-complaints',
             title: 'All Complaints',
             description: 'View all your submitted complaints',
+            path: '/my-complaints',
             icon: <List />,
             color: '#ab47bc',
             bgColor: '#f3e5f5'

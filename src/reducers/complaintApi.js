@@ -4,6 +4,7 @@ import AuthUtils from "../utils/AuthUtils.jsx";
 
 export const complaintApi = createApi({
    reducerPath: "complaint",
+    tagTypes: ["complaints"],
    baseQuery: fetchBaseQuery({
        baseUrl: CONFIG.BACKEND_BASE_URL,
        credentials: "include",
@@ -20,9 +21,20 @@ export const complaintApi = createApi({
                 url: '/srw/complaint/register',
                 method: 'POST',
                 body: complaintDTO
-            })
+            }),
+            invalidatesTags: ["complaints"]
+        }),
+        fetchMyComplaints: builder.query({
+            query: userId => ({
+                url: '/srw/complaint/raisedBy',
+                method: 'GET',
+                params: {userId}
+            }),
+            providesTags: (result, error, userId) => [
+                { type: "complaints", id: `user-${userId}` },
+            ]
         })
     })
 });
 
-export const { useComplaintRegisterMutation } = complaintApi;
+export const { useComplaintRegisterMutation, useFetchMyComplaintsQuery } = complaintApi;

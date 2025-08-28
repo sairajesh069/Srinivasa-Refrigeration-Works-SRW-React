@@ -18,6 +18,7 @@ import UpdateUserProfile from "./components/dashboard/UpdateUserProfile.jsx";
 import AccountSettings from "./components/dashboard/AccountSettings.jsx";
 import CustomToast from "./utils/CustomToast.jsx";
 import ComplaintRegister from "./components/dashboard/ComplaintRegister.jsx";
+import DisplayComplaints from "./components/dashboard/DisplayComplaints.jsx";
 
 const App = () => {
     return (
@@ -129,6 +130,16 @@ const App = () => {
                         unauthorizedFallback="/unauthorized"
                     >
                         <ComplaintRegister />
+                    </AuthGuard>
+                } />
+
+                <Route path="/my-complaints" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <DisplayComplaints />
                     </AuthGuard>
                 } />
 
