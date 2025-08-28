@@ -39,21 +39,21 @@ const Dashboard = () => {
             bgColor: '#fbe9e7'
         },
         {
-            id: 'all-complaints',
-            title: 'All Complaints',
-            description: 'View all your submitted complaints',
-            path: '/my-complaints',
-            icon: <List />,
-            color: '#ab47bc',
-            bgColor: '#f3e5f5'
-        },
-        {
             id: 'track-complaint',
             title: 'Track Status',
             description: 'Track the progress of your complaints',
+            path: '/my-complaints',
             icon: <TrackChanges />,
             color: '#29b6f6',
             bgColor: '#e1f5fe'
+        },
+        {
+            id: 'all-complaints',
+            title: 'All Complaints',
+            description: 'View all your submitted complaints',
+            icon: <List />,
+            color: '#ab47bc',
+            bgColor: '#f3e5f5'
         },
         {
             id: 'give-feedback',

@@ -1,8 +1,8 @@
-import { Handyman, Star, Phone, Schedule } from "@mui/icons-material";
+import {Handyman, Star, Phone, Schedule, TrackChanges} from "@mui/icons-material";
 import { Box, Typography, Button, Container, Grid, Card, CardContent } from "@mui/material";
 import { useHomeQuery } from "../../reducers/homeApi.js";
 import AuthUtils from "../../utils/AuthUtils.jsx";
-import {Link, useNavigate} from "react-router-dom";
+import {Link} from "react-router-dom";
 
 const Home = () => {
 
@@ -10,8 +10,6 @@ const Home = () => {
 
     const isAuthenticated = AuthUtils.isAuthenticated();
     const username =  isAuthenticated ? AuthUtils.getUserData().username : null;
-
-    const navigate = useNavigate();
 
     const features = [
         {
@@ -185,7 +183,7 @@ const Home = () => {
                                     <Button
                                         variant="contained"
                                         size="large"
-                                        endIcon={<Handyman />}
+                                        startIcon={<Handyman />}
                                         {...(
                                             isAuthenticated
                                                 ? { component: Link, to: "/complaint-register" }
@@ -219,8 +217,12 @@ const Home = () => {
                                     <Button
                                         variant="outlined"
                                         size="large"
-                                        endIcon={<Phone />}
-                                        href="#about"
+                                        startIcon={<TrackChanges />}
+                                        {...(
+                                            isAuthenticated
+                                                ? { component: Link, to: "/my-complaints" }
+                                                : { href: "#about" }
+                                        )}
                                         sx={{
                                             color: "#ffffff",
                                             borderColor: "rgba(255, 255, 255, 0.5)",
@@ -240,7 +242,7 @@ const Home = () => {
                                             }
                                         }}
                                     >
-                                        Learn More
+                                        {isAuthenticated ? `Track Complaint` : `Learn More`}
                                     </Button>
                                 </Box>
                             </Box>

@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button, Alert, Divider, useTheme,
     useMediaQuery, InputAdornment, MenuItem, Collapse, Badge, Tooltip, IconButton, CircularProgress } from '@mui/material';
-import { Dashboard, FilterList, Search, CalendarToday, Person, Phone, Email,
-    Home, Build, Description, Schedule, CheckCircle, Pending,
-    Error, Handyman, ExpandMore, ExpandLess, ContactPhone, Engineering, Feedback, History, List } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
+import {
+    Dashboard, FilterList, Search, CalendarToday, Person, Phone, Email,
+    Home, Build, Description, Schedule, CheckCircle, Pending, Error, Handyman,
+    ExpandMore, ExpandLess, ContactPhone, Engineering, Feedback, History, List, TrackChanges} from '@mui/icons-material';
+import {useLocation, useNavigate} from 'react-router-dom';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import useAuth from "../../utils/useAuth.jsx";
@@ -15,6 +16,7 @@ const DisplayComplaints = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('All');
@@ -94,6 +96,8 @@ const DisplayComplaints = () => {
 
     const statusOptions = ['All', 'PENDING', 'IN_PROGRESS', 'RESOLVED'];
     const productTypeOptions = ['All', 'Air Conditioner', 'Refrigerator', 'Other'];
+
+    const isUserComplaintsPath = location.pathname === '/my-complaints';
 
     if (isLoading) {
         return (
@@ -262,12 +266,10 @@ const DisplayComplaints = () => {
                                 fontWeight: 700,
                                 border: '4px solid rgba(255, 255, 255, 0.3)'
                             }}>
-                                <List sx={{
-                                    fontSize: {
-                                        xs: '2rem',
-                                        md: '3rem'
-                                    }
-                                }} />
+                                {isUserComplaintsPath
+                                    ? <TrackChanges sx={{ fontSize: { xs: '2rem', md: '3rem' } }} />
+                                    : <List sx={{ fontSize: { xs: '2rem', md: '3rem' } }} />
+                                }
                             </Avatar>
                             <Box sx={{ flex: 1 }}>
                                 <Typography variant={isMobile ? "h4" : "h3"} sx={{
@@ -280,7 +282,7 @@ const DisplayComplaints = () => {
                                         md: '3rem'
                                     }
                                 }}>
-                                    All Complaints
+                                    {isUserComplaintsPath ? "Complaint History" : "All Complaints" }
                                 </Typography>
                                 <Box sx={{
                                     display: 'flex',

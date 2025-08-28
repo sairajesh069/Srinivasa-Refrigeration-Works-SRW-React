@@ -137,7 +137,8 @@ const Nav = () => {
                 fontSize: size === 24 ? '12px' : '14px',
                 fontWeight: 600,
                 border: '2px solid rgba(79, 195, 247, 0.3)',
-                boxShadow: '0 4px 12px rgba(79, 195, 247, 0.2)'
+                boxShadow: '0 4px 12px rgba(79, 195, 247, 0.2)',
+                mr: 3
             }}
         >
             {getUserInitials()}
