@@ -4,12 +4,13 @@ import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button, 
 import {
     Dashboard, FilterList, Search, CalendarToday, Person, Phone, Email,
     Home, Build, Description, Schedule, CheckCircle, Pending, Error, Handyman,
-    ExpandMore, ExpandLess, ContactPhone, Engineering, Feedback, History, List, TrackChanges} from '@mui/icons-material';
+    ExpandMore, ExpandLess, ContactPhone, Engineering, Feedback, History, List, TrackChanges, AssignmentInd
+} from '@mui/icons-material';
 import {useLocation, useNavigate} from 'react-router-dom';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import useAuth from "../../utils/useAuth.jsx";
-import {useFetchMyComplaintsQuery, useFetchAllComplaintsQuery} from "../../reducers/complaintApi.js";
+import {useFetchMyComplaintsQuery, useFetchAllComplaintsQuery, useFetchAssignedComplaintsQuery} from "../../reducers/complaintApi.js";
 
 const DisplayComplaints = () => {
     const { user } = useAuth();
@@ -24,14 +25,21 @@ const DisplayComplaints = () => {
     const [expandedCards, setExpandedCards] = useState({});
 
     const isUserComplaintsPath = location.pathname === '/my-complaints';
+    const isAllComplaintsPath = location.pathname === '/all-complaints';
+    const isAssignedComplaintsPath = location.pathname === '/assigned-complaints';
 
     const { data: userComplaintsData, isLoading: fetchUserComplaintsLoading,
-        isError: fetchUserComplaintsError } = useFetchMyComplaintsQuery(user.userId, { skip: !isUserComplaintsPath });
+        isError: fetchUserComplaintsError } = useFetchMyComplaintsQuery(user?.userId, { skip: !isUserComplaintsPath });
+
     const { data: allComplaintsData, isLoading: fetchAllComplaintsLoading,
-        isError: fetchAllComplaintsError } = useFetchAllComplaintsQuery(user.userId, { skip: isUserComplaintsPath });
+        isError: fetchAllComplaintsError } = useFetchAllComplaintsQuery(user?.userId, { skip: !isAllComplaintsPath });
 
+    const { data: assignedComplaintsData, isLoading: fetchAssignedComplaintsLoading,
+        isError: fetchAssignedComplaintsError } = useFetchAssignedComplaintsQuery(user?.userId, { skip: !isAssignedComplaintsPath });
 
-    const complaints = isUserComplaintsPath ? userComplaintsData?.complaintsDTO : allComplaintsData?.complaintsDTO;
+    const complaints = isUserComplaintsPath ? userComplaintsData?.complaintsDTO
+            : isAllComplaintsPath ? allComplaintsData?.complaintsDTO
+            : assignedComplaintsData?.complaintsDTO;
 
     const isOwner = user?.userType === 'OWNER';
 
@@ -105,7 +113,7 @@ const DisplayComplaints = () => {
     const statusOptions = ['All', 'PENDING', 'IN_PROGRESS', 'RESOLVED'];
     const productTypeOptions = ['All', 'Air Conditioner', 'Refrigerator', 'Other'];
 
-    if (fetchUserComplaintsLoading || fetchAllComplaintsLoading) {
+    if (fetchUserComplaintsLoading || fetchAllComplaintsLoading || fetchAssignedComplaintsLoading) {
         return (
             <Box sx={{
                 display: 'flex',
@@ -123,7 +131,7 @@ const DisplayComplaints = () => {
         );
     }
 
-    if (fetchUserComplaintsError || fetchAllComplaintsError) {
+    if (fetchUserComplaintsError || fetchAllComplaintsError || fetchAssignedComplaintsError) {
         return (
             <Box sx={{
                 p: 4,
@@ -272,10 +280,9 @@ const DisplayComplaints = () => {
                                 fontWeight: 700,
                                 border: '4px solid rgba(255, 255, 255, 0.3)'
                             }}>
-                                {isUserComplaintsPath
-                                    ? <TrackChanges sx={{ fontSize: { xs: '2rem', md: '3rem' } }} />
-                                    : <List sx={{ fontSize: { xs: '2rem', md: '3rem' } }} />
-                                }
+                                { isUserComplaintsPath && <TrackChanges sx={{ fontSize: { xs: '2rem', md: '3rem' } }} /> }
+                                { isAllComplaintsPath && <List sx={{ fontSize: { xs: '2rem', md: '3rem' } }} /> }
+                                { isAssignedComplaintsPath && <AssignmentInd sx={{ fontSize: { xs: '2rem', md: '3rem' } }} /> }
                             </Avatar>
                             <Box sx={{ flex: 1 }}>
                                 <Typography variant={isMobile ? "h4" : "h3"} sx={{
@@ -288,7 +295,9 @@ const DisplayComplaints = () => {
                                         md: '3rem'
                                     }
                                 }}>
-                                    {isUserComplaintsPath ? "Complaint History" : "All Complaints" }
+                                    { isUserComplaintsPath && "Complaint History" }
+                                    { isAllComplaintsPath && "All Complaints" }
+                                    { isAssignedComplaintsPath && "Assigned Complaints" }
                                 </Typography>
                                 <Box sx={{
                                     display: 'flex',

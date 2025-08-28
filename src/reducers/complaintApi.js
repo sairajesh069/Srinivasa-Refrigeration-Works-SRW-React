@@ -26,12 +26,12 @@ export const complaintApi = createApi({
         }),
         fetchMyComplaints: builder.query({
             query: userId => ({
-                url: '/srw/complaint/raisedBy',
+                url: '/srw/complaint/raised-by',
                 method: 'GET',
                 params: {userId}
             }),
             providesTags: (result, error, userId) => [
-                { type: "complaints", id: `user-${userId}` },
+                { type: "complaints", id: `raised-by-${userId}` },
             ]
         }),
         fetchAllComplaints: builder.query({
@@ -43,7 +43,18 @@ export const complaintApi = createApi({
                 { type: "complaints", id: `list` },
             ]
         }),
+        fetchAssignedComplaints: builder.query({
+            query: employeeId => ({
+                url: '/srw/complaint/assigned-to',
+                method: 'GET',
+                params: {employeeId}
+            }),
+            providesTags: (result, error, employeeId) => [
+                { type: "complaints", id: `assigned-to-${employeeId}` },
+            ]
+        })
     })
 });
 
-export const { useComplaintRegisterMutation, useFetchMyComplaintsQuery, useFetchAllComplaintsQuery } = complaintApi;
+export const { useComplaintRegisterMutation, useFetchMyComplaintsQuery,
+    useFetchAllComplaintsQuery, useFetchAssignedComplaintsQuery } = complaintApi;

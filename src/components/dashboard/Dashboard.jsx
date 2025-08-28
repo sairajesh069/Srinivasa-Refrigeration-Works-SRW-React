@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button } from '@mui/material';
 import { Dashboard as DashboardIcon, Person, Security, AccessTime, AccountBox, Edit, List,
-    TrackChanges, Feedback, Settings, Notifications, ArrowForward, Handyman } from '@mui/icons-material';
+    TrackChanges, Feedback, Settings, Notifications, ArrowForward, Handyman, AssignmentInd } from '@mui/icons-material';
 import useAuth from '../../utils/useAuth.jsx';
 import {useNavigate} from "react-router-dom";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
@@ -11,7 +11,7 @@ const Dashboard = () => {
     const navigate = useNavigate();
 
     const isOwner = user?.userType === 'OWNER';
-    const isEmployee = user?.userType === 'Employee';
+    const isEmployee = user?.userType === 'EMPLOYEE';
 
     const accountActions = [
         {
@@ -86,6 +86,18 @@ const Dashboard = () => {
             icon: <List />,
             color: '#ab47bc',
             bgColor: '#f3e5f5'
+        });
+    }
+
+    if(isEmployee) {
+        accountActions.push({
+            id: 'assigned-complaints',
+            title: 'Assigned Complaints',
+            description: 'View and manage all your assigned complaints',
+            path: '/assigned-complaints',
+            icon: <AssignmentInd />,
+            color: '#1fafa0',
+            bgColor: '#d8f4f1'
         });
     }
 
