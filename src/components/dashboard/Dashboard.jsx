@@ -10,6 +10,9 @@ const Dashboard = () => {
     const { user } = useAuth();
     const navigate = useNavigate();
 
+    const isOwner = user?.userType === 'OWNER';
+    const isEmployee = user?.userType === 'Employee';
+
     const accountActions = [
         {
             id: 'profile',
@@ -48,14 +51,6 @@ const Dashboard = () => {
             bgColor: '#e1f5fe'
         },
         {
-            id: 'all-complaints',
-            title: 'All Complaints',
-            description: 'View all your submitted complaints',
-            icon: <List />,
-            color: '#ab47bc',
-            bgColor: '#f3e5f5'
-        },
-        {
             id: 'give-feedback',
             title: 'Give Feedback',
             description: 'Provide feedback on resolved complaints',
@@ -81,6 +76,18 @@ const Dashboard = () => {
             bgColor: '#eceff1'
         }
     ];
+
+    if(isOwner) {
+        accountActions.push({
+            id: 'all-complaints',
+            title: 'All Complaints',
+            description: 'View all your submitted complaints',
+            path: '/all-complaints',
+            icon: <List />,
+            color: '#ab47bc',
+            bgColor: '#f3e5f5'
+        });
+    }
 
     const handleActionClick = actionId => {
         const action = accountActions.find(a => a.id === actionId);

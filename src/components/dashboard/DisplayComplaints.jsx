@@ -9,7 +9,7 @@ import {useLocation, useNavigate} from 'react-router-dom';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import useAuth from "../../utils/useAuth.jsx";
-import {useFetchMyComplaintsQuery} from "../../reducers/complaintApi.js";
+import {useFetchMyComplaintsQuery, useFetchAllComplaintsQuery} from "../../reducers/complaintApi.js";
 
 const DisplayComplaints = () => {
     const { user } = useAuth();
@@ -23,9 +23,17 @@ const DisplayComplaints = () => {
     const [productTypeFilter, setProductTypeFilter] = useState('All');
     const [expandedCards, setExpandedCards] = useState({});
 
-    const { data, isLoading, isError } = useFetchMyComplaintsQuery(user.userId);
+    const isUserComplaintsPath = location.pathname === '/my-complaints';
 
-    const complaints = data?.complaintsDTO;
+    const { data: userComplaintsData, isLoading: fetchUserComplaintsLoading,
+        isError: fetchUserComplaintsError } = useFetchMyComplaintsQuery(user.userId, { skip: !isUserComplaintsPath });
+    const { data: allComplaintsData, isLoading: fetchAllComplaintsLoading,
+        isError: fetchAllComplaintsError } = useFetchAllComplaintsQuery(user.userId, { skip: isUserComplaintsPath });
+
+
+    const complaints = isUserComplaintsPath ? userComplaintsData?.complaintsDTO : allComplaintsData?.complaintsDTO;
+
+    const isOwner = user?.userType === 'OWNER';
 
     const toggleCardExpansion = complaintId => {
         setExpandedCards(prev => ({
@@ -97,9 +105,7 @@ const DisplayComplaints = () => {
     const statusOptions = ['All', 'PENDING', 'IN_PROGRESS', 'RESOLVED'];
     const productTypeOptions = ['All', 'Air Conditioner', 'Refrigerator', 'Other'];
 
-    const isUserComplaintsPath = location.pathname === '/my-complaints';
-
-    if (isLoading) {
+    if (fetchUserComplaintsLoading || fetchAllComplaintsLoading) {
         return (
             <Box sx={{
                 display: 'flex',
@@ -117,7 +123,7 @@ const DisplayComplaints = () => {
         );
     }
 
-    if (isError) {
+    if (fetchUserComplaintsError || fetchAllComplaintsError) {
         return (
             <Box sx={{
                 p: 4,
@@ -522,7 +528,7 @@ const DisplayComplaints = () => {
                                                 mb: 1
                                             }}>
                                                 <Person sx={{ fontSize: '18px', color: '#4fc3f7' }} />
-                                                {complaint.customerName}
+                                                {complaint.customerName} {isOwner && `(ID: ${complaint.bookedById})`}
                                             </Typography>
                                             <Box sx={{
                                                 display: 'flex',
@@ -669,7 +675,7 @@ const DisplayComplaints = () => {
                                                             {complaint.technicianDetails.fullName}
                                                         </Typography>
                                                         <Typography variant="body2" sx={{ color: '#7f8c8d', mb: 0.5 }}>
-                                                            {complaint.technicianDetails.designation} (ID: {complaint.technicianDetails.employeeId})
+                                                            {complaint.technicianDetails.designation} {isOwner && `(ID: ${complaint.technicianDetails.employeeId})`}
                                                         </Typography>
                                                         <Typography variant="body2" sx={{
                                                             color: '#495057',

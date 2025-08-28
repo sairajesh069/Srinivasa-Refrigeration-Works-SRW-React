@@ -143,6 +143,16 @@ const App = () => {
                     </AuthGuard>
                 } />
 
+                <Route path="/all-complaints" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <DisplayComplaints />
+                    </AuthGuard>
+                } />
+
                 <Route path="/unauthorized" element={ <Unauthorized /> } />
 
                 <Route path="*" element={ <PageNotFound /> } />

@@ -33,8 +33,17 @@ export const complaintApi = createApi({
             providesTags: (result, error, userId) => [
                 { type: "complaints", id: `user-${userId}` },
             ]
-        })
+        }),
+        fetchAllComplaints: builder.query({
+            query: () => ({
+                url: '/srw/complaint/list',
+                method: 'GET'
+            }),
+            providesTags: (result, error) => [
+                { type: "complaints", id: `list` },
+            ]
+        }),
     })
 });
 
-export const { useComplaintRegisterMutation, useFetchMyComplaintsQuery } = complaintApi;
+export const { useComplaintRegisterMutation, useFetchMyComplaintsQuery, useFetchAllComplaintsQuery } = complaintApi;
