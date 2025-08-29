@@ -550,9 +550,13 @@ const Register = () => {
                                         boxShadow: '0 4px 12px rgba(79, 195, 247, 0.15)'
                                     }
                                 }}
-                                to= { isCustomerRegistration && isAuthenticated ? '/dashboard' : '/login' }
+                                to= {
+                                    (isCustomerRegistration || isEmployeeRegistration || isOwnerRegistration) && isAuthenticated
+                                        ? '/dashboard'
+                                        : '/login'
+                                    }
                             >
-                                { isCustomerRegistration && isAuthenticated
+                                { (isCustomerRegistration || isEmployeeRegistration || isOwnerRegistration) && isAuthenticated
                                     ? `Back to Dashboard`
                                     : `Already have an account? Sign In`
                                 }

@@ -6,7 +6,7 @@ import { Settings, Person, Lock, Visibility, VisibilityOff, Save, Cancel,
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import useAuth from '../../utils/useAuth.jsx';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
@@ -22,7 +22,11 @@ const AccountSettings = () => {
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const { data: loginData } = useFetchUsernameQuery(user?.userId);
+    const location = useLocation();
+
+    const { data: loginData } = useFetchUsernameQuery(user?.userId, {
+        skip: !(location.pathname === '/account-settings' && !isLoggingOut && user?.userId)
+    });
 
     const validationSchema = Yup.object({
         oldPassword: Yup.string()

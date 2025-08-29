@@ -2,6 +2,7 @@ import React from "react";
 import * as Yup from 'yup';
 import {Box, CircularProgress, Typography} from "@mui/material";
 import {toast} from "react-toastify";
+import {useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery} from "../reducers/userProfileApi.js";
 
 const ProfileUtils = {
     getValidationSchema: (userType, isUpdate = false) => {
@@ -224,6 +225,24 @@ const ProfileUtils = {
         const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
 
         return `${hours}h ${minutes}m`;
+    },
+
+    getActiveUserProfileQuery: (userId, userType, shouldFetch) => {
+        const customerQuery = useCustomerProfileQuery(userId, {
+            skip: userType !== 'CUSTOMER' || !shouldFetch
+        });
+
+        const ownerQuery = useOwnerProfileQuery(userId, {
+            skip: userType !== 'OWNER' || !shouldFetch
+        });
+
+        const employeeQuery = useEmployeeProfileQuery(userId, {
+            skip: userType !== 'EMPLOYEE' || !shouldFetch
+        });
+
+        return userType === 'CUSTOMER' ? customerQuery
+            : userType === 'OWNER' ? ownerQuery
+                : employeeQuery;
     }
 };
 

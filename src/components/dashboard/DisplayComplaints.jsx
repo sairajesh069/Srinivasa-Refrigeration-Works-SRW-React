@@ -13,7 +13,7 @@ import useAuth from "../../utils/useAuth.jsx";
 import {useFetchMyComplaintsQuery, useFetchAllComplaintsQuery, useFetchAssignedComplaintsQuery} from "../../reducers/complaintApi.js";
 
 const DisplayComplaints = () => {
-    const { user } = useAuth();
+    const { user, isLoggingOut } = useAuth();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate();
@@ -29,13 +29,19 @@ const DisplayComplaints = () => {
     const isAssignedComplaintsPath = location.pathname === '/assigned-complaints';
 
     const { data: userComplaintsData, isLoading: fetchUserComplaintsLoading,
-        isError: fetchUserComplaintsError } = useFetchMyComplaintsQuery(user?.userId, { skip: !isUserComplaintsPath });
+        isError: fetchUserComplaintsError } = useFetchMyComplaintsQuery(user?.userId, {
+            skip: !(isUserComplaintsPath && !isLoggingOut && user?.userId)
+        });
 
     const { data: allComplaintsData, isLoading: fetchAllComplaintsLoading,
-        isError: fetchAllComplaintsError } = useFetchAllComplaintsQuery(user?.userId, { skip: !isAllComplaintsPath });
+        isError: fetchAllComplaintsError } = useFetchAllComplaintsQuery(user?.userId, {
+            skip: !(isAllComplaintsPath && !isLoggingOut && user?.userId)
+        });
 
     const { data: assignedComplaintsData, isLoading: fetchAssignedComplaintsLoading,
-        isError: fetchAssignedComplaintsError } = useFetchAssignedComplaintsQuery(user?.userId, { skip: !isAssignedComplaintsPath });
+        isError: fetchAssignedComplaintsError } = useFetchAssignedComplaintsQuery(user?.userId, {
+            skip: !(isAssignedComplaintsPath && !isLoggingOut && user?.userId)
+        });
 
     const complaints = isUserComplaintsPath ? userComplaintsData?.complaintsDTO
             : isAllComplaintsPath ? allComplaintsData?.complaintsDTO

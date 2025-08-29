@@ -5,7 +5,7 @@ import { Person, Email, Phone, Badge, CalendarToday, Work, Save, Cancel,
     LocationOn, CurrencyRupee, WorkOutline, Dashboard, Male, Female, Transgender } from '@mui/icons-material';
 import { Form, Formik } from 'formik';
 import { toast } from 'react-toastify';
-import { useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import useAuth from '../../utils/useAuth.jsx';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
@@ -14,22 +14,18 @@ import { useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery,
     useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation } from "../../reducers/userProfileApi.js";
 
 const UpdateUserProfile = () => {
-    const { user } = useAuth();
+    const { user, isLoggingOut } = useAuth();
     const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [isSubmitting, setIsSubmitting] = useState(false);
     const userId = user?.userId;
     const userType = user?.userType;
+    const location = useLocation();
 
-    const hooks = {
-        CUSTOMER: useCustomerProfileQuery,
-        OWNER: useOwnerProfileQuery,
-        EMPLOYEE: useEmployeeProfileQuery
-    };
+    const shouldFetch = userId && userType && location.pathname === "/update-profile" && !isLoggingOut;
 
-    const useProfileQuery = hooks[userType];
-    const { data: profile, isLoading } = useProfileQuery(userId);
+    const { data: profile, isLoading } = ProfileUtils.getActiveUserProfileQuery(userId, userType, shouldFetch);
 
     if (isLoading) {
         ProfileUtils.profileLoader("Loading profile data...");
@@ -40,7 +36,7 @@ const UpdateUserProfile = () => {
         userType: userType || 'USER',
         firstName: profile?.userDTO?.firstName || 'User',
         lastName: profile?.userDTO?.lastName || 'N/A',
-        gender: profile?.userDTO?.gender || 'other',
+        gender: profile?.userDTO?.gender || 'Other',
         phoneNumber: profile?.userDTO?.phoneNumber.slice(3) || 'N/A',
         email: profile?.userDTO?.email || 'N/A',
         address: profile?.userDTO?.address || 'N/A',

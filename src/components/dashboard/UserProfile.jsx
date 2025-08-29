@@ -4,29 +4,22 @@ import { Person, Edit, Email, Phone, Home, Badge, CalendarToday, Work, AccountBa
     Dashboard, Security, Male, Female, Transgender } from '@mui/icons-material';
 import useAuth from '../../utils/useAuth.jsx';
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
-import {useNavigate} from "react-router-dom";
-import { useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery } from "../../reducers/userProfileApi.js";
+import {useLocation, useNavigate} from "react-router-dom";
 
 const UserProfile = () => {
-    const { user } = useAuth();
+    const { user, isLoggingOut } = useAuth();
     const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+    const location = useLocation();
 
     const userId = user?.userId;
     const userType = user?.userType;
 
-    const hooks = {
-        CUSTOMER: useCustomerProfileQuery,
-        OWNER: useOwnerProfileQuery,
-        EMPLOYEE: useEmployeeProfileQuery
-    };
+    const shouldFetch = userId && userType && location.pathname === "/profile" && !isLoggingOut;
 
-    const useProfileQuery = hooks[userType];
-    const { data: profile, isLoading } = useProfileQuery(userId, {
-        refetchOnMountOrArgChange: true
-    });
+    const { data: profile, isLoading } = ProfileUtils.getActiveUserProfileQuery(userId, userType, shouldFetch);
 
     if (isLoading) {
         ProfileUtils.profileLoader(`Fetching ${user?.username}'s details...`);
@@ -37,7 +30,7 @@ const UserProfile = () => {
         userType: userType || 'USER',
         firstName: profile?.userDTO?.firstName || 'User',
         lastName: profile?.userDTO?.lastName || 'N/A',
-        gender: profile?.userDTO?.gender || 'other',
+        gender: profile?.userDTO?.gender || 'Other',
         phoneNumber: profile?.userDTO?.phoneNumber || 'N/A',
         email: profile?.userDTO?.email || 'N/A',
         address: profile?.userDTO?.address || 'N/A',
