@@ -66,7 +66,7 @@ const Login = () => {
     };
 
     const handleLoginError = useCallback((error, setFieldError) => {
-        const status = error.status;
+        const status = error?.status;
         const errorMessage = error.data?.message;
 
         if (status === 401 && errorMessage) {

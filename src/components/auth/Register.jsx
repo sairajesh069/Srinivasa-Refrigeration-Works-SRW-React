@@ -16,8 +16,11 @@ const Register = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
+    const isCustomerRegistration = location.pathname === '/customer-register';
     const isOwnerRegistration = location.pathname === '/owner-register';
     const isEmployeeRegistration = location.pathname === '/employee-register';
+
+    const isAuthenticated = AuthUtils.isAuthenticated();
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -547,9 +550,12 @@ const Register = () => {
                                         boxShadow: '0 4px 12px rgba(79, 195, 247, 0.15)'
                                     }
                                 }}
-                                to='/login'
+                                to= { isCustomerRegistration && isAuthenticated ? '/dashboard' : '/login' }
                             >
-                                Already have an account? Sign In
+                                { isCustomerRegistration && isAuthenticated
+                                    ? `Back to Dashboard`
+                                    : `Already have an account? Sign In`
+                                }
                             </StyledLink>
                         </Form>
                     )}

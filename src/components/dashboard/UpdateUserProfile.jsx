@@ -19,8 +19,8 @@ const UpdateUserProfile = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const userId = user.userId;
-    const userType = user.userType;
+    const userId = user?.userId;
+    const userType = user?.userType;
 
     const hooks = {
         CUSTOMER: useCustomerProfileQuery,

@@ -119,7 +119,7 @@ const ComplaintRegister = () => {
         setIsSubmitting(true);
 
         const complaintDTO = {
-            bookedById: user.userId,
+            bookedById: user?.userId,
             customerName: values.fullName,
             contactNumber: values.contactNumber,
             email: values.email || 'N/A',
@@ -305,7 +305,7 @@ const ComplaintRegister = () => {
                                     }
                                 }}>
                                     <Chip
-                                        label={user.userType}
+                                        label={user?.userType}
                                         size={isMobile ? "small" : "medium"}
                                         sx={{
                                             backgroundColor: 'rgba(255, 255, 255, 0.2)',

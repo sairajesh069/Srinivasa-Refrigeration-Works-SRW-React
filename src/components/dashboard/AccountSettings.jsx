@@ -17,13 +17,12 @@ const AccountSettings = () => {
     const navigate = useNavigate();
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
-    const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'));
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showOldPassword, setShowOldPassword] = useState(false);
     const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const { data: loginData } = useFetchUsernameQuery(user.userId);
+    const { data: loginData } = useFetchUsernameQuery(user?.userId);
 
     const validationSchema = Yup.object({
         oldPassword: Yup.string()
@@ -53,8 +52,8 @@ const AccountSettings = () => {
                 return;
             }
             const passwordChangeDTO = {
-                userId: user.userId,
-                username: loginData.username,
+                userId: user?.userId,
+                username: loginData?.username,
                 oldPassword: values.oldPassword,
                 newPassword: values.newPassword
             };
@@ -65,7 +64,7 @@ const AccountSettings = () => {
             await logout(false);
         }
         catch (error) {
-            const errorMessage = error?.data?.message || error.message;
+            const errorMessage = error?.data?.message || error?.message;
             if (errorMessage === 'Invalid current password') {
                 setFieldError('oldPassword', 'Current password is incorrect');
                 toast.error(errorMessage);

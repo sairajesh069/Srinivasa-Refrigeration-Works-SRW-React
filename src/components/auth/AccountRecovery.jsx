@@ -117,12 +117,12 @@ const AccountRecovery = () => {
 
             if (isUsernameRecovery) {
                 response = await usernameRecovery(accountRecoveryDTO).unwrap();
-                setValidationResponse(response.message);
+                setValidationResponse(response?.message);
             }
             else if (isUserValidation) {
                 response = await userValidation(accountRecoveryDTO).unwrap();
                 setIsUserValidated(true);
-                setValidationResponse(response.message);
+                setValidationResponse(response?.message);
                 navigate('/forgot-password');
             }
             else if (isPasswordReset) {
@@ -131,12 +131,12 @@ const AccountRecovery = () => {
             }
 
             setIsError(false);
-            toast.success(pageConfig.successMessage);
+            toast.success(pageConfig?.successMessage);
         }
         catch (error) {
             setIsError(true);
             if (error.data?.status === 404 && (isUsernameRecovery || isUserValidation)) {
-                setValidationResponse(error.data.message);
+                setValidationResponse(error.data?.message);
                 setIsUserValidated(false);
             }
 
@@ -144,7 +144,7 @@ const AccountRecovery = () => {
                 setPasswordResetResponse("Something went wrong. Please try again later.");
             }
 
-            toast.error(error.data?.status === 404 ? error.data.message : "Something went wrong...");
+            toast.error(error.data?.status === 404 ? error.data?.message : "Something went wrong...");
         }
     };
 

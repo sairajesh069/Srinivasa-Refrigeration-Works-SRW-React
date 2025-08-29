@@ -14,8 +14,8 @@ const UserProfile = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-    const userId = user.userId;
-    const userType = user.userType;
+    const userId = user?.userId;
+    const userType = user?.userType;
 
     const hooks = {
         CUSTOMER: useCustomerProfileQuery,
@@ -29,7 +29,7 @@ const UserProfile = () => {
     });
 
     if (isLoading) {
-        ProfileUtils.profileLoader(`Fetching ${user.username}'s details...`);
+        ProfileUtils.profileLoader(`Fetching ${user?.username}'s details...`);
     }
 
     const userData = {
@@ -69,10 +69,11 @@ const UserProfile = () => {
 
     const InfoCard = ({ icon, label, value, fullWidth = false }) => (
         <Grid
-            item
-            xs={12}
-            sm={fullWidth ? 12 : 6}
-            md={fullWidth ? 12 : 4}
+            size={{
+                xs: 12,
+                sm: fullWidth ? 12 : 6,
+                md: fullWidth ? 12 : 4,
+            }}
         >
             <Paper sx={{
                 p: { xs: 1.5, sm: 2, md: 2.5 },

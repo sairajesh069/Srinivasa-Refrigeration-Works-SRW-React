@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import AuthUtils from './AuthUtils.jsx';
 import { Box, CircularProgress, Typography } from '@mui/material';
@@ -32,14 +32,18 @@ const AuthGuard = ({
         userRole: null
     });
     const location = useLocation();
+    const hasChecked = useRef(false);
 
     useEffect(() => {
-        const checkAuth = async () => {
+
+        if (hasChecked.current) return;
+
+        const checkAuth = () => {
             try {
-                await new Promise(resolve => setTimeout(resolve, 50));
+                hasChecked.current = true;
 
                 const isAuthenticated = AuthUtils.isAuthenticated();
-                const userRole = isAuthenticated ? AuthUtils.getUserData().userType : null;
+                const userRole = isAuthenticated ? AuthUtils.getUserData()?.userType : null;
 
                 setAuthState({
                     isLoading: false,
@@ -47,6 +51,7 @@ const AuthGuard = ({
                     userRole
                 });
             } catch (error) {
+                console.error('Auth check failed:', error);
                 setAuthState({
                     isLoading: false,
                     isAuthenticated: false,
@@ -56,7 +61,11 @@ const AuthGuard = ({
         };
 
         checkAuth();
-    }, []);
+
+        return () => {
+            hasChecked.current = false;
+        };
+    }, [location.pathname]);
 
     if (authState.isLoading) {
         return <AuthLoader />;
@@ -64,10 +73,6 @@ const AuthGuard = ({
 
     if (requireAuth && !authState.isAuthenticated) {
         return <Navigate to={fallback} state={{ from: location }} replace />;
-    }
-
-    if (!requireAuth && authState.isAuthenticated) {
-        return <Navigate to="/" replace />;
     }
 
     if (requireAuth && authState.isAuthenticated && allowedRoles.length > 0) {

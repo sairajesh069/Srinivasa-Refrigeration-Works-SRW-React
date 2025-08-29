@@ -1,7 +1,24 @@
 import React from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button } from '@mui/material';
-import { Dashboard as DashboardIcon, Person, Security, AccessTime, AccountBox, Edit, List,
-    TrackChanges, Feedback, Settings, Notifications, ArrowForward, Handyman, AssignmentInd } from '@mui/icons-material';
+import {
+    Dashboard as DashboardIcon,
+    Person,
+    Security,
+    AccessTime,
+    AccountBox,
+    Edit,
+    List,
+    TrackChanges,
+    Feedback,
+    Settings,
+    Notifications,
+    ArrowForward,
+    Handyman,
+    AssignmentInd,
+    PersonAdd,
+    Work,
+    BusinessCenter
+} from '@mui/icons-material';
 import useAuth from '../../utils/useAuth.jsx';
 import {useNavigate} from "react-router-dom";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
@@ -78,15 +95,44 @@ const Dashboard = () => {
     ];
 
     if(isOwner) {
-        accountActions.push({
-            id: 'all-complaints',
-            title: 'All Complaints',
-            description: 'View all your submitted complaints',
-            path: '/all-complaints',
-            icon: <List />,
-            color: '#ab47bc',
-            bgColor: '#f3e5f5'
-        });
+        accountActions.push(
+            {
+                id: 'customer-register',
+                title: 'Register customer',
+                description: 'Register a new customer in the portal',
+                path: '/customer-register',
+                icon: <PersonAdd />,
+                color: '#1976d2',
+                bgColor: '#e3f2fd'
+            },
+            {
+                id: 'employee-register',
+                title: 'Register Employee',
+                description: 'Register a new employee in the portal',
+                path: '/employee-register',
+                icon: <Work />,
+                color: '#2e7d32',
+                bgColor: '#e8f5e9'
+            },
+            {
+                id: 'owner-register',
+                title: 'Register owner',
+                description: 'Register a new owner in the portal',
+                path: '/owner-register',
+                icon: <BusinessCenter />,
+                color: '#9c27b0',
+                bgColor: '#f3e5f5'
+            },
+            {
+                id: 'all-complaints',
+                title: 'All Complaints',
+                description: 'View all your submitted complaints',
+                path: '/all-complaints',
+                icon: <List />,
+                color: '#ab47bc',
+                bgColor: '#f3e5f5'
+            }
+        );
     }
 
     if(isEmployee) {
