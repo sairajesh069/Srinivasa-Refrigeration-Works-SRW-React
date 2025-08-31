@@ -4,62 +4,13 @@ import { Box, Typography, Paper, Grid, Avatar, Button, Alert, CircularProgress,
 import { Person, Email, Phone, Home, Build, Category,
     Business, Save, Cancel, Dashboard, LocationOn, Map, Handyman, Description } from '@mui/icons-material';
 import { Form, Formik } from 'formik';
-import * as Yup from 'yup';
 import { toast } from 'react-toastify';
 import {useLocation, useNavigate} from 'react-router-dom';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import useAuth from "../../utils/useAuth.jsx";
 import {useComplaintRegisterMutation} from "../../reducers/complaintApi.js";
-
-const PRODUCT_TYPES = ["Air Conditioner", "Refrigerator", "Other"];
-const AIR_CONDITIONER_BRANDS = ["Samsung", "LG", "Panasonic", "Daikin", "Haier", "Lloyd", "Hitachi", "BlueStar", "Carrier", "O'General", "Voltas", "Others"];
-const AIR_CONDITIONER_MODELS = ["Inverter Technology Split AC", "Non-Inverter Split AC", "Window Air Conditioner"];
-const REFRIGERATOR_BRANDS = ["Samsung", "LG", "Whirlpool", "Haier", "Godrej", "Bosch", "Hitachi", "Kelvinator", "Voltas", "Panasonic", "Others"];
-const REFRIGERATOR_MODELS = ["Single-door Non-Inverter", "Single-door Inverter", "Double-door Non-Inverter", "Double-door Inverter"];
-
-const validationSchema = Yup.object().shape({
-    fullName: Yup.string()
-        .min(4, 'Full name must be at least 4 characters')
-        .required('Full name is required'),
-    contactNumber: Yup.string()
-        .matches(/^\d{10}$/, 'Contact number must be 10 digits')
-        .required('Contact number is required'),
-    email: Yup.string()
-        .transform(value => (value ? value.trim() : value))
-        .email('Invalid email address'),
-    doorNumber: Yup.string()
-        .min(1, 'Door number is required')
-        .required('Door number is required'),
-    street: Yup.string()
-        .min(3, 'Street must be at least 3 characters')
-        .required('Street is required'),
-    city: Yup.string()
-        .min(3, 'City must be at least 3 characters')
-        .required('City is required'),
-    district: Yup.string()
-        .min(3, 'District must be at least 3 characters')
-        .required('District is required'),
-    state: Yup.string()
-        .min(3, 'State must be at least 3 characters')
-        .required('State is required'),
-    pincode: Yup.string()
-        .matches(/^\d{6}$/, 'Pincode must be 6 digits')
-        .required('Pincode is required'),
-    country: Yup.string()
-        .min(2, 'Country must be at least 2 characters')
-        .required('Country is required'),
-    productType: Yup.string()
-        .oneOf(PRODUCT_TYPES, 'Please select a valid product type')
-        .required('Product type is required'),
-    brand: Yup.string()
-        .required('Brand is required'),
-    productModel: Yup.string()
-        .required('Product model is required'),
-    description: Yup.string()
-        .min(10, 'Description must be at least 10 characters')
-        .required('Description is required')
-});
+import ComplaintUtils from "../../utils/ComplaintUtils.jsx";
 
 const ComplaintRegister = () => {
     const { user } = useAuth();
@@ -74,43 +25,23 @@ const ComplaintRegister = () => {
     const productType = queryParams.get("productType");
 
     const initialValues = {
-        fullName: '',
+        customerName: '',
         contactNumber: '',
         email: '',
-        doorNumber: '',
-        street: '',
-        landmark: '',
-        city: '',
-        district: '',
-        state: '',
-        pincode: '',
-        country: 'India',
+        address: {
+            doorNumber: '',
+            street: '',
+            landmark: '',
+            city: '',
+            district: '',
+            state: '',
+            pincode: '',
+            country: 'India'
+        },
         productType: productType ? productType : '',
         brand: '',
         productModel: '',
         description: ''
-    };
-
-    const getBrandOptions = productType => {
-        switch (productType) {
-            case 'Air Conditioner':
-                return AIR_CONDITIONER_BRANDS;
-            case 'Refrigerator':
-                return REFRIGERATOR_BRANDS;
-            default:
-                return ['Others'];
-        }
-    };
-
-    const getModelOptions = productType => {
-        switch (productType) {
-            case 'Air Conditioner':
-                return AIR_CONDITIONER_MODELS;
-            case 'Refrigerator':
-                return REFRIGERATOR_MODELS;
-            default:
-                return ['Others'];
-        }
     };
 
     const [complaintRegister] = useComplaintRegisterMutation();
@@ -120,18 +51,18 @@ const ComplaintRegister = () => {
 
         const complaintDTO = {
             bookedById: user?.userId,
-            customerName: values.fullName,
+            customerName: values.customerName,
             contactNumber: values.contactNumber,
             email: values.email || 'N/A',
             address: {
-                doorNumber: values.doorNumber,
-                street: values.street,
-                landmark: values.landmark || 'N/A',
-                city: values.city,
-                district: values.district,
-                state: values.state,
-                pincode: values.pincode,
-                country: values.country
+                doorNumber: values.address?.doorNumber,
+                street: values.address?.street,
+                landmark: values.address?.landmark || 'N/A',
+                city: values.address?.city,
+                district: values.address?.district,
+                state: values.address?.state,
+                pincode: values.address?.pincode,
+                country: values.address?.country
             },
             productType: values.productType,
             brand: values.brand,
@@ -153,6 +84,8 @@ const ComplaintRegister = () => {
             setIsSubmitting(false);
         }
     };
+
+    const validationSchema = ComplaintUtils.getValidationSchema();
 
     return (
         <Box sx={{
@@ -456,11 +389,11 @@ const ComplaintRegister = () => {
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Full Name"
-                                                    name="fullName"
-                                                    value={values.fullName}
+                                                    name="customerName"
+                                                    value={values.customerName}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.fullName || values.fullName) && errors.fullName)}
-                                                    helperText={(touched.fullName || values.fullName) && errors.fullName}
+                                                    error={Boolean((touched.customerName || values.customerName) && errors.customerName)}
+                                                    helperText={(touched.customerName || values.customerName) && errors.customerName}
                                                     variant="outlined"
                                                     placeholder="Enter your full name"
                                                     sx={{
@@ -649,16 +582,16 @@ const ComplaintRegister = () => {
                                         xs: 2,
                                         md: 3
                                     }}>
-                                        <Grid size={{xs:12, sm:6, md:4}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Door Number"
-                                                    name="doorNumber"
-                                                    value={values.doorNumber}
+                                                    name="address.doorNumber"
+                                                    value={values.address?.doorNumber}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.doorNumber || values.doorNumber) && errors.doorNumber)}
-                                                    helperText={(touched.doorNumber || values.doorNumber) && errors.doorNumber}
+                                                    error={Boolean((touched.address?.doorNumber || values.address?.doorNumber) && errors.address?.doorNumber)}
+                                                    helperText={(touched.address?.doorNumber || values.address?.doorNumber) && errors.address?.doorNumber}
                                                     variant="outlined"
                                                     placeholder="Enter your door/flat number"
                                                     sx={{
@@ -703,16 +636,16 @@ const ComplaintRegister = () => {
                                             </Box>
                                         </Grid>
 
-                                        <Grid size={{xs:12, sm:6, md:8}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Street"
-                                                    name="street"
-                                                    value={values.street}
+                                                    name="address.street"
+                                                    value={values.address?.street}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.street || values.street) && errors.street)}
-                                                    helperText={(touched.street || values.street) && errors.street}
+                                                    error={Boolean((touched.address?.street || values.address?.street) && errors.address?.street)}
+                                                    helperText={(touched.address?.street || values.address?.street) && errors.address?.street}
                                                     variant="outlined"
                                                     placeholder="Enter street name"
                                                     sx={{
@@ -757,16 +690,16 @@ const ComplaintRegister = () => {
                                             </Box>
                                         </Grid>
 
-                                        <Grid size={{xs:12, sm:6, md:8}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Landmark"
-                                                    name="landmark"
-                                                    value={values.landmark}
+                                                    name="address.landmark"
+                                                    value={values.address?.landmark}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.landmark || values.landmark) && errors.landmark)}
-                                                    helperText={(touched.landmark || values.landmark) && errors.landmark}
+                                                    error={Boolean((touched.address?.landmark || values.address?.landmark) && errors.address?.landmark)}
+                                                    helperText={(touched.address?.landmark || values.address?.landmark) && errors.address?.landmark}
                                                     variant="outlined"
                                                     placeholder="Enter landmark"
                                                     sx={{
@@ -816,11 +749,11 @@ const ComplaintRegister = () => {
                                                 <StyledTextField
                                                     fullWidth
                                                     label="City"
-                                                    name="city"
-                                                    value={values.city}
+                                                    name="address.city"
+                                                    value={values.address?.city}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.city || values.city) && errors.city)}
-                                                    helperText={(touched.city || values.city) && errors.city}
+                                                    error={Boolean((touched.address?.city || values.address?.city) && errors.address?.city)}
+                                                    helperText={(touched.address?.city || values.address?.city) && errors.address?.city}
                                                     variant="outlined"
                                                     placeholder="Enter city"
                                                     sx={{
@@ -870,11 +803,11 @@ const ComplaintRegister = () => {
                                                 <StyledTextField
                                                     fullWidth
                                                     label="District"
-                                                    name="district"
-                                                    value={values.district}
+                                                    name="address.district"
+                                                    value={values.address?.district}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.district || values.district) && errors.district)}
-                                                    helperText={(touched.district || values.district) && errors.district}
+                                                    error={Boolean((touched.address?.district || values.address?.district) && errors.address?.district)}
+                                                    helperText={(touched.address?.district || values.address?.district) && errors.address?.district}
                                                     variant="outlined"
                                                     placeholder="Enter district"
                                                     sx={{
@@ -919,16 +852,16 @@ const ComplaintRegister = () => {
                                             </Box>
                                         </Grid>
 
-                                        <Grid size={{xs:12, sm:6, md:4}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="State"
-                                                    name="state"
-                                                    value={values.state}
+                                                    name="address.state"
+                                                    value={values.address?.state}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.state || values.state) && errors.state)}
-                                                    helperText={(touched.state || values.state) && errors.state}
+                                                    error={Boolean((touched.address?.state || values.address?.state) && errors.address?.state)}
+                                                    helperText={(touched.address?.state || values.address?.state) && errors.address?.state}
                                                     variant="outlined"
                                                     placeholder="Enter state"
                                                     sx={{
@@ -973,16 +906,16 @@ const ComplaintRegister = () => {
                                             </Box>
                                         </Grid>
 
-                                        <Grid size={{xs:12, sm:6, md:4}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Pincode"
-                                                    name="pincode"
-                                                    value={values.pincode}
+                                                    name="address.pincode"
+                                                    value={values.address?.pincode}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.pincode || values.pincode) && errors.pincode)}
-                                                    helperText={(touched.pincode || values.pincode) && errors.pincode}
+                                                    error={Boolean((touched.address?.pincode || values.address?.pincode) && errors.address?.pincode)}
+                                                    helperText={(touched.address?.pincode || values.address?.pincode) && errors.address?.pincode}
                                                     variant="outlined"
                                                     placeholder="Enter 6-digit pincode"
                                                     sx={{
@@ -1027,16 +960,16 @@ const ComplaintRegister = () => {
                                             </Box>
                                         </Grid>
 
-                                        <Grid size={{xs:12, sm:6, md:4}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
                                                     label="Country"
-                                                    name="country"
-                                                    value={values.country}
+                                                    name="address.country"
+                                                    value={values.address?.country}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.country || values.country) && errors.country)}
-                                                    helperText={(touched.country || values.country) && errors.country}
+                                                    error={Boolean((touched.address?.country || values.address?.country) && errors.address?.country)}
+                                                    helperText={(touched.address?.country || values.address?.country) && errors.address?.country}
                                                     variant="outlined"
                                                     placeholder="Enter country"
                                                     sx={{
@@ -1117,7 +1050,7 @@ const ComplaintRegister = () => {
                                         xs: 2,
                                         md: 3
                                     }}>
-                                        <Grid size={{xs:12, sm:6, md:4}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
@@ -1178,14 +1111,14 @@ const ComplaintRegister = () => {
                                                     }}
                                                 >
                                                     <MenuItem value="">--Select Product Type--</MenuItem>
-                                                    {PRODUCT_TYPES.map(type => (
+                                                    {ComplaintUtils.PRODUCT_TYPES.map(type => (
                                                         <MenuItem key={type} value={type}>{type}</MenuItem>
                                                     ))}
                                                 </StyledTextField>
                                             </Box>
                                         </Grid>
 
-                                        <Grid size={{xs:12, sm:6, md:4}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
@@ -1246,14 +1179,14 @@ const ComplaintRegister = () => {
                                                     }}
                                                 >
                                                     <MenuItem value="">--Select Brand--</MenuItem>
-                                                    {getBrandOptions(values.productType).map(brand => (
+                                                    {ComplaintUtils.getBrandOptions(values.productType).map(brand => (
                                                         <MenuItem key={brand} value={brand}>{brand}</MenuItem>
                                                     ))}
                                                 </StyledTextField>
                                             </Box>
                                         </Grid>
 
-                                        <Grid size={{xs:12, sm:6, md:4}}>
+                                        <Grid size={{xs:12, sm:6}}>
                                             <Box sx={{ mb: 0.5 }}>
                                                 <StyledTextField
                                                     fullWidth
@@ -1311,7 +1244,7 @@ const ComplaintRegister = () => {
                                                     }}
                                                 >
                                                     <MenuItem value="">--Select Model--</MenuItem>
-                                                    {getModelOptions(values.productType).map((model) => (
+                                                    {ComplaintUtils.getModelOptions(values.productType).map((model) => (
                                                         <MenuItem key={model} value={model}>{model}</MenuItem>
                                                     ))}
                                                 </StyledTextField>

@@ -10,7 +10,7 @@ import useAuth from '../../utils/useAuth.jsx';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
-import { useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery, useUpdateCustomerProfileMutation,
+import { useUpdateCustomerProfileMutation,
     useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation } from "../../reducers/userProfileApi.js";
 
 const UpdateUserProfile = () => {
@@ -37,7 +37,7 @@ const UpdateUserProfile = () => {
         firstName: profile?.userDTO?.firstName || 'User',
         lastName: profile?.userDTO?.lastName || 'N/A',
         gender: profile?.userDTO?.gender || 'Other',
-        phoneNumber: profile?.userDTO?.phoneNumber.slice(3) || 'N/A',
+        phoneNumber: profile?.userDTO?.phoneNumber?.slice(3) || 'N/A',
         email: profile?.userDTO?.email || 'N/A',
         address: profile?.userDTO?.address || 'N/A',
         createdAt: profile?.userDTO?.createdAt,
@@ -78,7 +78,9 @@ const UpdateUserProfile = () => {
                         phoneNumber: values.phoneNumber,
                         email: values.email.toLowerCase(),
                         address: values.address,
-                        status: userData.userStatus
+                        status: userData?.userStatus,
+                        createdAt: userData?.createdAt,
+                        updatedAt: userData?.updatedAt
                     },
                     userCredentialDTO: userCredentialDTO
                 }
@@ -96,7 +98,9 @@ const UpdateUserProfile = () => {
                         email: values.email.toLowerCase(),
                         address: values.address,
                         nationalIdNumber: values.nationalIdNumber,
-                        status: userData.userStatus
+                        status: userData?.userStatus,
+                        createdAt: userData?.createdAt,
+                        updatedAt: userData?.updatedAt
                     },
                     userCredentialDTO: userCredentialDTO
                 }
@@ -116,7 +120,10 @@ const UpdateUserProfile = () => {
                         nationalIdNumber: values.nationalIdNumber,
                         designation: values.designation,
                         salary: values.salary,
-                        status: userData.userStatus
+                        status: userData?.userStatus,
+                        dateOfHire: userData?.dateOfHire,
+                        dateOfExit: userData?.dateOfExit,
+                        updatedAt: userData?.updatedAt
                     },
                     userCredentialDTO: userCredentialDTO
                 }

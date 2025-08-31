@@ -1,16 +1,19 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button, Alert, Divider, useTheme,
     useMediaQuery, InputAdornment, MenuItem, Collapse, Badge, Tooltip, IconButton, CircularProgress } from '@mui/material';
-import {
-    Dashboard, FilterList, Search, CalendarToday, Person, Phone, Email,
-    Home, Build, Description, Schedule, CheckCircle, Pending, Error, Handyman,
-    ExpandMore, ExpandLess, ContactPhone, Engineering, Feedback, History, List, TrackChanges, AssignmentInd
-} from '@mui/icons-material';
+import { Dashboard, FilterList, Search, CalendarToday, Person, Phone, Email, Home, Build, Description,
+    Schedule, CheckCircle, Pending, Error, Handyman, ExpandMore, ExpandLess, ContactPhone, Engineering,
+    Feedback, History, List, TrackChanges, AssignmentInd, Edit } from '@mui/icons-material';
 import {useLocation, useNavigate} from 'react-router-dom';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import useAuth from "../../utils/useAuth.jsx";
-import {useFetchMyComplaintsQuery, useFetchAllComplaintsQuery, useFetchAssignedComplaintsQuery} from "../../reducers/complaintApi.js";
+import {
+    useFetchMyComplaintsQuery,
+    useFetchAllComplaintsQuery,
+    useFetchAssignedComplaintsQuery
+} from "../../reducers/complaintApi.js";
+import ComplaintUtils from "../../utils/ComplaintUtils.jsx";
 
 const DisplayComplaints = () => {
     const { user, isLoggingOut } = useAuth();
@@ -120,39 +123,11 @@ const DisplayComplaints = () => {
     const productTypeOptions = ['All', 'Air Conditioner', 'Refrigerator', 'Other'];
 
     if (fetchUserComplaintsLoading || fetchAllComplaintsLoading || fetchAssignedComplaintsLoading) {
-        return (
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                minHeight: '100vh',
-                gap: 2
-            }}>
-                <CircularProgress size={60} sx={{ color: '#4fc3f7' }} />
-                <Typography variant="h6" sx={{ color: '#7f8c8d' }}>
-                    Fetching complaints....
-                </Typography>
-            </Box>
-        );
+        ComplaintUtils.complaintLoader("Fetching complaints....");
     }
 
     if (fetchUserComplaintsError || fetchAllComplaintsError || fetchAssignedComplaintsError) {
-        return (
-            <Box sx={{
-                p: 4,
-                textAlign: 'center',
-                backgroundColor: '#f8f9fa',
-                minHeight: '50vh',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-            }}>
-                <Alert severity="error" sx={{ maxWidth: '500px' }}>
-                    Failed to load complaints. Please try again.
-                </Alert>
-            </Box>
-        );
+        ComplaintUtils.complaintError("Failed to load complaints. Please try again.");
     }
 
     return (
@@ -493,45 +468,73 @@ const DisplayComplaints = () => {
                                     }
                                 }}>
                                     <CardContent sx={{ p: 3 }}>
-                                        {/* Header with Complaint ID and Status */}
-                                        <Box sx={{
-                                            display: 'flex',
-                                            justifyContent: 'space-between',
-                                            alignItems: 'flex-start',
-                                            mb: 2
-                                        }}>
-                                            <Box>
+                                        <Box sx={{ mb: 1.5 }}>
+                                            {/* Complaint ID and Edit Button */}
+                                            <Box sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center',
+                                                mb: 1
+                                            }}>
                                                 <Typography variant="h6" sx={{
                                                     fontWeight: 700,
                                                     color: '#2c3e50',
-                                                    mb: 0.5
+                                                    fontSize: {xs: '16px', sm: '18.5px', lg: '20px'},
                                                 }}>
                                                     {complaint.complaintId}
                                                 </Typography>
+                                                <Tooltip title="Edit Complaint">
+                                                    <IconButton
+                                                        size="small"
+                                                        sx={{
+                                                            color: '#4fc3f7',
+                                                            backgroundColor: 'rgba(79, 195, 247, 0.1)',
+                                                            '&:hover': {
+                                                                backgroundColor: 'rgba(79, 195, 247, 0.2)',
+                                                                transform: 'scale(1.05)'
+                                                            },
+                                                            width: '32px',
+                                                            height: '32px',
+                                                            transition: 'all 0.2s ease'
+                                                        }}
+                                                        onClick={() => {
+                                                            navigate(`/update-complaint?complaintId=${complaint.complaintId}`);
+                                                        }}
+                                                    >
+                                                        <Edit sx={{ fontSize: '16px' }} />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </Box>
+
+                                            {/* Created Date and Status */}
+                                            <Box sx={{
+                                                display: 'flex',
+                                                justifyContent: 'space-between',
+                                                alignItems: 'center'
+                                            }}>
                                                 <Typography variant="body2" sx={{
                                                     color: '#7f8c8d',
                                                     display: 'flex',
                                                     alignItems: 'center',
-                                                    gap: 0.5
+                                                    gap: 0.6
                                                 }}>
                                                     <CalendarToday sx={{ fontSize: '14px' }} />
                                                     {formatDate(complaint.createdAt)}
                                                 </Typography>
+                                                <Chip
+                                                    icon={getStatusIcon(complaint.status)}
+                                                    label={complaint.status}
+                                                    sx={{
+                                                        backgroundColor: `${getStatusColor(complaint.status)}15`,
+                                                        color: getStatusColor(complaint.status),
+                                                        fontWeight: 600,
+                                                        '& .MuiChip-icon': {
+                                                            color: getStatusColor(complaint.status)
+                                                        }
+                                                    }}
+                                                />
                                             </Box>
-                                            <Chip
-                                                icon={getStatusIcon(complaint.status)}
-                                                label={complaint.status}
-                                                sx={{
-                                                    backgroundColor: `${getStatusColor(complaint.status)}15`,
-                                                    color: getStatusColor(complaint.status),
-                                                    fontWeight: 600,
-                                                    '& .MuiChip-icon': {
-                                                        color: getStatusColor(complaint.status)
-                                                    }
-                                                }}
-                                            />
                                         </Box>
-
                                         {/* Customer Info */}
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="subtitle1" sx={{
