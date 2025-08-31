@@ -4,7 +4,6 @@ import AuthUtils from "../utils/AuthUtils.jsx";
 
 export const userProfileApi = createApi({
     reducerPath: "userProfile",
-    tagTypes: ['userProfile'],
     baseQuery: fetchBaseQuery({
         baseUrl: CONFIG.BACKEND_BASE_URL,
         credentials: 'include',
@@ -20,60 +19,42 @@ export const userProfileApi = createApi({
             query: customerId => ({
                 url: '/srw/customer/profile',
                 method: 'GET',
-                params: {customerId},
-                providesTags: (result, error, customerId) => [
-                    { type: "userProfile", id: `customer-${customerId}` },
-                ]
+                params: {customerId}
             })
         }),
         ownerProfile: builder.query({
             query: ownerId => ({
                 url: '/srw/owner/profile',
                 method: 'GET',
-                params: {ownerId},
-                providesTags: (result, error, ownerId) => [
-                    { type: "userProfile", id: `owner-${ownerId}` },
-                ]
+                params: {ownerId}
             })
         }),
         employeeProfile: builder.query({
             query: employeeId => ({
                 url: '/srw/employee/profile',
                 method: 'GET',
-                params: {employeeId},
-                providesTags: (result, error, employeeId) => [
-                    { type: "userProfile", id: `employee-${employeeId}` },
-                ]
+                params: {employeeId}
             })
         }),
         updateCustomerProfile: builder.mutation({
             query: customerDTO => ({
                 url: '/srw/customer/update-profile',
                 method: 'PUT',
-                body: customerDTO,
-                invalidatesTags: (result, error, { customerId }) => [
-                    { type: "userProfile", id: `customer-${customerId}` },
-                ]
+                body: customerDTO
             })
         }),
         updateOwnerProfile: builder.mutation({
             query: ownerDTO => ({
                 url: '/srw/owner/update-profile',
                 method: 'PUT',
-                body: ownerDTO,
-                invalidatesTags: (result, error, { ownerId }) => [
-                    { type: "userProfile", id: `owner-${ownerId}` },
-                ]
+                body: ownerDTO
             })
         }),
         updateEmployeeProfile: builder.mutation({
             query: employeeDTO => ({
                 url: '/srw/employee/update-profile',
                 method: 'PUT',
-                body: employeeDTO,
-                invalidatesTags: (result, error, { employeeId }) => [
-                    { type: "userProfile", id: `employee-${employeeId}` },
-                ]
+                body: employeeDTO
             })
         }),
         fetchUsername: builder.query({

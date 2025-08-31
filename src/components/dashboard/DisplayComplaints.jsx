@@ -33,16 +33,19 @@ const DisplayComplaints = () => {
 
     const { data: userComplaintsData, isLoading: fetchUserComplaintsLoading,
         isError: fetchUserComplaintsError } = useFetchMyComplaintsQuery(user?.userId, {
+            refetchOnMountOrArgChange: true,
             skip: !(isUserComplaintsPath && !isLoggingOut && user?.userId)
         });
 
     const { data: allComplaintsData, isLoading: fetchAllComplaintsLoading,
         isError: fetchAllComplaintsError } = useFetchAllComplaintsQuery(user?.userId, {
+            refetchOnMountOrArgChange: true,
             skip: !(isAllComplaintsPath && !isLoggingOut && user?.userId)
         });
 
     const { data: assignedComplaintsData, isLoading: fetchAssignedComplaintsLoading,
         isError: fetchAssignedComplaintsError } = useFetchAssignedComplaintsQuery(user?.userId, {
+            refetchOnMountOrArgChange: true,
             skip: !(isAssignedComplaintsPath && !isLoggingOut && user?.userId)
         });
 

@@ -229,14 +229,17 @@ const ProfileUtils = {
 
     getActiveUserProfileQuery: (userId, userType, shouldFetch) => {
         const customerQuery = useCustomerProfileQuery(userId, {
+            refetchOnMountOrArgChange: true,
             skip: userType !== 'CUSTOMER' || !shouldFetch
         });
 
         const ownerQuery = useOwnerProfileQuery(userId, {
+            refetchOnMountOrArgChange: true,
             skip: userType !== 'OWNER' || !shouldFetch
         });
 
         const employeeQuery = useEmployeeProfileQuery(userId, {
+            refetchOnMountOrArgChange: true,
             skip: userType !== 'EMPLOYEE' || !shouldFetch
         });
 
