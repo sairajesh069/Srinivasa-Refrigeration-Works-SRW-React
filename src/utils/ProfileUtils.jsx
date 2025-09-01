@@ -1,6 +1,6 @@
 import React from "react";
 import * as Yup from 'yup';
-import {Box, CircularProgress, Typography} from "@mui/material";
+import {Alert, Box, CircularProgress, Typography} from "@mui/material";
 import {toast} from "react-toastify";
 import {useCustomerProfileQuery, useEmployeeProfileQuery, useOwnerProfileQuery} from "../reducers/userProfileApi.js";
 
@@ -196,6 +196,24 @@ const ProfileUtils = {
                 <Typography variant="h6" sx={{ color: '#7f8c8d' }}>
                     { loadingText }
                 </Typography>
+            </Box>
+        );
+    },
+
+    profileError: errorText => {
+        return (
+            <Box sx={{
+                p: 4,
+                textAlign: 'center',
+                backgroundColor: '#f8f9fa',
+                minHeight: '50vh',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}>
+                <Alert severity="error" sx={{ maxWidth: '500px' }}>
+                    {errorText}
+                </Alert>
             </Box>
         );
     },

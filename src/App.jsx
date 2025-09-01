@@ -20,6 +20,7 @@ import CustomToast from "./utils/CustomToast.jsx";
 import ComplaintRegister from "./components/dashboard/ComplaintRegister.jsx";
 import DisplayComplaints from "./components/dashboard/DisplayComplaints.jsx";
 import UpdateComplaint from "./components/dashboard/UpdateComplaint.jsx";
+import DisplayUsers from "./components/dashboard/DisplayUsers.jsx";
 
 const App = () => {
     return (
@@ -173,6 +174,34 @@ const App = () => {
                         <UpdateComplaint />
                     </AuthGuard>
                 } />
+
+                <Route path="/owner-list" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <DisplayUsers />
+                    </AuthGuard>
+                }/>
+                <Route path="/employee-list" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <DisplayUsers />
+                    </AuthGuard>
+                }/>
+                <Route path="/customer-list" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['OWNER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <DisplayUsers />
+                    </AuthGuard>
+                }/>
 
                 <Route path="/unauthorized" element={ <Unauthorized /> } />
 

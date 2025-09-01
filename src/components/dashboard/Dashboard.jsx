@@ -1,24 +1,8 @@
 import React from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button } from '@mui/material';
-import {
-    Dashboard as DashboardIcon,
-    Person,
-    Security,
-    AccessTime,
-    AccountBox,
-    Edit,
-    List,
-    TrackChanges,
-    Feedback,
-    Settings,
-    Notifications,
-    ArrowForward,
-    Handyman,
-    AssignmentInd,
-    PersonAdd,
-    Work,
-    BusinessCenter
-} from '@mui/icons-material';
+import { Dashboard as DashboardIcon, Person, Security, AccessTime, AccountBox, Edit, List, TrackChanges, Feedback, Settings,
+    Notifications, ArrowForward, Handyman, AssignmentInd, PersonAdd, Work, Badge, BusinessCenter, Groups,
+    AdminPanelSettings } from '@mui/icons-material';
 import useAuth from '../../utils/useAuth.jsx';
 import {useNavigate} from "react-router-dom";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
@@ -102,8 +86,17 @@ const Dashboard = () => {
                 description: 'Register a new customer in the portal',
                 path: '/customer-register',
                 icon: <PersonAdd />,
-                color: '#1976d2',
-                bgColor: '#e3f2fd'
+                color: '#2e7d32',
+                bgColor: '#e8f5e9'
+            },
+            {
+                id: 'customer-list',
+                title: 'Customer List',
+                description: 'View and manage customers in the portal',
+                path: '/customer-list',
+                icon: <Groups />,
+                color: '#2e7d32',
+                bgColor: '#e8f5e9'
             },
             {
                 id: 'employee-register',
@@ -111,8 +104,17 @@ const Dashboard = () => {
                 description: 'Register a new employee in the portal',
                 path: '/employee-register',
                 icon: <Work />,
-                color: '#2e7d32',
-                bgColor: '#e8f5e9'
+                color: '#1976d2',
+                bgColor: '#e3f2fd'
+            },
+            {
+                id: 'employee-list',
+                title: 'Employee List',
+                description: 'View and manage employees in the portal',
+                path: '/employee-list',
+                icon: <Badge />,
+                color: '#1976d2',
+                bgColor: '#e3f2fd'
             },
             {
                 id: 'owner-register',
@@ -124,13 +126,22 @@ const Dashboard = () => {
                 bgColor: '#f3e5f5'
             },
             {
+                id: 'owner-list',
+                title: 'Owner List',
+                description: 'View and manage owners in the portal',
+                path: '/owner-list',
+                icon: <AdminPanelSettings />,
+                color: '#7b1fa2',
+                bgColor: '#f3e5f5'
+            },
+            {
                 id: 'all-complaints',
                 title: 'All Complaints',
                 description: 'View all your submitted complaints',
                 path: '/all-complaints',
                 icon: <List />,
-                color: '#ab47bc',
-                bgColor: '#f3e5f5'
+                color: '#ff7043',
+                bgColor: '#fbe9e7'
             }
         );
     }

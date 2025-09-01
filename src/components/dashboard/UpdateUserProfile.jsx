@@ -19,9 +19,13 @@ const UpdateUserProfile = () => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const userId = user?.userId;
-    const userType = user?.userType;
     const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const paramUserId = queryParams.get("userId");
+    const paramUserType = queryParams.get("userType");
+
+    const userId = paramUserId ? paramUserId : user?.userId;
+    const userType = paramUserType ? paramUserType : user?.userType;
 
     const shouldFetch = userId && userType && location.pathname === "/update-profile" && !isLoggingOut;
 
@@ -131,7 +135,7 @@ const UpdateUserProfile = () => {
             }
 
             toast.success('Profile updated successfully!');
-            navigate('/profile');
+            navigate(-1);
         } catch (error) {
             error.status === 409
                 ? ProfileUtils.handleDuplicateFieldError(error, setFieldError)
@@ -140,10 +144,6 @@ const UpdateUserProfile = () => {
         finally {
             setIsSubmitting(false);
         }
-    };
-
-    const handleCancel = () => {
-        navigate('/profile');
     };
 
     const statusColors = ProfileUtils.getStatusColor(userData.userStatus);
@@ -1116,7 +1116,9 @@ const UpdateUserProfile = () => {
                                     <Button
                                         variant="outlined"
                                         startIcon={<Cancel />}
-                                        onClick={handleCancel}
+                                        onClick={() => {
+                                            navigate(-1);
+                                        }}
                                         disabled={isSubmitting}
                                         fullWidth={isMobile}
                                         sx={{

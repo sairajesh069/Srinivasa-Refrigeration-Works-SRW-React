@@ -97,7 +97,6 @@ const UpdateComplaint = () => {
     const [updateComplaint, isLoading] = useUpdateComplaintMutation();
 
     const handleSubmit = async values => {
-        console.log("in handle submit");
 
         const complaintDTO = {
             complaintId: complaintId,
@@ -134,7 +133,6 @@ const UpdateComplaint = () => {
             customerFeedback: values.customerFeedback || ''
         };
 
-        console.log("Clean Values: ", complaintDTO);
         setIsSubmitting(true);
         try {
             await updateComplaint(complaintDTO).unwrap();
@@ -1382,7 +1380,7 @@ const UpdateComplaint = () => {
                                         size="large"
                                         startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Save />}
                                         type="submit"
-                                        disabled={isSubmitting}
+                                        disabled={isSubmitting || isLoading}
                                         sx={{
                                             backgroundColor: '#4fc3f7',
                                             color: 'white',
