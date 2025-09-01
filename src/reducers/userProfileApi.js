@@ -71,24 +71,6 @@ export const userProfileApi = createApi({
                 body: changePasswordData
             })
         }),
-        fetchAllOwners: builder.query({
-            query: () => ({
-                url: '/srw/owner/list',
-                method: 'GET'
-            })
-        }),
-        fetchAllEmployees: builder.query({
-            query: () => ({
-                url: '/srw/employee/list',
-                method: 'GET'
-            })
-        }),
-        fetchAllCustomers: builder.query({
-            query: () => ({
-                url: '/srw/customer/list',
-                method: 'GET'
-            })
-        }),
         fetchAllUsersByUserType: builder.query({
             query: userType => ({
                 url: `/srw/${userType}/list`,
@@ -108,5 +90,4 @@ export const userProfileApi = createApi({
 export const { useCustomerProfileQuery, useOwnerProfileQuery, useEmployeeProfileQuery,
     useUpdateCustomerProfileMutation, useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation,
     useFetchUsernameQuery, useChangePasswordMutation,
-    useFetchAllUsersByUserTypeQuery, useUpdateUserStatusMutation,
-    useFetchAllOwnersQuery, useFetchAllEmployeesQuery, useFetchAllCustomersQuery } = userProfileApi;
+    useFetchAllUsersByUserTypeQuery, useUpdateUserStatusMutation } = userProfileApi;

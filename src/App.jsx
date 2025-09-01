@@ -21,6 +21,7 @@ import ComplaintRegister from "./components/dashboard/ComplaintRegister.jsx";
 import DisplayComplaints from "./components/dashboard/DisplayComplaints.jsx";
 import UpdateComplaint from "./components/dashboard/UpdateComplaint.jsx";
 import DisplayUsers from "./components/dashboard/DisplayUsers.jsx";
+import ComplaintFeedback from "./components/dashboard/ComplaintFeedback.jsx";
 
 const App = () => {
     return (
@@ -202,6 +203,16 @@ const App = () => {
                         <DisplayUsers />
                     </AuthGuard>
                 }/>
+
+                <Route path="/user-feedback" element={
+                    <AuthGuard
+                        requireAuth={true}
+                        allowedRoles={['CUSTOMER', 'EMPLOYEE', 'OWNER']}
+                        unauthorizedFallback="/unauthorized"
+                    >
+                        <ComplaintFeedback />
+                    </AuthGuard>
+                } />
 
                 <Route path="/unauthorized" element={ <Unauthorized /> } />
 

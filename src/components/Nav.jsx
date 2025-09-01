@@ -138,7 +138,6 @@ const Nav = () => {
                 fontWeight: 600,
                 border: '2px solid rgba(79, 195, 247, 0.3)',
                 boxShadow: '0 4px 12px rgba(79, 195, 247, 0.2)',
-                mr: 3
             }}
         >
             {getUserInitials()}
@@ -380,10 +379,10 @@ const Nav = () => {
                                 onClick={handleProfileMenuOpen}
                                 sx={{
                                     color: 'white',
-                                    ml: 2,
                                     '&:hover': {
                                         backgroundColor: 'rgba(255, 255, 255, 0.1)'
-                                    }
+                                    },
+                                    mr: 1
                                 }}
                             >
                                 <UserAvatar />

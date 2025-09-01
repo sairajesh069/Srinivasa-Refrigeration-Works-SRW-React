@@ -55,6 +55,7 @@ const Dashboard = () => {
             id: 'give-feedback',
             title: 'Give Feedback',
             description: 'Provide feedback on resolved complaints',
+            path: '/user-feedback',
             icon: <Feedback />,
             color: '#ffa726',
             bgColor: '#fff3e0'

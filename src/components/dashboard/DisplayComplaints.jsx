@@ -562,7 +562,7 @@ const DisplayComplaints = () => {
                                                     <Phone sx={{ fontSize: '14px' }} />
                                                     {complaint.contactNumber}
                                                 </Box>
-                                                {complaint.email !== 'N/A' && (
+                                                {complaint.email !== '' && (
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                         <Email sx={{ fontSize: '14px' }} />
                                                         {complaint.email}
