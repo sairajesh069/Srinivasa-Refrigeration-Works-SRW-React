@@ -30,6 +30,10 @@ const Register = () => {
     const [owner, { isLoading: isOwnerLoading }] = useOwnerMutation();
     const [employee, { isLoading: isEmployeeLoading }] = useEmployeeMutation();
 
+    const accessedBy = isOwnerRegistration ? 'Owner' :
+        isEmployeeRegistration ? 'Employee' :
+            'Customer';
+
     const handleRegister = async (values, { setFieldError }) => {
         const userCredentialDTO = {
             username: values.username.toLowerCase(),
@@ -90,8 +94,8 @@ const Register = () => {
                 await employee(employeeCredentialDTO).unwrap();
             }
 
-            toast.success(AuthUtils.isAuthenticated() ? "Registration successful." : "Registration successful. Please login");
-            navigate('/login');
+            toast.success(isAuthenticated ? `${accessedBy} registered successful.` : "Registration successful. Please login");
+            navigate(isAuthenticated ? `/${accessedBy.toLowerCase()}-list` : '/login');
         } catch (error) {
             error.status === 409
                 ? ProfileUtils.handleDuplicateFieldError(error, setFieldError)
@@ -99,11 +103,8 @@ const Register = () => {
         }
     }
 
-    const accessedBy = isOwnerRegistration ? 'owner' :
-        isEmployeeRegistration ? 'employee' :
-            'customer';
-    const initialValues = ProfileUtils.getInitialValues(accessedBy, null, false);
-    const validationSchema = ProfileUtils.getValidationSchema(accessedBy, false);
+    const initialValues = ProfileUtils.getInitialValues(accessedBy.toUpperCase(), null, false);
+    const validationSchema = ProfileUtils.getValidationSchema(accessedBy.toUpperCase(), false);
 
     return(
         <Box sx={{
@@ -165,7 +166,7 @@ const Register = () => {
                         fontSize: '16px',
                         fontWeight: 400,
                     }}>
-                        Get started with your new { accessedBy } account
+                        Get started with your new { accessedBy.toLowerCase() } account
                     </Typography>
                 </Box>
                 <Formik

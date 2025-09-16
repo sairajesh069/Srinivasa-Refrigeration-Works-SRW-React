@@ -119,7 +119,7 @@ const ProfileUtils = {
         // Add Employee-specific fields
         if (userType === 'EMPLOYEE') {
             baseValues.designation = profileData?.userDTO?.designation || '';
-            baseValues.salary = profileData?.userDTO?.salary || '';
+            baseValues.salary = profileData?.userDTO?.salary ? String(profileData.userDTO.salary) : '';
         }
 
         return baseValues;

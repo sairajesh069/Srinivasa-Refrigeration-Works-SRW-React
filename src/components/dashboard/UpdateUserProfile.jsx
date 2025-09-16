@@ -55,7 +55,7 @@ const UpdateUserProfile = () => {
         dateOfHire: profile?.userDTO?.dateOfHire,
         dateOfExit: profile?.userDTO?.dateOfExit,
         designation: profile?.userDTO?.designation || 'N/A',
-        salary: profile?.userDTO?.salary || '000'
+        salary: profile?.userDTO?.salary ? String(profile.userDTO.salary) : '000'
     };
 
     const [updateCustomerProfile] = useUpdateCustomerProfileMutation();
@@ -124,7 +124,7 @@ const UpdateUserProfile = () => {
                         address: values.address,
                         nationalIdNumber: values.nationalIdNumber,
                         designation: values.designation,
-                        salary: values.salary,
+                        salary: Number(values.salary),
                         status: userData?.userStatus,
                         dateOfHire: userData?.dateOfHire,
                         dateOfExit: userData?.dateOfExit,
@@ -430,7 +430,7 @@ const UpdateUserProfile = () => {
                         onSubmit={handleSubmit}
                         enableReinitialize={true}
                     >
-                        {({ values, handleChange, errors, touched}) => (
+                        {({ dirty, values, handleChange, errors, touched}) => (
                             <Form>
                                 {/* Basic Information Section */}
                                 <Box sx={{
@@ -696,7 +696,7 @@ const UpdateUserProfile = () => {
                                                     helperText={(touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber}
                                                     variant="outlined"
                                                     placeholder="Enter your Aadhar or PAN number"
-                                                    disabled={userType !== 'OWNER'}
+                                                    disabled={user?.userType !== 'OWNER'}
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
                                                             borderRadius: {
@@ -983,7 +983,7 @@ const UpdateUserProfile = () => {
                                                     helperText={(touched.designation || values.designation) && errors.designation}
                                                     variant="outlined"
                                                     placeholder="Enter designation"
-                                                    disabled={userType !== 'OWNER'}
+                                                    disabled={user?.userType !== 'OWNER'}
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
                                                             borderRadius: {
@@ -1039,7 +1039,7 @@ const UpdateUserProfile = () => {
                                                     helperText={(touched.salary || values.salary) && errors.salary}
                                                     variant="outlined"
                                                     placeholder="Enter salary"
-                                                    disabled={userType !== 'OWNER'}
+                                                    disabled={user?.userType !== 'OWNER'}
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
                                                             borderRadius: {
@@ -1104,10 +1104,7 @@ const UpdateUserProfile = () => {
                                         xs: 2,
                                         md: 3
                                     },
-                                    justifyContent: {
-                                        xs: 'center',
-                                        sm: 'flex-end'
-                                    },
+                                    justifyContent: 'center',
                                     flexWrap: 'wrap',
                                     marginTop: {
                                         xs: '24px',
@@ -1118,6 +1115,51 @@ const UpdateUserProfile = () => {
                                         sm: 'row'
                                     }
                                 }}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Save />}
+                                        disabled={isSubmitting || !dirty}
+                                        fullWidth={isMobile}
+                                        sx={{
+                                            borderRadius: {
+                                                xs: '8px',
+                                                md: '12px'
+                                            },
+                                            textTransform: 'none',
+                                            fontWeight: 600,
+                                            padding: {
+                                                xs: '12px 24px',
+                                                md: '14px 32px'
+                                            },
+                                            fontSize: {
+                                                xs: '0.9rem',
+                                                md: '1rem'
+                                            },
+                                            minWidth: {
+                                                xs: 'auto',
+                                                sm: '180px'
+                                            },
+                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
+                                            transition: 'all 0.2s ease',
+                                            '&:hover': {
+                                                background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
+                                                boxShadow: '0 12px 32px rgba(102, 126, 234, 0.4)',
+                                                transform: 'translateY(-2px)'
+                                            },
+                                            '&:active': {
+                                                transform: 'translateY(0px)'
+                                            },
+                                            '&:disabled': {
+                                                background: '#cccccc',
+                                                boxShadow: 'none',
+                                                transform: 'none'
+                                            }
+                                        }}
+                                    >
+                                        {isSubmitting ? 'Updating Profile...' : 'Update Profile'}
+                                    </Button>
                                     <Button
                                         variant="outlined"
                                         startIcon={<Cancel />}
@@ -1160,51 +1202,6 @@ const UpdateUserProfile = () => {
                                         }}
                                     >
                                         Cancel
-                                    </Button>
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Save />}
-                                        disabled={isSubmitting}
-                                        fullWidth={isMobile}
-                                        sx={{
-                                            borderRadius: {
-                                                xs: '8px',
-                                                md: '12px'
-                                            },
-                                            textTransform: 'none',
-                                            fontWeight: 600,
-                                            padding: {
-                                                xs: '12px 24px',
-                                                md: '14px 32px'
-                                            },
-                                            fontSize: {
-                                                xs: '0.9rem',
-                                                md: '1rem'
-                                            },
-                                            minWidth: {
-                                                xs: 'auto',
-                                                sm: '180px'
-                                            },
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                                                boxShadow: '0 12px 32px rgba(102, 126, 234, 0.4)',
-                                                transform: 'translateY(-2px)'
-                                            },
-                                            '&:active': {
-                                                transform: 'translateY(0px)'
-                                            },
-                                            '&:disabled': {
-                                                background: '#cccccc',
-                                                boxShadow: 'none',
-                                                transform: 'none'
-                                            }
-                                        }}
-                                    >
-                                        {isSubmitting ? 'Updating Profile...' : 'Update Profile'}
                                     </Button>
                                 </Box>
                             </Form>

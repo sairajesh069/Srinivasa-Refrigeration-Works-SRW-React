@@ -358,7 +358,7 @@ const UpdateComplaint = () => {
                     onSubmit={handleSubmit}
                     enableReinitialize={true}
                 >
-                    {({ values, handleChange, errors, touched, setFieldValue, setValues }) => (
+                    {({ dirty, values, handleChange, errors, touched, setFieldValue, setValues }) => (
                         <Form>
                             {/* Basic Information */}
                             <Paper sx={{
@@ -1386,7 +1386,7 @@ const UpdateComplaint = () => {
                                         size="large"
                                         startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Save />}
                                         type="submit"
-                                        disabled={isSubmitting || isLoading}
+                                        disabled={isSubmitting || !dirty}
                                         sx={{
                                             backgroundColor: '#4fc3f7',
                                             color: 'white',
