@@ -16,6 +16,7 @@ import useAuth from "../../utils/useAuth.jsx";
 import {useSearchParams} from "react-router";
 import ComplaintUtils from "../../utils/ComplaintUtils.jsx";
 import {useFetchComplaintQuery, useFetchTechniciansQuery, useUpdateComplaintMutation} from "../../reducers/complaintApi.js";
+import Unauthorized from "../exceptions/Unauthorized.jsx";
 
 const UpdateComplaint = () => {
     const { user, isLoggingOut } = useAuth();
@@ -31,7 +32,7 @@ const UpdateComplaint = () => {
     const shouldFetch = location.pathname === '/update-complaint' && !isLoggingOut && complaintId;
 
     const { data: complaintData, isLoading: isFetchComplaintLoading,
-        isError: isFetchComplaintError } = useFetchComplaintQuery(complaintId, {
+        isError: isFetchComplaintError, error: fetchComplaintError } = useFetchComplaintQuery(complaintId, {
         refetchOnMountOrArgChange: true,
         skip: !shouldFetch
     });
@@ -167,9 +168,14 @@ const UpdateComplaint = () => {
         return ComplaintUtils.complaintLoader("Fetching complaint details....");
     }
 
+    if(isFetchComplaintError && fetchComplaintError.status===403) {
+        return <Unauthorized />;
+    }
+
     if (isFetchComplaintError || isFetchTechniciansError) {
         return ComplaintUtils.complaintError("Failed to load complaint data. Please try again.");
     }
+
 
     const initialValues = {
         complaintId: complaintId || '',

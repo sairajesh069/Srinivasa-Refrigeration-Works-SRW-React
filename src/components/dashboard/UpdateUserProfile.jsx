@@ -12,6 +12,7 @@ import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
 import { useUpdateCustomerProfileMutation,
     useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation } from "../../reducers/userProfileApi.js";
+import Unauthorized from "../exceptions/Unauthorized.jsx";
 
 const UpdateUserProfile = () => {
     const { user, isLoggingOut } = useAuth();
@@ -29,7 +30,7 @@ const UpdateUserProfile = () => {
 
     const shouldFetch = userId && userType && location.pathname === "/update-profile" && !isLoggingOut;
 
-    const { data: profile, isLoading } = ProfileUtils.getActiveUserProfileQuery(userId, userType, shouldFetch);
+    const { data: profile, isLoading, isError, error: userFetchError } = ProfileUtils.getActiveUserProfileQuery(userId, userType, shouldFetch);
 
     if (isLoading) {
         ProfileUtils.profileLoader("Loading profile data...");
@@ -161,6 +162,10 @@ const UpdateUserProfile = () => {
 
     const initialValues = ProfileUtils.getInitialValues(userType, { userDTO: userData }, true);
     const validationSchema = ProfileUtils.getValidationSchema(userType, true);
+
+    if(isError && userFetchError.status===403) {
+        return <Unauthorized />;
+    }
 
     return (
         <Box sx={{
