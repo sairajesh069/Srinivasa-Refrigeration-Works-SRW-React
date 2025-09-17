@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
-import { Box, Typography, Paper, Grid, Avatar, Button, Alert, CircularProgress,
-    Divider, InputAdornment, MenuItem, Chip, useTheme, useMediaQuery } from '@mui/material';
+import {
+    Box, Typography, Paper, Grid, Avatar, Button, Alert, CircularProgress,
+    Divider, InputAdornment, MenuItem, Chip, useTheme, useMediaQuery, Tooltip, IconButton
+} from '@mui/material';
 import { Person, Email, Phone, Badge, CalendarToday, Work, Save, Cancel,
     LocationOn, CurrencyRupee, WorkOutline, Dashboard, Male, Female, Transgender } from '@mui/icons-material';
 import { Form, Formik } from 'formik';
@@ -30,11 +32,7 @@ const UpdateUserProfile = () => {
 
     const shouldFetch = userId && userType && location.pathname === "/update-profile" && !isLoggingOut;
 
-    const { data: profile, isLoading, isError, error: userFetchError } = ProfileUtils.getActiveUserProfileQuery(userId, userType, shouldFetch);
-
-    if (isLoading) {
-        ProfileUtils.profileLoader("Loading profile data...");
-    }
+    const { data: profile, isLoading: isUserFetchLoading, isError: isUserFetchError, error: userFetchError } = ProfileUtils.getActiveUserProfileQuery(userId, userType, shouldFetch);
 
     const userData = {
         userId: userId || 'N/A',
@@ -163,8 +161,16 @@ const UpdateUserProfile = () => {
     const initialValues = ProfileUtils.getInitialValues(userType, { userDTO: userData }, true);
     const validationSchema = ProfileUtils.getValidationSchema(userType, true);
 
-    if(isError && userFetchError.status===403) {
+    if (isUserFetchLoading) {
+        ProfileUtils.profileLoader("Loading profile data...");
+    }
+
+    if(isUserFetchError && userFetchError.status === 403) {
         return <Unauthorized />;
+    }
+
+    if (isUserFetchError) {
+        ProfileUtils.profileError("Failed to load profile. Please try again.");
     }
 
     return (
@@ -206,45 +212,27 @@ const UpdateUserProfile = () => {
                     }}>
                         <Box sx={{
                             position: 'absolute',
-                            top: {
-                                xs: 12,
-                                md: 20
-                            },
-                            right: {
-                                xs: 12,
-                                md: 20
-                            },
+                            top: { xs: 12, sm: 16, md: 20 },
+                            right: { xs: 12, sm: 16, md: 20 },
                             display: 'flex',
-                            gap: 1
+                            gap: { xs: 1, sm: 1.5, md: 2 },
+                            flexDirection: { xs: 'column', sm: 'row' }
                         }}>
-                            <Button
-                                variant="outlined"
-                                startIcon={<Dashboard />}
-                                onClick={() => navigate('/dashboard')}
-                                sx={{
-                                    color: 'white',
-                                    borderColor: 'rgba(255, 255, 255, 0.3)',
-                                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                    backdropFilter: 'blur(10px)',
-                                    fontWeight: 600,
-                                    borderRadius: '12px',
-                                    textTransform: 'none',
-                                    padding: {
-                                        xs: '8px 16px',
-                                        md: '12px 24px'
-                                    },
-                                    fontSize: {
-                                        xs: '0.8rem',
-                                        md: '1rem'
-                                    },
-                                    '&:hover': {
+                            <Tooltip title="Dashboard">
+                                <IconButton
+                                    size={isMobile ? 'small' : 'medium'}
+                                    sx={{
+                                        color: 'white',
                                         backgroundColor: 'rgba(255, 255, 255, 0.2)',
-                                        borderColor: 'rgba(255, 255, 255, 0.5)'
-                                    }
-                                }}
-                            >
-                                Dashboard
-                            </Button>
+                                        '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.3)' },
+                                        width: { xs: '36px', sm: '40px', md: '48px' },
+                                        height: { xs: '36px', sm: '40px', md: '48px' }
+                                    }}
+                                    onClick={() => navigate('/dashboard')}
+                                >
+                                    <Dashboard sx={{ fontSize: { xs: '18px', sm: '20px', md: '24px' } }} />
+                                </IconButton>
+                            </Tooltip>
                         </Box>
 
                         <Box sx={{

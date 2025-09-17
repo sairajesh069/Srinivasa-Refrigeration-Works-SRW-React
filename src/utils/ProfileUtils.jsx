@@ -194,7 +194,7 @@ const ProfileUtils = {
             }}>
                 <CircularProgress size={60} sx={{ color: '#4fc3f7' }} />
                 <Typography variant="h6" sx={{ color: '#7f8c8d' }}>
-                    { loadingText }
+                    {loadingText}
                 </Typography>
             </Box>
         );

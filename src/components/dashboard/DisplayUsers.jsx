@@ -10,6 +10,7 @@ import useAuth from "../../utils/useAuth.jsx";
 import { toast } from 'react-toastify';
 import { useFetchAllUsersByUserTypeQuery, useUpdateUserStatusMutation } from "../../reducers/userProfileApi.js";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
+import Unauthorized from "../exceptions/Unauthorized.jsx";
 
 const DisplayUsers = () => {
     const {  isLoggingOut } = useAuth();
@@ -31,8 +32,8 @@ const DisplayUsers = () => {
             : isFetchingCustomers ? "Customer"
                 : '';
 
-    const { data: usersList, isLoading: fetchUsersListLoading,
-        isError: fetchUsersListError, refetch: refetchUsersList } = useFetchAllUsersByUserTypeQuery(fetchedUserType.toLowerCase(), {
+    const { data: usersList, isLoading: isFetchUsersListLoading, isError: isFetchUsersListError,
+        error: fetchUsersListError, refetch: refetchUsersList } = useFetchAllUsersByUserTypeQuery(fetchedUserType.toLowerCase(), {
             refetchOnMountOrArgChange: true,
             skip: !fetchedUserType && isLoggingOut
     });
@@ -144,13 +145,18 @@ const DisplayUsers = () => {
 
     const userStatusOptions = ['All', 'ACTIVE', 'IN_ACTIVE'];
 
-    if (fetchUsersListLoading) {
-        ProfileUtils.profileLoader("Fetching users......")
+    if (isFetchUsersListLoading) {
+        ProfileUtils.profileLoader("Fetching users...")
     }
 
-    if (fetchUsersListError) {
+    if(isFetchUsersListError && fetchUsersListError.status === 403) {
+        return <Unauthorized />;
+    }
+
+    if (isFetchUsersListError) {
         ProfileUtils.profileError("Failed to load users. Please try again.");
     }
+
 
     return (
         <Box sx={{

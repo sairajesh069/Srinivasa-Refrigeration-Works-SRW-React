@@ -12,6 +12,7 @@ import { useFetchResolvedComplaintsQuery, useSaveComplaintFeedbackMutation } fro
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import ComplaintUtils from "../../utils/ComplaintUtils.jsx";
+import Unauthorized from "../exceptions/Unauthorized.jsx";
 
 const ComplaintFeedback = () => {
     const { user, isLoggingOut } = useAuth();
@@ -24,8 +25,8 @@ const ComplaintFeedback = () => {
     const [expandedCards, setExpandedCards] = useState({});
     const [editingFeedback, setEditingFeedback] = useState({});
 
-    const { data: resolvedComplaintsData, isLoading: isFetchResolvedComplaintsLoading,
-        isError: isFetchingResolvedComplaintsError, refetch } = useFetchResolvedComplaintsQuery(userId, {
+    const { data: resolvedComplaintsData, isLoading: isFetchResolvedComplaintsLoading, isError: isFetchingResolvedComplaintsError,
+        error: fetchingResolvedComplaintsError, refetch: refetchResolvedComplaints } = useFetchResolvedComplaintsQuery(userId, {
             refetchOnMountOrArgChange: true,
             skip: !(location.pathname === '/user-feedback' && userId && !isLoggingOut)
         }
@@ -59,14 +60,12 @@ const ComplaintFeedback = () => {
             await saveComplaintFeedback(complaintFeedbackDTO).unwrap();
             toast.success("Complaint feedback saved successfully");
 
-            // Reset the editing state for this complaint
             setEditingFeedback(prev => ({
                 ...prev,
                 [values.complaintId]: false
             }));
 
-            // Refetch the complaints data to get the updated feedback
-            await refetch();
+            await refetchResolvedComplaints();
 
             resetForm();
         } catch (error) {
@@ -95,6 +94,10 @@ const ComplaintFeedback = () => {
 
     if (isFetchResolvedComplaintsLoading) {
         ComplaintUtils.complaintLoader("Loading resolved complaints...");
+    }
+
+    if(isFetchingResolvedComplaintsError && fetchingResolvedComplaintsError.status === 403) {
+        return <Unauthorized />;
     }
 
     if (isFetchingResolvedComplaintsError) {

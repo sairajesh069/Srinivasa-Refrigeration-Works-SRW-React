@@ -11,6 +11,7 @@ import useAuth from '../../utils/useAuth.jsx';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
 import { useFetchUsernameQuery, useChangePasswordMutation } from "../../reducers/userProfileApi.js";
+import Unauthorized from "../exceptions/Unauthorized.jsx";
 
 const AccountSettings = () => {
     const { user, isLoggingOut, logout } = useAuth();
@@ -24,7 +25,9 @@ const AccountSettings = () => {
 
     const location = useLocation();
 
-    const { data: loginData } = useFetchUsernameQuery(user?.userId, {
+    const { data: loginData, isLoading: isFetchUsernameLoading, isError: isFetchUsernameError,
+        error: fetchUsernameError } = useFetchUsernameQuery(user?.userId, {
+        refetchOnMountOrArgChange: true,
         skip: !(location.pathname === '/account-settings' && !isLoggingOut && user?.userId)
     });
 
@@ -83,6 +86,18 @@ const AccountSettings = () => {
     };
 
     const statusColors = ProfileUtils.getStatusColor(user?.status || 'active');
+
+    if (isFetchUsernameLoading) {
+        ProfileUtils.profileLoader("Fetching username...");
+    }
+
+    if(isFetchUsernameError && fetchUsernameError.status === 403) {
+        return <Unauthorized />;
+    }
+
+    if (isFetchUsernameError) {
+        ProfileUtils.profileError("Failed to fetch username. Please try again.");
+    }
 
     return (
         <Box sx={{

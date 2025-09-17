@@ -15,6 +15,7 @@ import {
 } from "../../reducers/complaintApi.js";
 import ComplaintUtils from "../../utils/ComplaintUtils.jsx";
 import {toast} from "react-toastify";
+import Unauthorized from "../exceptions/Unauthorized.jsx";
 
 const DisplayComplaints = () => {
     const { user, isLoggingOut } = useAuth();
@@ -32,20 +33,20 @@ const DisplayComplaints = () => {
     const isAllComplaintsPath = location.pathname === '/all-complaints';
     const isAssignedComplaintsPath = location.pathname === '/assigned-complaints';
 
-    const { data: userComplaintsData, isLoading: fetchUserComplaintsLoading,
-        isError: fetchUserComplaintsError, refetch: refetchMyComplaints } = useFetchMyComplaintsQuery(user?.userId, {
+    const { data: userComplaintsData, isLoading: isFetchUserComplaintsLoading, isError: isFetchUserComplaintsError,
+        error: fetchUserComplaintsError, refetch: refetchMyComplaints } = useFetchMyComplaintsQuery(user?.userId, {
             refetchOnMountOrArgChange: true,
             skip: !(isUserComplaintsPath && !isLoggingOut && user?.userId)
         });
 
-    const { data: allComplaintsData, isLoading: fetchAllComplaintsLoading,
-        isError: fetchAllComplaintsError, refetch: refetchAllComplaints } = useFetchAllComplaintsQuery(user?.userId, {
+    const { data: allComplaintsData, isLoading: isFetchAllComplaintsLoading, isError: isFetchAllComplaintsError,
+        error: fetchAllComplaintsError, refetch: refetchAllComplaints } = useFetchAllComplaintsQuery(user?.userId, {
             refetchOnMountOrArgChange: true,
             skip: !(isAllComplaintsPath && !isLoggingOut && user?.userId)
         });
 
-    const { data: assignedComplaintsData, isLoading: fetchAssignedComplaintsLoading,
-        isError: fetchAssignedComplaintsError, refetch: refetchAssignedComplaints } = useFetchAssignedComplaintsQuery(user?.userId, {
+    const { data: assignedComplaintsData, isLoading: isFetchAssignedComplaintsLoading, isError: isFetchAssignedComplaintsError,
+        error: fetchAssignedComplaintsError, refetch: refetchAssignedComplaints } = useFetchAssignedComplaintsQuery(user?.userId, {
             refetchOnMountOrArgChange: true,
             skip: !(isAssignedComplaintsPath && !isLoggingOut && user?.userId)
         });
@@ -157,11 +158,18 @@ const DisplayComplaints = () => {
         return state?.toLowerCase() === 'closed' ? '#4caf50' : '#f44336';
     };
 
-    if (fetchUserComplaintsLoading || fetchAllComplaintsLoading || fetchAssignedComplaintsLoading) {
-        ComplaintUtils.complaintLoader("Fetching complaints....");
+    if (isFetchUserComplaintsLoading || isFetchAllComplaintsLoading || isFetchAssignedComplaintsLoading) {
+        ComplaintUtils.complaintLoader("Fetching complaints...");
     }
 
-    if (fetchUserComplaintsError || fetchAllComplaintsError || fetchAssignedComplaintsError) {
+    if((isFetchAllComplaintsError && fetchAllComplaintsError.status === 403)
+        || (isFetchUserComplaintsError && fetchUserComplaintsError.status === 403)
+        || (isFetchAssignedComplaintsError && fetchAssignedComplaintsError.status === 403)
+    ) {
+        return <Unauthorized />;
+    }
+
+    if (isFetchUserComplaintsError || isFetchAllComplaintsError || isFetchAssignedComplaintsError) {
         ComplaintUtils.complaintError("Failed to load complaints. Please try again.");
     }
 

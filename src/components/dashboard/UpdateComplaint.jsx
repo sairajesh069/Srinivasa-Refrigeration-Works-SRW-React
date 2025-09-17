@@ -165,10 +165,10 @@ const UpdateComplaint = () => {
     };
 
     if (isFetchComplaintLoading || isFetchTechniciansLoading) {
-        return ComplaintUtils.complaintLoader("Fetching complaint details....");
+        return ComplaintUtils.complaintLoader("Fetching complaint details...");
     }
 
-    if(isFetchComplaintError && fetchComplaintError.status===403) {
+    if(isFetchComplaintError && fetchComplaintError.status === 403) {
         return <Unauthorized />;
     }
 

@@ -5,6 +5,7 @@ import { Person, Edit, Email, Phone, Home, Badge, CalendarToday, Work, AccountBa
 import useAuth from '../../utils/useAuth.jsx';
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
 import {useLocation, useNavigate} from "react-router-dom";
+import Unauthorized from "../exceptions/Unauthorized.jsx";
 
 const UserProfile = () => {
     const { user, isLoggingOut } = useAuth();
@@ -19,11 +20,8 @@ const UserProfile = () => {
 
     const shouldFetch = userId && userType && location.pathname === "/profile" && !isLoggingOut;
 
-    const { data: profile, isLoading } = ProfileUtils.getActiveUserProfileQuery(userId, userType, shouldFetch);
-
-    if (isLoading) {
-        ProfileUtils.profileLoader(`Fetching ${user?.username}'s details...`);
-    }
+    const { data: profile, isLoading: isFetchProfileLoading, isError: isFetchProfileError,
+        error: fetchProfileError } = ProfileUtils.getActiveUserProfileQuery(userId, userType, shouldFetch);
 
     const userData = {
         userId: userId || 'N/A',
@@ -59,6 +57,18 @@ const UserProfile = () => {
     };
 
     const statusColors = ProfileUtils.getStatusColor(userData.userStatus);
+
+    if (isFetchProfileLoading) {
+        ProfileUtils.profileLoader(`Fetching ${user?.username}'s details...`);
+    }
+
+    if(isFetchProfileError && fetchProfileError.status === 403) {
+        return <Unauthorized />;
+    }
+
+    if (isFetchProfileError) {
+        ProfileUtils.profileError(`Failed to ${user?.username}'s details. Please try again.`);
+    }
 
     const InfoCard = ({ icon, label, value, fullWidth = false }) => (
         <Grid
