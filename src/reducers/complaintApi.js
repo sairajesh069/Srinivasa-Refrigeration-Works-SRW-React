@@ -76,10 +76,17 @@ export const complaintApi = createApi({
                 method: 'POST',
                 body: complaintFeedbackDTO
             })
+        }),
+        updateComplaintState: builder.mutation({
+            query: updateComplaintStateDTO => ({
+                url: '/srw/complaint/update-state',
+                method: 'PUT',
+                body: updateComplaintStateDTO
+            })
         })
     })
 });
 
 export const { useComplaintRegisterMutation, useFetchMyComplaintsQuery, useFetchAllComplaintsQuery, useFetchAssignedComplaintsQuery,
     useFetchComplaintQuery, useFetchTechniciansQuery, useUpdateComplaintMutation, useFetchResolvedComplaintsQuery,
-    useSaveComplaintFeedbackMutation } = complaintApi;
+    useSaveComplaintFeedbackMutation, useUpdateComplaintStateMutation } = complaintApi;

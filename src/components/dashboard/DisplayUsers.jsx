@@ -2,8 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button, Alert, Divider, useTheme,
     useMediaQuery, InputAdornment, MenuItem, Collapse, Badge, Tooltip, IconButton, Switch, FormControlLabel } from '@mui/material';
 import { Dashboard, FilterList, Search, CalendarToday, Person, Phone, Email, Home, Work, Error, PeopleAlt, ExpandMore,
-    ExpandLess, PersonAdd, History, Edit, PersonOutline, Badge as BadgeIcon, DateRange,
-    AccountBalance, AttachMoney } from '@mui/icons-material';
+    ExpandLess, PersonAdd, History, Edit, PersonOutline, Badge as BadgeIcon, DateRange, AccountBalance } from '@mui/icons-material';
 import {useLocation, useNavigate} from 'react-router-dom';
 import StyledTextField from "../../utils/form-styling/StyledTextField.jsx";
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
@@ -704,7 +703,6 @@ const DisplayUsers = () => {
                                                         )}
                                                         {user.salary && (
                                                             <Typography variant="body2" sx={{ color: '#495057', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                                <AttachMoney sx={{ fontSize: '14px' }} />
                                                                 <strong>Salary:</strong> ₹{user.salary.toLocaleString('en-IN')}
                                                             </Typography>
                                                         )}

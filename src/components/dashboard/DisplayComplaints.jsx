@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Box, Typography, Paper, Grid, Card, CardContent, Chip, Avatar, Button, Alert, Divider, useTheme,
-    useMediaQuery, InputAdornment, MenuItem, Collapse, Badge, Tooltip, IconButton, CircularProgress } from '@mui/material';
+    useMediaQuery, InputAdornment, MenuItem, Collapse, Badge, Tooltip, IconButton, FormControlLabel, Switch } from '@mui/material';
 import { Dashboard, FilterList, Search, CalendarToday, Person, Phone, Email, Home, Build, Description,
     Schedule, CheckCircle, Pending, Error, Handyman, ExpandMore, ExpandLess, ContactPhone, Engineering,
     Feedback, History, List, TrackChanges, AssignmentInd, Edit } from '@mui/icons-material';
@@ -11,9 +11,10 @@ import useAuth from "../../utils/useAuth.jsx";
 import {
     useFetchMyComplaintsQuery,
     useFetchAllComplaintsQuery,
-    useFetchAssignedComplaintsQuery
+    useFetchAssignedComplaintsQuery, useUpdateComplaintStateMutation
 } from "../../reducers/complaintApi.js";
 import ComplaintUtils from "../../utils/ComplaintUtils.jsx";
+import {toast} from "react-toastify";
 
 const DisplayComplaints = () => {
     const { user, isLoggingOut } = useAuth();
@@ -32,19 +33,19 @@ const DisplayComplaints = () => {
     const isAssignedComplaintsPath = location.pathname === '/assigned-complaints';
 
     const { data: userComplaintsData, isLoading: fetchUserComplaintsLoading,
-        isError: fetchUserComplaintsError } = useFetchMyComplaintsQuery(user?.userId, {
+        isError: fetchUserComplaintsError, refetch: refetchMyComplaints } = useFetchMyComplaintsQuery(user?.userId, {
             refetchOnMountOrArgChange: true,
             skip: !(isUserComplaintsPath && !isLoggingOut && user?.userId)
         });
 
     const { data: allComplaintsData, isLoading: fetchAllComplaintsLoading,
-        isError: fetchAllComplaintsError } = useFetchAllComplaintsQuery(user?.userId, {
+        isError: fetchAllComplaintsError, refetch: refetchAllComplaints } = useFetchAllComplaintsQuery(user?.userId, {
             refetchOnMountOrArgChange: true,
             skip: !(isAllComplaintsPath && !isLoggingOut && user?.userId)
         });
 
     const { data: assignedComplaintsData, isLoading: fetchAssignedComplaintsLoading,
-        isError: fetchAssignedComplaintsError } = useFetchAssignedComplaintsQuery(user?.userId, {
+        isError: fetchAssignedComplaintsError, refetch: refetchAssignedComplaints } = useFetchAssignedComplaintsQuery(user?.userId, {
             refetchOnMountOrArgChange: true,
             skip: !(isAssignedComplaintsPath && !isLoggingOut && user?.userId)
         });
@@ -124,6 +125,37 @@ const DisplayComplaints = () => {
 
     const statusOptions = ['All', 'PENDING', 'IN_PROGRESS', 'RESOLVED'];
     const productTypeOptions = ['All', 'Air Conditioner', 'Refrigerator', 'Other'];
+
+    const [updateComplaintState] = useUpdateComplaintStateMutation();
+
+    const handleComplaintStateToggle = async (complaintId, currentState, assignedTo) => {
+
+        const newState = currentState === 'CLOSED' ? 'REOPENED' : 'CLOSED';
+
+        try {
+
+            const updateComplaintStateDTO = {
+                complaintId: complaintId,
+                complaintState: newState,
+                assignedTo: assignedTo ? assignedTo : ''
+            }
+
+            await updateComplaintState(updateComplaintStateDTO).unwrap();
+
+            toast.success(`Complaint ${newState.toLowerCase()} successfully`);
+            isUserComplaintsPath ? refetchMyComplaints()
+                : isAllComplaintsPath ? refetchAllComplaints()
+                    : isAssignedComplaintsPath ? refetchAssignedComplaints()
+                        : null;
+        }
+        catch (error) {
+            toast.error(`Failed to ${newState.toLowerCase() === 'closed' ? 'close' : 'reopen'} complaint`);
+        }
+    };
+
+    const getComplaintStateColor = state => {
+        return state?.toLowerCase() === 'closed' ? '#4caf50' : '#f44336';
+    };
 
     if (fetchUserComplaintsLoading || fetchAllComplaintsLoading || fetchAssignedComplaintsLoading) {
         ComplaintUtils.complaintLoader("Fetching complaints....");
@@ -620,6 +652,41 @@ const DisplayComplaints = () => {
                                                 }
                                             </Typography>
                                         </Box>
+
+                                        {/* Complaint State Toggle */}
+                                        {(user?.userType !== 'CUSTOMER' && (complaint.complaintState === 'CLOSED' || complaint.complaintState === 'REOPENED')) &&
+                                            <Box sx={{ mb: 2 }}>
+                                                <FormControlLabel
+                                                    control={
+                                                        <Switch
+                                                            checked={complaint.complaintState === 'CLOSED'}
+                                                            onChange={() => handleComplaintStateToggle(complaint.complaintId, complaint.complaintState, complaint?.technicianDetails?.employeeId)}
+                                                            sx={{
+                                                                '& .MuiSwitch-switchBase.Mui-checked': {
+                                                                    color: '#4caf50',
+                                                                },
+                                                                '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
+                                                                    backgroundColor: '#4caf50',
+                                                                },
+                                                                '& .MuiSwitch-track': {
+                                                                    backgroundColor: complaint.complaintState === 'CLOSED' ? '#4caf50' : '#f44336',
+                                                                }
+                                                            }}
+                                                        />
+                                                    }
+                                                    label={
+                                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+                                                            <Typography variant="body2" sx={{
+                                                                fontWeight: 600,
+                                                                color: getComplaintStateColor(complaint.complaintState)
+                                                            }}>
+                                                                {complaint.complaintState}
+                                                            </Typography>
+                                                        </Box>
+                                                    }
+                                                />
+                                            </Box>
+                                        }
 
                                         {/* Expand/Collapse Button */}
                                         <Box sx={{
