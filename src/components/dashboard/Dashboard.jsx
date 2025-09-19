@@ -64,6 +64,7 @@ const Dashboard = () => {
             id: 'notifications',
             title: 'Notifications',
             description: 'Manage your notification preferences',
+            path: '/user-notifications',
             icon: <Notifications />,
             color: '#ef5350',
             bgColor: '#ffebee'
