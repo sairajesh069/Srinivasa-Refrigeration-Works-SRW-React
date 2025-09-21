@@ -67,7 +67,8 @@ const ComplaintRegister = () => {
             productType: values.productType,
             brand: values.brand,
             productModel: values.productModel,
-            description: values.description
+            description: values.description,
+            initialAssigneeId: ''
         };
 
         try {

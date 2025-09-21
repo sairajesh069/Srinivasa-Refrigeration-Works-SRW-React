@@ -95,7 +95,7 @@ const UpdateComplaint = () => {
         }));
     };
 
-    const [updateComplaint, isLoading] = useUpdateComplaintMutation();
+    const [updateComplaint] = useUpdateComplaintMutation();
 
     const handleSubmit = async values => {
 
@@ -131,7 +131,8 @@ const UpdateComplaint = () => {
             reopenedAt: complaint?.reopenedAt,
             complaintState: complaint?.complaintState,
             technicianFeedback: values.technicianFeedback || '',
-            customerFeedback: values.customerFeedback || ''
+            customerFeedback: values.customerFeedback || '',
+            initialAssigneeId: complaint?.technicianDetails?.employeeId || ''
         };
 
         setIsSubmitting(true);

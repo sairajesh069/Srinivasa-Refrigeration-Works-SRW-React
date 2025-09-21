@@ -129,7 +129,7 @@ const DisplayComplaints = () => {
 
     const [updateComplaintState] = useUpdateComplaintStateMutation();
 
-    const handleComplaintStateToggle = async (complaintId, currentState, assignedTo) => {
+    const handleComplaintStateToggle = async (complaintId, currentState, assignedTo, bookedById, productType) => {
 
         const newState = currentState === 'CLOSED' ? 'REOPENED' : 'CLOSED';
 
@@ -138,7 +138,9 @@ const DisplayComplaints = () => {
             const updateComplaintStateDTO = {
                 complaintId: complaintId,
                 complaintState: newState,
-                assignedTo: assignedTo ? assignedTo : ''
+                assignedTo: assignedTo ? assignedTo : '',
+                bookedById: bookedById,
+                productType: productType
             }
 
             await updateComplaintState(updateComplaintStateDTO).unwrap();
@@ -668,7 +670,7 @@ const DisplayComplaints = () => {
                                                     control={
                                                         <Switch
                                                             checked={complaint.complaintState === 'CLOSED'}
-                                                            onChange={() => handleComplaintStateToggle(complaint.complaintId, complaint.complaintState, complaint?.technicianDetails?.employeeId)}
+                                                            onChange={() => handleComplaintStateToggle(complaint.complaintId, complaint.complaintState, complaint?.technicianDetails?.employeeId, complaint.bookedById, complaint.productType)}
                                                             sx={{
                                                                 '& .MuiSwitch-switchBase.Mui-checked': {
                                                                     color: '#4caf50',
