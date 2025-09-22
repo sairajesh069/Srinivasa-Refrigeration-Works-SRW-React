@@ -14,9 +14,15 @@ const UserProfile = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const paramUserId = queryParams.get("userId");
+    const paramUserType = paramUserId.endsWith("OWNR") ? "OWNER"
+        : paramUserId.endsWith("EMPL") ? "EMPLOYEE"
+            : paramUserId.endsWith("CUST") ? "CUSTOMER"
+                : '';
 
-    const userId = user?.userId;
-    const userType = user?.userType;
+    const userId = paramUserId ? paramUserId : user?.userId;
+    const userType = paramUserType ? paramUserType : user?.userType;
 
     const shouldFetch = userId && userType && location.pathname === "/profile" && !isLoggingOut;
 
@@ -201,7 +207,7 @@ const UserProfile = () => {
                                         height: { xs: '36px', sm: '40px', md: '48px' }
                                     }}
                                     onClick={() => {
-                                        navigate('/update-profile');
+                                        navigate(`/update-profile?userId=${userId}&userType=${userType}`);
                                     }}
                                 >
                                     <Edit sx={{ fontSize: { xs: '18px', sm: '20px', md: '24px' } }} />

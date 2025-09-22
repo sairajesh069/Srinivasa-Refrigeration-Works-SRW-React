@@ -111,6 +111,19 @@ const DisplayNotifications = () => {
 
     const typeOptions = ['All', 'INFO', 'WARNING', 'ERROR', 'REPAIR_UPDATE'];
 
+    const handleHrefClick = event => {
+        const target = event.target;
+        if (target.tagName === "A") {
+            event.preventDefault(); // stop full reload
+            const href = target.getAttribute("href");
+            if (href.startsWith("/")) {
+                navigate(href); // internal navigation
+            } else {
+                window.open(href, "_blank"); // external links
+            }
+        }
+    };
+
     if (isLoading) {
         ProfileUtils.profileLoader("Fetching notifications...");
     }
@@ -462,15 +475,45 @@ const DisplayNotifications = () => {
 
                                         {/* Message Preview */}
                                         <Box sx={{ mb: 2 }}>
-                                            <Typography variant="body2" sx={{
-                                                color: '#495057',
-                                                lineHeight: 1.6
-                                            }}>
-                                                {expandedCards[notification.notificationId] || notification.message.length <= 150
-                                                    ? notification.message
-                                                    : `${notification.message.substring(0, 150)}...`
-                                                }
-                                            </Typography>
+                                            <Typography
+                                                variant="body2"
+                                                sx={{
+                                                    color: '#495057',
+                                                    lineHeight: 1.6,
+                                                    '& a': {
+                                                        color: '#0d6efd',
+                                                        fontWeight: 600,
+                                                        textDecoration: 'none',
+                                                        position: 'relative',
+                                                        display: 'inline-block',
+                                                        transition: 'color 0.2s ease-in-out, transform 0.2s ease-in-out',
+                                                        '&::after': {
+                                                            content: '""',
+                                                            position: 'absolute',
+                                                            bottom: 0,
+                                                            left: 0,
+                                                            width: '0%',
+                                                            height: '1px',
+                                                            backgroundColor: '#0d6efd',
+                                                            transition: 'width 0.3s ease-in-out',
+                                                        },
+                                                    },
+                                                    '& a:hover': {
+                                                        color: '#0856d3',
+                                                        transform: 'translateY(-1px)',
+                                                        '&::after': {
+                                                            width: '100%',
+                                                        },
+                                                    },
+                                                }}
+                                                component="div"
+                                                onClick={event => handleHrefClick(event)}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: expandedCards[notification.notificationId] || notification.message.length <= 150
+                                                        ? notification.message
+                                                        : `${notification.message.substring(0, 150)}...`
+                                                }}
+                                            />
                                         </Box>
 
                                         {/* Notification as Alert (for better visibility) */}

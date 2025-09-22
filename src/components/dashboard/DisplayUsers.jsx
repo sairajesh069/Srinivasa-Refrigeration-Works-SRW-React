@@ -540,14 +540,55 @@ const DisplayUsers = () => {
                                                 flexWrap: 'wrap',
                                                 gap: 2,
                                                 fontSize: '14px',
-                                                color: '#7f8c8d'
                                             }}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                    <Phone sx={{ fontSize: '14px' }} />
+                                                <Box
+                                                    component="a"
+                                                    href={`tel:${user.phoneNumber}`}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 0.5,
+                                                        color: '#7f8c8d',
+                                                        fontWeight: 600,
+                                                        textDecoration: 'none',
+                                                        transition: 'all 0.2s ease-in-out',
+                                                        '&:hover': {
+                                                            color: '#0d6efd',
+                                                            textDecoration: 'underline',
+                                                            transform: 'translateY(-1px)',
+                                                        },
+                                                    }}
+                                                >
+                                                    <Phone sx={{
+                                                            fontSize: '14px',
+                                                            transition: 'transform 0.2s ease-in-out',
+                                                        }}
+                                                    />
                                                     {user.phoneNumber}
                                                 </Box>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                    <Email sx={{ fontSize: '14px' }} />
+                                                <Box
+                                                    component="a"
+                                                    href={`mailto:${user.email}`}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 0.5,
+                                                        color: '#7f8c8d',
+                                                        fontWeight: 600,
+                                                        textDecoration: 'none',
+                                                        transition: 'all 0.2s ease-in-out',
+                                                        '&:hover': {
+                                                            color: '#0d6efd',
+                                                            textDecoration: 'underline',
+                                                            transform: 'translateY(-1px)',
+                                                        },
+                                                    }}
+                                                >
+                                                    <Email sx={{
+                                                            fontSize: '14px',
+                                                            transition: 'transform 0.2s ease-in-out',
+                                                        }}
+                                                    />
                                                     {user.email}
                                                 </Box>
                                             </Box>

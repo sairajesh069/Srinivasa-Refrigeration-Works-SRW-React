@@ -23,8 +23,10 @@ const DisplayComplaints = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const navigate = useNavigate();
     const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const paramComplaintId = queryParams.get("complaintId");
 
-    const [searchTerm, setSearchTerm] = useState('');
+    const [searchTerm, setSearchTerm] = useState(paramComplaintId ? paramComplaintId : '');
     const [statusFilter, setStatusFilter] = useState('All');
     const [productTypeFilter, setProductTypeFilter] = useState('All');
     const [expandedCards, setExpandedCards] = useState({});
@@ -598,15 +600,56 @@ const DisplayComplaints = () => {
                                                 flexWrap: 'wrap',
                                                 gap: 2,
                                                 fontSize: '14px',
-                                                color: '#7f8c8d'
                                             }}>
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                    <Phone sx={{ fontSize: '14px' }} />
+                                                <Box
+                                                    component="a"
+                                                    href={`tel:${complaint.contactNumber}`}
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 0.5,
+                                                        color: '#495057',
+                                                        fontWeight: 600,
+                                                        textDecoration: 'none',
+                                                        transition: 'all 0.2s ease-in-out',
+                                                        '&:hover': {
+                                                            color: '#0d6efd',
+                                                            textDecoration: 'underline',
+                                                            transform: 'translateY(-1px)',
+                                                        },
+                                                    }}
+                                                >
+                                                    <Phone sx={{
+                                                            fontSize: '14px',
+                                                            transition: 'transform 0.2s ease-in-out',
+                                                        }}
+                                                    />
                                                     {complaint.contactNumber}
                                                 </Box>
                                                 {complaint.email !== '' && (
-                                                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                                                        <Email sx={{ fontSize: '14px' }} />
+                                                    <Box
+                                                        component="a"
+                                                        href={`mailto:${complaint.email}`}
+                                                        sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 0.5,
+                                                            color: '#495057',
+                                                            fontWeight: 600,
+                                                            textDecoration: 'none',
+                                                            transition: 'all 0.2s ease-in-out',
+                                                            '&:hover': {
+                                                                color: '#0d6efd',
+                                                                textDecoration: 'underline',
+                                                                transform: 'translateY(-1px)',
+                                                            },
+                                                    }}
+                                                    >
+                                                        <Email sx={{
+                                                                fontSize: '14px',
+                                                                transition: 'transform 0.2s ease-in-out',
+                                                            }}
+                                                        />
                                                         {complaint.email}
                                                     </Box>
                                                 )}
@@ -775,13 +818,30 @@ const DisplayComplaints = () => {
                                                         <Typography variant="body2" sx={{ color: '#7f8c8d', mb: 0.5 }}>
                                                             {complaint.technicianDetails.designation} {isOwner && `(ID: ${complaint.technicianDetails.employeeId})`}
                                                         </Typography>
-                                                        <Typography variant="body2" sx={{
-                                                            color: '#495057',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            gap: 0.5
-                                                        }}>
-                                                            <ContactPhone sx={{ fontSize: '14px' }} />
+                                                        <Typography
+                                                            variant="body2"
+                                                            component="a"
+                                                            href={`tel:${complaint.technicianDetails.phoneNumber}`}
+                                                            sx={{
+                                                                color: '#495057',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                gap: 0.5,
+                                                                fontWeight: 600,
+                                                                textDecoration: 'none',
+                                                                transition: 'all 0.2s ease-in-out',
+                                                                '&:hover': {
+                                                                    color: '#0d6efd',
+                                                                    textDecoration: 'underline',
+                                                                    transform: 'translateY(-1px)',
+                                                                },
+                                                            }}
+                                                        >
+                                                            <ContactPhone sx={{
+                                                                    fontSize: '14px',
+                                                                    transition: 'transform 0.2s ease-in-out',
+                                                                }}
+                                                            />
                                                             {complaint.technicianDetails.phoneNumber}
                                                         </Typography>
                                                     </Box>
