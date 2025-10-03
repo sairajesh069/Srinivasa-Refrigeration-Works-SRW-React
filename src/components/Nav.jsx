@@ -1,6 +1,6 @@
 import React from "react";
 import {AppBar, Toolbar, Typography, Button, Box, Menu, MenuItem, Avatar, IconButton, Divider,
-    Drawer, ListItemIcon, ListItemText, useMediaQuery, useTheme, Card, CardContent, Chip, Stack } from '@mui/material';
+    Drawer, ListItemIcon, ListItemText, useMediaQuery, useTheme, Card, CardContent, Chip, Stack, Dialog, DialogTitle, DialogContent, DialogActions, DialogContentText } from '@mui/material';
 import { ExitToApp, Menu as MenuIcon, Dashboard, Home, Info, Build, ContactMail, Close } from '@mui/icons-material';
 import {Link, useNavigate} from "react-router-dom";
 import { useState, useEffect } from "react";
@@ -10,6 +10,7 @@ const Nav = () => {
     const [anchorEl, setAnchorEl] = useState(null);
     const [profileMenuOpen, setProfileMenuOpen] = useState(false);
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
     const { isAuthenticated, user, isLoggingOut, logout } = useAuth();
 
@@ -51,10 +52,19 @@ const Nav = () => {
         navigate(path);
     };
 
-    const handleLogout = async () => {
+    const handleLogoutClick = () => {
+        setLogoutDialogOpen(true);
+    };
+
+    const handleLogoutConfirm = async () => {
+        setLogoutDialogOpen(false);
         handleProfileMenuClose();
         handleDrawerClose();
         await logout();
+    };
+
+    const handleLogoutCancel = () => {
+        setLogoutDialogOpen(false);
     };
 
     const getDisplayName = () => {
@@ -277,7 +287,7 @@ const Nav = () => {
             <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)' }} />
 
             <MenuItem
-                onClick={handleLogout}
+                onClick={handleLogoutClick}
                 disabled={isLoggingOut}
                 sx={{
                     py: 1.5,
@@ -291,6 +301,81 @@ const Nav = () => {
                 {isLoggingOut ? 'Logging out...' : 'Logout'}
             </MenuItem>
         </Menu>
+    );
+
+    const renderLogoutDialog = (
+        <Dialog
+            open={logoutDialogOpen}
+            onClose={handleLogoutCancel}
+            slotProps={{
+                paper: {
+                    sx: {
+                        backgroundColor: '#051120',
+                        borderRadius: 3,
+                        border: '1px solid rgba(79, 195, 247, 0.2)',
+                        minWidth: 320,
+                        maxWidth: 400
+                    }
+                }
+            }}
+        >
+            <DialogTitle sx={{
+                color: '#ffffff',
+                fontWeight: 600,
+                borderBottom: '1px solid rgba(79, 195, 247, 0.1)',
+                pb: 2
+            }}>
+                Confirm Logout
+            </DialogTitle>
+            <DialogContent sx={{
+                pt: 2,
+                '&:first-of-type': {
+                    pt: 2
+                }
+            }}>
+                <DialogContentText sx={{ color: 'rgba(255, 255, 255, 0.8)' }}>
+                    Are you sure you want to logout? You will need to login again to access your account.
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions sx={{ p: 2.5, pt: 1 }}>
+                <Button
+                    onClick={handleLogoutCancel}
+                    sx={{
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        textTransform: 'none',
+                        fontWeight: 500,
+                        px: 3,
+                        borderRadius: 2,
+                        '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                        }
+                    }}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    onClick={handleLogoutConfirm}
+                    disabled={isLoggingOut}
+                    variant="contained"
+                    sx={{
+                        backgroundColor: '#ef5350',
+                        color: '#ffffff',
+                        textTransform: 'none',
+                        fontWeight: 600,
+                        px: 3,
+                        borderRadius: 2,
+                        '&:hover': {
+                            backgroundColor: '#e53935'
+                        },
+                        '&:disabled': {
+                            backgroundColor: 'rgba(239, 83, 80, 0.5)'
+                        }
+                    }}
+                >
+                    {isLoggingOut ? 'Logging out...' : 'Logout'}
+                </Button>
+            </DialogActions>
+        </Dialog>
     );
 
     return (
@@ -661,7 +746,7 @@ const Nav = () => {
 
                                 <Button
                                     startIcon={<ExitToApp />}
-                                    onClick={handleLogout}
+                                    onClick={handleLogoutClick}
                                     disabled={isLoggingOut}
                                     fullWidth
                                     sx={{
@@ -705,6 +790,7 @@ const Nav = () => {
             </Drawer>
 
             {renderProfileMenu}
+            {renderLogoutDialog}
         </>
     );
 };
