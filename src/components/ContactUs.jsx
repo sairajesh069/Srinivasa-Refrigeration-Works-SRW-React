@@ -1,12 +1,14 @@
 import React from 'react';
 import { Phone, WhatsApp, Email, LocationOn, Schedule, Business, ArrowForward } from '@mui/icons-material';
 import { Box, Typography, Card, CardContent, Container, Grid, Button, Chip,
-    Divider, Paper, Stack, useTheme, useMediaQuery } from "@mui/material";
+    Divider, Paper, Stack, useTheme, useMediaQuery, Tooltip } from "@mui/material";
+import {usePrivacyPolicy} from "../utils/PrivacyPolicyContext.jsx";
 
 const ContactUs = () => {
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md'));
     const isSmallMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const { openPrivacyPolicy } = usePrivacyPolicy();
 
     const contactMethods = [
         {
@@ -133,22 +135,22 @@ const ContactUs = () => {
                             px: { xs: 1, sm: 2, md: 0 }
                         }}
                     >
-                        Contact Our Expert Team
+                        Connect With Our Expert Team
                     </Typography>
                     <Typography
                         variant="h6"
                         sx={{
-                            color: "rgba(255, 255, 255, 0.8)",
-                            maxWidth: { xs: "100%", sm: "600px", md: "800px" },
+                            color: "rgba(255, 255, 255, 0.75)",
+                            maxWidth: { xs: "100%", sm: "600px", md: "750px" },
                             mx: "auto",
-                            lineHeight: 1.6,
+                            lineHeight: 1.7,
                             fontWeight: 400,
-                            fontSize: { xs: '1rem', sm: '1.2rem', md: '1.4rem' },
+                            fontSize: { xs: '0.95rem', sm: '1.1rem', md: '1.25rem' },
                             px: { xs: 1, sm: 2, md: 0 }
                         }}
                     >
-                        Ready to solve your cooling problems? Reach out to us for professional service
-                        and quick solutions.
+                        Experience professional refrigeration services backed by decades of expertise.
+                        We're here to provide prompt, reliable solutions for all your cooling needs.
                     </Typography>
                 </Box>
 
@@ -257,7 +259,7 @@ const ContactUs = () => {
                                         flexDirection: 'column',
                                         position: 'relative',
                                         overflow: 'hidden',
-                                        height: { xs: '280px', sm: '320px', md: 'auto' }, // Fixed heights for smaller devices
+                                        height: { xs: '280px', sm: '320px', md: 'auto' },
                                         '&::before': {
                                             content: '""',
                                             position: 'absolute',
@@ -456,7 +458,7 @@ const ContactUs = () => {
                                         borderRadius: { xs: 2, sm: 2.5, md: 3 },
                                         border: "1px solid rgba(255, 255, 255, 0.1)",
                                         transition: "all 0.3s ease",
-                                        height: { xs: '220px', sm: '240px', md: '260px' }, // Fixed heights for consistency
+                                        height: { xs: '220px', sm: '240px', md: '260px' },
                                         justifyContent: 'center',
                                         '&:hover': {
                                             backgroundColor: "rgba(255, 255, 255, 0.05)",
@@ -609,7 +611,28 @@ const ContactUs = () => {
                             fontSize: { xs: '0.85rem', sm: '0.9rem', md: '0.95rem' }
                         }}
                     >
-                        © 2024 Srinivasa Refrigeration Works. Serving Tuni with excellence since 1998.
+                        © 2024 Srinivasa Refrigeration Works. Serving Tuni with excellence since 1998 {" "}
+                        <Tooltip title="Privacy Policy">
+                            <Typography
+                                component="span"
+                                onClick={event => {
+                                    event.preventDefault();
+                                    openPrivacyPolicy();
+                                }}
+                                sx={{
+                                    color: '#4fc3f7',
+                                    fontWeight: 600,
+                                    cursor: 'pointer',
+                                    textDecoration: 'underline',
+                                    '&:hover': {
+                                        color: '#29b6f6',
+                                    }
+                                }}
+                            >
+                                T&C
+                            </Typography>
+                        </Tooltip>
+                        .
                     </Typography>
                 </Box>
             </Container>

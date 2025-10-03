@@ -1,6 +1,7 @@
-import {Box, Button, Typography, Paper, InputAdornment, IconButton, MenuItem} from "@mui/material";
+import {Box, Button, Typography, Paper, InputAdornment, IconButton, MenuItem, Checkbox, FormControlLabel} from "@mui/material";
 import {Form, Formik} from "formik";
-import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, LocationOn, Wc, CalendarToday, Badge, WorkOutline, CurrencyRupee } from '@mui/icons-material';
+import { PersonOutline, LockOutlined, Visibility, VisibilityOff, Phone, Email, LocationOn, Wc,
+    CalendarToday, Badge, WorkOutline, CurrencyRupee } from '@mui/icons-material';
 import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -10,6 +11,7 @@ import {useCustomerMutation, useEmployeeMutation, useOwnerMutation} from "../../
 import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import AuthUtils from "../../utils/AuthUtils.jsx";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
+import {usePrivacyPolicy} from "../../utils/PrivacyPolicyContext.jsx";
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +28,8 @@ const Register = () => {
         setShowPassword(!showPassword);
     };
 
+    const { openPrivacyPolicy } = usePrivacyPolicy();
+
     const [customer, { isLoading: isCustomerLoading }] = useCustomerMutation();
     const [owner, { isLoading: isOwnerLoading }] = useOwnerMutation();
     const [employee, { isLoading: isEmployeeLoading }] = useEmployeeMutation();
@@ -35,11 +39,17 @@ const Register = () => {
             'Customer';
 
     const handleRegister = async (values, { setFieldError }) => {
+        if (!values.agreedToTerms) {
+            setFieldError('agreedToTerms', 'You must agree to the terms and conditions');
+            return;
+        }
+
         const userCredentialDTO = {
             username: values.username.toLowerCase(),
             password: values.password,
             phoneNumber: values.phoneNumber,
-            email: values.email.toLowerCase()
+            email: values.email.toLowerCase(),
+            agreedToTerms: values.agreedToTerms ? 1 : 0
         }
 
         try {
@@ -103,7 +113,10 @@ const Register = () => {
         }
     }
 
-    const initialValues = ProfileUtils.getInitialValues(accessedBy.toUpperCase(), null, false);
+    const initialValues = {
+        ...ProfileUtils.getInitialValues(accessedBy.toUpperCase(), null, false),
+        agreedToTerms: false
+    };
     const validationSchema = ProfileUtils.getValidationSchema(accessedBy.toUpperCase(), false);
 
     return(
@@ -177,7 +190,7 @@ const Register = () => {
                     validateOnBlur={true}
                     validateOnMount={true}
                 >
-                    {({ values, handleChange, errors, touched, setFieldError }) => (
+                    {({ values, handleChange, errors, touched, setFieldError, setFieldValue }) => (
                         <Form>
                             <Typography sx={{
                                 color: '#2c3e50',
@@ -503,6 +516,53 @@ const Register = () => {
                                     ),
                                 }}
                             />
+
+                            <Box sx={{ marginTop: '10px', marginBottom: '8px' }}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={values.agreedToTerms}
+                                            onChange={event =>
+                                                setFieldValue('agreedToTerms', event.target.checked)
+                                            }
+                                            sx={{
+                                                color: errors.agreedToTerms && touched.agreedToTerms ? '#d32f2f' : '#4fc3f7',
+                                                '&.Mui-checked': {
+                                                    color: '#4fc3f7',
+                                                },
+                                            }}
+                                        />
+                                    }
+                                    label={
+                                        <Typography sx={{ fontSize: '14px', color: '#555' }}>
+                                            I agree to the{' '}
+                                            <Typography
+                                                component="span"
+                                                onClick={event => {
+                                                    event.preventDefault();
+                                                    openPrivacyPolicy();
+                                                }}
+                                                sx={{
+                                                    color: '#4fc3f7',
+                                                    cursor: 'pointer',
+                                                    textDecoration: 'underline',
+                                                    '&:hover': {
+                                                        color: '#29b6f6',
+                                                    }
+                                                }}
+                                            >
+                                                Terms and Conditions
+                                            </Typography>
+                                        </Typography>
+                                    }
+                                />
+                                {errors.agreedToTerms && touched.agreedToTerms && (
+                                    <Typography sx={{ color: '#d32f2f', fontSize: '12px', marginLeft: '32px', marginTop: '4px' }}>
+                                        {errors.agreedToTerms}
+                                    </Typography>
+                                )}
+                            </Box>
+
                             <Button
                                 fullWidth
                                 type="submit"
@@ -555,7 +615,7 @@ const Register = () => {
                                     (isCustomerRegistration || isEmployeeRegistration || isOwnerRegistration) && isAuthenticated
                                         ? '/dashboard'
                                         : '/login'
-                                    }
+                                }
                             >
                                 { (isCustomerRegistration || isEmployeeRegistration || isOwnerRegistration) && isAuthenticated
                                     ? `Back to Dashboard`

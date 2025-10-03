@@ -23,6 +23,7 @@ import UpdateComplaint from "./components/dashboard/UpdateComplaint.jsx";
 import DisplayUsers from "./components/dashboard/DisplayUsers.jsx";
 import ComplaintFeedback from "./components/dashboard/ComplaintFeedback.jsx";
 import DisplayNotifications from "./components/dashboard/DisplayNotifications.jsx";
+import { PrivacyPolicyProvider } from './utils/PrivacyPolicyContext';
 
 const App = () => {
     return (
@@ -30,206 +31,210 @@ const App = () => {
             <CustomToast />
             <ScrollHandler />
             <Nav/>
-            <Routes>
-                <Route path="/" element={
-                    <>
-                        <Home/>
-                        <AboutUs/>
-                        <Services/>
-                    </>
-                } />
+            <PrivacyPolicyProvider>
+                <Routes>
+                    <Route path="/" element={
+                        <>
+                            <Home/>
+                            <AboutUs/>
+                            <Services/>
+                        </>
+                    } />
 
-                <Route path="/login" element={
-                    <AuthGuard requireAuth={false}>
-                        <Login />
-                    </AuthGuard>
-                } />
+                    <Route path="/login" element={
+                        <AuthGuard requireAuth={false}>
+                            <Login />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/forgot-username" element={
-                    <AuthGuard requireAuth={false}>
-                        <AccountRecovery />
-                    </AuthGuard>
-                } />
-                <Route path="/validate-user" element={
-                    <AuthGuard requireAuth={false}>
-                        <AccountRecovery />
-                    </AuthGuard>
-                } />
-                <Route path="/forgot-password" element={
-                    <AuthGuard requireAuth={false}>
-                        <AccountRecovery />
-                    </AuthGuard>
-                } />
+                    <Route path="/forgot-username" element={
+                        <AuthGuard requireAuth={false}>
+                            <AccountRecovery />
+                        </AuthGuard>
+                    } />
+                    <Route path="/validate-user" element={
+                        <AuthGuard requireAuth={false}>
+                            <AccountRecovery />
+                        </AuthGuard>
+                    } />
+                    <Route path="/forgot-password" element={
+                        <AuthGuard requireAuth={false}>
+                            <AccountRecovery />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/customer-register" element={
-                    <AuthGuard requireAuth={false}>
-                        <Register />
-                    </AuthGuard>
-                } />
+                    <Route path="/customer-register" element={
+                        <AuthGuard requireAuth={false}>
+                            <Register />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/owner-register" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <Register />
-                    </AuthGuard>
-                } />
+                    <Route path="/owner-register" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <Register />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/employee-register" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <Register />
-                    </AuthGuard>
-                } />
+                    <Route path="/employee-register" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <Register />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/dashboard" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <Dashboard />
-                    </AuthGuard>
-                } />
+                    <Route path="/dashboard" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <Dashboard />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/profile" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <UserProfile />
-                    </AuthGuard>
-                } />
+                    <Route path="/profile" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <UserProfile />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/update-profile" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <UpdateUserProfile />
-                    </AuthGuard>
-                } />
+                    <Route path="/update-profile" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <UpdateUserProfile />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/account-settings" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <AccountSettings />
-                    </AuthGuard>
-                } />
+                    <Route path="/account-settings" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <AccountSettings />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/complaint-register" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <ComplaintRegister />
-                    </AuthGuard>
-                } />
+                    <Route path="/complaint-register" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <ComplaintRegister />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/my-complaints" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <DisplayComplaints />
-                    </AuthGuard>
-                } />
+                    <Route path="/my-complaints" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER', 'EMPLOYEE', 'CUSTOMER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <DisplayComplaints />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/all-complaints" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <DisplayComplaints />
-                    </AuthGuard>
-                } />
+                    <Route path="/all-complaints" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <DisplayComplaints />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/assigned-complaints" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['EMPLOYEE']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <DisplayComplaints />
-                    </AuthGuard>
-                } />
+                    <Route path="/assigned-complaints" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['EMPLOYEE']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <DisplayComplaints />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/update-complaint" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['CUSTOMER', 'EMPLOYEE', 'OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <UpdateComplaint />
-                    </AuthGuard>
-                } />
+                    <Route path="/update-complaint" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['CUSTOMER', 'EMPLOYEE', 'OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <UpdateComplaint />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/owner-list" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <DisplayUsers />
-                    </AuthGuard>
-                }/>
-                <Route path="/employee-list" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <DisplayUsers />
-                    </AuthGuard>
-                }/>
-                <Route path="/customer-list" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <DisplayUsers />
-                    </AuthGuard>
-                }/>
+                    <Route path="/owner-list" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <DisplayUsers />
+                        </AuthGuard>
+                    }/>
+                    <Route path="/employee-list" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <DisplayUsers />
+                        </AuthGuard>
+                    }/>
+                    <Route path="/customer-list" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <DisplayUsers />
+                        </AuthGuard>
+                    }/>
 
-                <Route path="/user-feedback" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['CUSTOMER', 'EMPLOYEE', 'OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <ComplaintFeedback />
-                    </AuthGuard>
-                } />
+                    <Route path="/user-feedback" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['CUSTOMER', 'EMPLOYEE', 'OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <ComplaintFeedback />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/user-notifications" element={
-                    <AuthGuard
-                        requireAuth={true}
-                        allowedRoles={['CUSTOMER', 'EMPLOYEE', 'OWNER']}
-                        unauthorizedFallback="/unauthorized"
-                    >
-                        <DisplayNotifications />
-                    </AuthGuard>
-                } />
+                    <Route path="/user-notifications" element={
+                        <AuthGuard
+                            requireAuth={true}
+                            allowedRoles={['CUSTOMER', 'EMPLOYEE', 'OWNER']}
+                            unauthorizedFallback="/unauthorized"
+                        >
+                            <DisplayNotifications />
+                        </AuthGuard>
+                    } />
 
-                <Route path="/unauthorized" element={ <Unauthorized /> } />
+                    <Route path="/unauthorized" element={ <Unauthorized /> } />
 
-                <Route path="*" element={ <PageNotFound /> } />
-            </Routes>
-            <ContactUs/>
+                    <Route path="*" element={ <PageNotFound /> } />
+
+                    <Route path="/privacy-policy" element={<Home />} />
+                </Routes>
+                <ContactUs/>
+            </PrivacyPolicyProvider>
         </React.Fragment>
     );
 }
