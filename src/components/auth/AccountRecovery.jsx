@@ -13,7 +13,8 @@ const AccountRecovery = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [validationResponse, setValidationResponse] = useState("");
     const [passwordResetResponse, setPasswordResetResponse] = useState("");
-    const [isError, setIsError] = useState(null);
+    const [isValidationError, setIsValidationError] = useState(null);
+    const [isPasswordResetError, setIsPasswordResetError] = useState(null);
     const [isUserValidated, setIsUserValidated] = useState(false);
 
     const location = useLocation();
@@ -94,9 +95,12 @@ const AccountRecovery = () => {
         return baseValues;
     };
 
-    const handleFieldChange = (event, handleChange) => {
+    const handleFieldChange = (event, handleChange, { setFieldValue }) => {
         handleChange(event);
         if (isPasswordReset) {
+            setFieldValue('password', '');
+            setFieldValue('confirmPassword', '');
+            setPasswordResetResponse("");
             setIsUserValidated(false);
             navigate('/validate-user');
         }
@@ -106,7 +110,7 @@ const AccountRecovery = () => {
     const handleAccountRecovery = async values => {
         const accountRecoveryDTO = {
             phoneNumber: values.phoneNumber,
-            loginId: values.loginId,
+            loginId: values.loginId.toLowerCase(),
             password: values.password
         };
 
@@ -118,30 +122,38 @@ const AccountRecovery = () => {
             if (isUsernameRecovery) {
                 response = await usernameRecovery(accountRecoveryDTO).unwrap();
                 setValidationResponse(response?.message);
+                setIsValidationError(false);
             }
             else if (isUserValidation) {
                 response = await userValidation(accountRecoveryDTO).unwrap();
                 setIsUserValidated(true);
                 setValidationResponse(response?.message);
+                setIsValidationError(false);
                 navigate('/forgot-password');
             }
             else if (isPasswordReset) {
                 await passwordReset(accountRecoveryDTO).unwrap();
                 setPasswordResetResponse("Your password has been updated successfully. Please proceed to log in.");
+                setIsPasswordResetError(false);
             }
 
-            setIsError(false);
             toast.success(pageConfig?.successMessage);
         }
         catch (error) {
-            setIsError(true);
             if (error.data?.status === 404 && (isUsernameRecovery || isUserValidation)) {
                 setValidationResponse(error.data?.message);
                 setIsUserValidated(false);
+                setIsValidationError(true);
             }
 
             if(isPasswordReset) {
-                setPasswordResetResponse("Something went wrong. Please try again later.");
+                if(error.data?.status === 409) {
+                    setPasswordResetResponse(error.data?.message);
+                }
+                else {
+                    setPasswordResetResponse("Something went wrong. Please try again later.");
+                }
+                setIsPasswordResetError(true);
             }
 
             toast.error(error.data?.status === 404 ? error.data?.message : "Something went wrong...");
@@ -317,7 +329,7 @@ const AccountRecovery = () => {
                     validateOnBlur={true}
                     validateOnMount={false}
                 >
-                    {({ values, handleChange, errors, touched }) => (
+                    {({ values, handleChange, errors, touched, setFieldValue }) => (
                         <Form>
                             {(isPasswordReset || isUserValidation) && (
                                 <StyledTextField
@@ -325,7 +337,7 @@ const AccountRecovery = () => {
                                     label="Username or Email"
                                     name="loginId"
                                     value={values.loginId}
-                                    onChange={(event) => handleFieldChange(event, handleChange)}
+                                    onChange={event => handleFieldChange(event, handleChange, { setFieldValue })}
                                     error={Boolean(touched.loginId && errors.loginId)}
                                     helperText={touched.loginId && errors.loginId}
                                     variant="outlined"
@@ -346,7 +358,7 @@ const AccountRecovery = () => {
                                 label="Phone Number"
                                 name="phoneNumber"
                                 value={values.phoneNumber}
-                                onChange={(event) => handleFieldChange(event, handleChange)}
+                                onChange={event => handleFieldChange(event, handleChange, { setFieldValue } )}
                                 error={Boolean((touched.phoneNumber || values.phoneNumber) && errors.phoneNumber)}
                                 helperText={(touched.phoneNumber || values.phoneNumber) && errors.phoneNumber}
                                 variant="outlined"
@@ -364,11 +376,11 @@ const AccountRecovery = () => {
 
                             {/* Response Messages */}
                             {isUsernameRecovery && validationResponse &&
-                                renderResponse(validationResponse, isError, true)
+                                renderResponse(validationResponse, isValidationError, true)
                             }
 
                             {(isUserValidation || isUserValidated) && validationResponse &&
-                                renderResponse(validationResponse, isError)
+                                renderResponse(validationResponse, isValidationError)
                             }
 
                             {/* Password Fields */}
@@ -425,7 +437,7 @@ const AccountRecovery = () => {
                                         variant="outlined"
                                         placeholder="Confirm your password"
                                         disabled={isLoading}
-                                        sx={{ marginBottom: validationResponse && 1.5 }}
+                                        sx={{ marginBottom: passwordResetResponse ? "8px" : "24px" }}
                                         InputProps={{
                                             startAdornment: (
                                                 <InputAdornment position="start">
@@ -447,7 +459,7 @@ const AccountRecovery = () => {
                                     />
 
                                     {passwordResetResponse &&
-                                        renderResponse(passwordResetResponse, isError)
+                                        renderResponse(passwordResetResponse, isPasswordResetError)
                                     }
                                 </>
                             )}
