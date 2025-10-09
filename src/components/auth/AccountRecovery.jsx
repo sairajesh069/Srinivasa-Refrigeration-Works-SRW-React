@@ -110,7 +110,7 @@ const AccountRecovery = () => {
     const handleAccountRecovery = async values => {
         const accountRecoveryDTO = {
             phoneNumber: values.phoneNumber,
-            loginId: values.loginId.toLowerCase(),
+            loginId: values.loginId?.toLowerCase(),
             password: values.password
         };
 
@@ -147,7 +147,7 @@ const AccountRecovery = () => {
             }
 
             if(isPasswordReset) {
-                if(error.data?.status === 409) {
+                if(error.data?.status === 400) {
                     setPasswordResetResponse(error.data?.message);
                 }
                 else {

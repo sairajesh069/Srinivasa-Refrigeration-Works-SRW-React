@@ -16,9 +16,9 @@ const UserProfile = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const paramUserId = queryParams.get("userId");
-    const paramUserType = paramUserId.endsWith("OWNR") ? "OWNER"
-        : paramUserId.endsWith("EMPL") ? "EMPLOYEE"
-            : paramUserId.endsWith("CUST") ? "CUSTOMER"
+    const paramUserType = paramUserId?.endsWith("OWNR") ? "OWNER"
+        : paramUserId?.endsWith("EMPL") ? "EMPLOYEE"
+            : paramUserId?.endsWith("CUST") ? "CUSTOMER"
                 : '';
 
     const userId = paramUserId ? paramUserId : user?.userId;

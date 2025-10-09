@@ -66,7 +66,7 @@ const AccountSettings = () => {
             };
 
             await changePassword(passwordChangeDTO).unwrap();
-            toast.success('Password updated successfully. Please login again!');
+            toast.success('Password updated successfully. Please login to continue.');
             resetForm();
             await logout(false);
         }

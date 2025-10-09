@@ -37,7 +37,7 @@ const UpdateComplaint = () => {
         skip: !shouldFetch
     });
 
-    const complaint = complaintData?.complaintDTO;
+    const complaint = complaintData?.dto;
 
     const isOwner = user?.userType === 'OWNER';
     const isEmployee = user?.userType === 'EMPLOYEE';

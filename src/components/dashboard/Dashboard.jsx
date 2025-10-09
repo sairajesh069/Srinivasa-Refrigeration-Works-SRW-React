@@ -34,6 +34,15 @@ const Dashboard = () => {
             bgColor: '#e8f5e8'
         },
         {
+            id: 'account-settings',
+            title: 'Account Settings',
+            description: 'Manage security and account preferences',
+            path: '/account-settings',
+            icon: <Settings />,
+            color: '#78909c',
+            bgColor: '#eceff1'
+        },
+        {
             id: 'register-complaint',
             title: 'Register Complaint',
             description: 'Submit a new complaint or report an issue',
@@ -50,55 +59,28 @@ const Dashboard = () => {
             icon: <TrackChanges />,
             color: '#29b6f6',
             bgColor: '#e1f5fe'
-        },
-        {
-            id: 'give-feedback',
-            title: 'Give Feedback',
-            description: 'Provide feedback on resolved complaints',
-            path: '/user-feedback',
-            icon: <Feedback />,
-            color: '#ffa726',
-            bgColor: '#fff3e0'
-        },
-        {
-            id: 'notifications',
-            title: 'Notifications',
-            description: 'Manage your notification preferences',
-            path: '/user-notifications',
-            icon: <Notifications />,
-            color: '#ef5350',
-            bgColor: '#ffebee'
-        },
-        {
-            id: 'account-settings',
-            title: 'Account Settings',
-            description: 'Manage security and account preferences',
-            path: '/account-settings',
-            icon: <Settings />,
-            color: '#78909c',
-            bgColor: '#eceff1'
         }
     ];
 
     if(isOwner) {
         accountActions.push(
             {
-                id: 'customer-register',
-                title: 'Register customer',
-                description: 'Register a new customer in the portal',
-                path: '/customer-register',
-                icon: <PersonAdd />,
-                color: '#2e7d32',
-                bgColor: '#e8f5e9'
+                id: 'owner-register',
+                title: 'Register owner',
+                description: 'Register a new owner in the portal',
+                path: '/owner-register',
+                icon: <BusinessCenter />,
+                color: '#9c27b0',
+                bgColor: '#f3e5f5'
             },
             {
-                id: 'customer-list',
-                title: 'Customer List',
-                description: 'View and manage customers in the portal',
-                path: '/customer-list',
-                icon: <Groups />,
-                color: '#2e7d32',
-                bgColor: '#e8f5e9'
+                id: 'owner-list',
+                title: 'Owner List',
+                description: 'View and manage owners in the portal',
+                path: '/owner-list',
+                icon: <AdminPanelSettings />,
+                color: '#7b1fa2',
+                bgColor: '#f3e5f5'
             },
             {
                 id: 'employee-register',
@@ -119,22 +101,22 @@ const Dashboard = () => {
                 bgColor: '#e3f2fd'
             },
             {
-                id: 'owner-register',
-                title: 'Register owner',
-                description: 'Register a new owner in the portal',
-                path: '/owner-register',
-                icon: <BusinessCenter />,
-                color: '#9c27b0',
-                bgColor: '#f3e5f5'
+                id: 'customer-register',
+                title: 'Register customer',
+                description: 'Register a new customer in the portal',
+                path: '/customer-register',
+                icon: <PersonAdd />,
+                color: '#2e7d32',
+                bgColor: '#e8f5e9'
             },
             {
-                id: 'owner-list',
-                title: 'Owner List',
-                description: 'View and manage owners in the portal',
-                path: '/owner-list',
-                icon: <AdminPanelSettings />,
-                color: '#7b1fa2',
-                bgColor: '#f3e5f5'
+                id: 'customer-list',
+                title: 'Customer List',
+                description: 'View and manage customers in the portal',
+                path: '/customer-list',
+                icon: <Groups />,
+                color: '#2e7d32',
+                bgColor: '#e8f5e9'
             },
             {
                 id: 'all-complaints',
@@ -159,6 +141,27 @@ const Dashboard = () => {
             bgColor: '#d8f4f1'
         });
     }
+
+    accountActions.push(
+        {
+            id: 'give-feedback',
+            title: 'Give Feedback',
+            description: 'Provide feedback on resolved complaints',
+            path: '/user-feedback',
+            icon: <Feedback />,
+            color: '#ffa726',
+            bgColor: '#fff3e0'
+        },
+        {
+            id: 'notifications',
+            title: 'Notifications',
+            description: 'Manage your notification preferences',
+            path: '/user-notifications',
+            icon: <Notifications />,
+            color: '#ef5350',
+            bgColor: '#ffebee'
+        }
+    );
 
     const handleActionClick = actionId => {
         const action = accountActions.find(a => a.id === actionId);

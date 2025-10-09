@@ -107,7 +107,7 @@ const Register = () => {
             toast.success(isAuthenticated ? `${accessedBy} registered successful.` : "Registration successful. Please login");
             navigate(isAuthenticated ? `/${accessedBy.toLowerCase()}-list` : '/login');
         } catch (error) {
-            error.status === 409
+            (error.status === 400 || error.status === 409)
                 ? ProfileUtils.handleDuplicateFieldError(error, setFieldError)
                 : toast.error("Registration failed. Please try again.");
         }

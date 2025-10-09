@@ -27,7 +27,7 @@ const ComplaintUtils =  {
                 .email('Invalid email address'),
             address: Yup.object().shape({
                 doorNumber: Yup.string()
-                    .min(1, 'Door number is required')
+                    .min(2, 'Door number must be at least 2 characters')
                     .required('Door number is required'),
                 street: Yup.string()
                     .min(3, 'Street must be at least 3 characters')
@@ -46,7 +46,7 @@ const ComplaintUtils =  {
                     .matches(/^\d{6}$/, 'Pincode must be 6 digits')
                     .required('Pincode is required'),
                 country: Yup.string()
-                    .min(2, 'Country must be at least 2 characters')
+                    .min(3, 'Country must be at least 3 characters')
                     .required('Country is required'),
             }),
             productType: Yup.string()
