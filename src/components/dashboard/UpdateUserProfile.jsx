@@ -15,6 +15,8 @@ import ProfileUtils from "../../utils/ProfileUtils.jsx";
 import { useUpdateCustomerProfileMutation,
     useUpdateOwnerProfileMutation, useUpdateEmployeeProfileMutation } from "../../reducers/userProfileApi.js";
 import Unauthorized from "../exceptions/Unauthorized.jsx";
+import * as Yup from "yup";
+import OTPField from "../../utils/form-styling/OTPField.jsx";
 
 const UpdateUserProfile = () => {
     const { user, isLoggingOut } = useAuth();
@@ -60,10 +62,22 @@ const UpdateUserProfile = () => {
     const [updateOwnerProfile] = useUpdateOwnerProfileMutation();
     const [updateEmployeeProfile] = useUpdateEmployeeProfileMutation();
 
+    const isOwner = user?.userType === "OWNER";
+
+    const handleOtpResponse = (response, { setFieldError }) => {
+        if (response?.error) {
+            ProfileUtils.handleOtpFieldError(response.errorMessage, setFieldError, "profileUpdate");
+        }
+    };
+
     const handleSubmit = async (values, { setFieldError }) => {
         setIsSubmitting(true);
         const isMobileNumberUpdated = userData.phoneNumber !== values.phoneNumber;
         const isEmailUpdated = userData.email !== values.email;
+
+        const isPhoneOtpRequired = !isOwner && isMobileNumberUpdated;
+        const isEmailOtpRequired = !isOwner && isEmailUpdated;
+
         const userCredentialDTO = {
             userId: (isMobileNumberUpdated || isEmailUpdated) ? userData.userId : null,
             phoneNumber: isMobileNumberUpdated ? values.phoneNumber : null,
@@ -87,6 +101,12 @@ const UpdateUserProfile = () => {
                     },
                     userCredentialDTO: userCredentialDTO
                 }
+                if (isPhoneOtpRequired) {
+                    customerCredentialDTO.customerDTO.phoneNumberOtp = values.phoneOtp;
+                }
+                if (isEmailOtpRequired) {
+                    customerCredentialDTO.customerDTO.emailOtp = values.emailOtp;
+                }
                 await updateCustomerProfile(customerCredentialDTO).unwrap();
             }
             else if(userType === 'OWNER') {
@@ -106,6 +126,12 @@ const UpdateUserProfile = () => {
                         updatedAt: userData?.updatedAt
                     },
                     userCredentialDTO: userCredentialDTO
+                }
+                if (isPhoneOtpRequired) {
+                    ownerCredentialDTO.ownerDTO.phoneNumberOtp = values.phoneOtp;
+                }
+                if (isEmailOtpRequired) {
+                    ownerCredentialDTO.ownerDTO.emailOtp = values.emailOtp;
                 }
                 await updateOwnerProfile(ownerCredentialDTO).unwrap();
             }
@@ -130,15 +156,39 @@ const UpdateUserProfile = () => {
                     },
                     userCredentialDTO: userCredentialDTO
                 }
+                if (isPhoneOtpRequired) {
+                    employeeCredentialDTO.employeeDTO.phoneNumberOtp = values.phoneOtp;
+                }
+                if (isEmailOtpRequired) {
+                    employeeCredentialDTO.employeeDTO.emailOtp = values.emailOtp;
+                }
                 await updateEmployeeProfile(employeeCredentialDTO).unwrap();
             }
 
             toast.success('Profile updated successfully!');
             navigate(-1);
-        } catch (error) {
-            error.status === 409
-                ? ProfileUtils.handleDuplicateFieldError(error, setFieldError)
-                : toast.error("Profile update failed. Please try again.");
+        }
+        catch (error) {
+            const errorMessage = error?.data?.message;
+
+            if(error.status === 409) {
+                ProfileUtils.handleDuplicateFieldError(errorMessage, setFieldError);
+            }
+            else if(error.status === 400) {
+                if(errorMessage.includes("Duplicate")) {
+                    ProfileUtils.handleDuplicateFieldError(errorMessage, setFieldError);
+                }
+                else if(errorMessage.includes("OTP")) {
+                    ProfileUtils.handleOtpFieldError(errorMessage, setFieldError, "profileUpdate");
+                }
+                else {
+
+                    toast.error(errorMessage);
+                }
+            }
+            else {
+                toast.error("Profile update failed. Please try again.")
+            }
         }
         finally {
             setIsSubmitting(false);
@@ -158,8 +208,30 @@ const UpdateUserProfile = () => {
         }
     };
 
-    const initialValues = ProfileUtils.getInitialValues(userType, { userDTO: userData }, true);
-    const validationSchema = ProfileUtils.getValidationSchema(userType, true);
+    const getDynamicValidationSchema = (phoneChanged, emailChanged) => {
+        const baseSchema = ProfileUtils.getValidationSchema(userType, true).fields;
+
+        if (!isOwner && phoneChanged) {
+            baseSchema.phoneOtp = Yup.string()
+                .matches(/^\d{6}$/, 'OTP must be 6 digits')
+                .required('Phone OTP is required');
+        }
+
+        if (!isOwner && emailChanged) {
+            baseSchema.emailOtp = Yup.string()
+                .matches(/^\d{6}$/, 'OTP must be 6 digits')
+                .required('Email OTP is required');
+        }
+
+        return Yup.object().shape(baseSchema);
+    };
+
+    const getInitialValues = () => {
+        let values = ProfileUtils.getInitialValues(userType, { userDTO: userData }, true);
+        values.phoneOtp = '';
+        values.emailOtp = '';
+        return values;
+    };
 
     if (isUserFetchLoading) {
         ProfileUtils.profileLoader("Loading profile data...");
@@ -413,520 +485,36 @@ const UpdateUserProfile = () => {
                     </Box>
 
                     <Formik
-                        initialValues={initialValues}
-                        validationSchema={validationSchema}
+                        initialValues={getInitialValues()}
                         onSubmit={handleSubmit}
                         enableReinitialize={true}
+                        validate={(values) => {
+                            const isPhoneChangedLocal = userData.phoneNumber !== values.phoneNumber;
+                            const isEmailChangedLocal = userData.email !== values.email;
+                            const schema = getDynamicValidationSchema(isPhoneChangedLocal, isEmailChangedLocal);
+
+                            try {
+                                schema.validateSync(values, { abortEarly: false });
+                                return {};
+                            } catch (err) {
+                                const errors = {};
+                                err.inner.forEach((error) => {
+                                    errors[error.path] = error.message;
+                                });
+                                return errors;
+                            }
+                        }}
                     >
-                        {({ dirty, values, handleChange, errors, touched}) => (
-                            <Form>
-                                {/* Basic Information Section */}
-                                <Box sx={{
-                                    marginBottom: {
-                                        xs: '24px',
-                                        md: '40px'
-                                    }
-                                }}>
-                                    <Typography variant="h6" sx={{
-                                        fontWeight: 600,
-                                        marginBottom: {
-                                            xs: '16px',
-                                            md: '20px'
-                                        },
-                                        color: '#495057',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        fontSize: {
-                                            xs: '1.1rem',
-                                            md: '1.25rem'
-                                        },
-                                        justifyContent: {
-                                            xs: 'center',
-                                            sm: 'flex-start'
-                                        }
-                                    }}>
-                                        <Person sx={{ color: '#4fc3f7' }} />
-                                        Basic Information
-                                    </Typography>
+                        {({ dirty, values, handleChange, errors, touched, setFieldValue, setFieldError}) => {
 
-                                    <Grid container spacing={{
-                                        xs: 2,
-                                        md: 3
-                                    }}>
-                                        <Grid size={{xs:12, sm:6, md:4}}>
-                                            <StyledTextField
-                                                fullWidth
-                                                label="First Name"
-                                                name="firstName"
-                                                value={values.firstName}
-                                                onChange={handleChange}
-                                                error={Boolean((touched.firstName || values.firstName) && errors.firstName)}
-                                                helperText={(touched.firstName || values.firstName) && errors.firstName}
-                                                variant="outlined"
-                                                placeholder="Enter your first name"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: {
-                                                            xs: '8px',
-                                                            md: '12px'
-                                                        },
-                                                        transition: 'all 0.2s ease',
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        },
-                                                        '&:hover': {
-                                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                                        },
-                                                        '&.Mui-focused': {
-                                                            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                        }
-                                                    },
-                                                    '& .MuiInputLabel-root': {
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        }
-                                                    }
-                                                }}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            <Person sx={{
-                                                                color: '#7f8c8d',
-                                                                fontSize: {
-                                                                    xs: '18px',
-                                                                    md: '20px'
-                                                                }
-                                                            }} />
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid size={{xs:12, sm:6, md:4}}>
-                                            <StyledTextField
-                                                fullWidth
-                                                label="Last Name"
-                                                name="lastName"
-                                                value={values.lastName}
-                                                onChange={handleChange}
-                                                error={Boolean((touched.lastName || values.lastName) && errors.lastName)}
-                                                helperText={(touched.lastName || values.lastName) && errors.lastName}
-                                                variant="outlined"
-                                                placeholder="Enter your last name"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: {
-                                                            xs: '8px',
-                                                            md: '12px'
-                                                        },
-                                                        transition: 'all 0.2s ease',
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        },
-                                                        '&:hover': {
-                                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                                        },
-                                                        '&.Mui-focused': {
-                                                            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                        }
-                                                    },
-                                                    '& .MuiInputLabel-root': {
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        }
-                                                    }
-                                                }}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            <Person sx={{
-                                                                color: '#7f8c8d',
-                                                                fontSize: {
-                                                                    xs: '18px',
-                                                                    md: '20px'
-                                                                }
-                                                            }} />
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid size={{xs:12, sm:6, md:4}}>
-                                            <StyledTextField
-                                                fullWidth
-                                                select
-                                                label="Gender"
-                                                name="gender"
-                                                value={values.gender}
-                                                onChange={handleChange}
-                                                error={Boolean(touched.gender && errors.gender)}
-                                                helperText={touched.gender && errors.gender}
-                                                variant="outlined"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: {
-                                                            xs: '8px',
-                                                            md: '12px'
-                                                        },
-                                                        transition: 'all 0.2s ease',
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        },
-                                                        '&:hover': {
-                                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                                        },
-                                                        '&.Mui-focused': {
-                                                            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                        }
-                                                    },
-                                                    '& .MuiInputLabel-root': {
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        }
-                                                    }
-                                                }}
-                                                SelectProps={{
-                                                    displayEmpty: true,
-                                                    MenuProps: StyledMenuProps
-                                                }}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            {getGenderIcon(values.gender)}
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            >
-                                                <MenuItem value="">--select--</MenuItem>
-                                                <MenuItem value="Male">Male</MenuItem>
-                                                <MenuItem value="Female">Female</MenuItem>
-                                                <MenuItem value="Transgender">Transgender</MenuItem>
-                                                <MenuItem value="Other">Other</MenuItem>
-                                                <MenuItem value="prefer-not-to-say">Prefer not to say</MenuItem>
-                                            </StyledTextField>
-                                        </Grid>
+                            const isPhoneChangedLocal = userData.phoneNumber !== values.phoneNumber;
+                            const isEmailChangedLocal = userData.email !== values.email;
+                            const isPhoneOtpRequired = !isOwner && isPhoneChangedLocal;
+                            const isEmailOtpRequired = !isOwner && isEmailChangedLocal;
 
-                                        {/* Date of Birth for Owner/Employee */}
-                                        {(userType === 'OWNER' || userType === 'EMPLOYEE') && (
-                                            <Grid size={{xs:12, sm:6, md:4}}>
-                                                <StyledTextField
-                                                    fullWidth
-                                                    label="Date of Birth"
-                                                    name="dateOfBirth"
-                                                    type="date"
-                                                    value={values.dateOfBirth ? new Date(values.dateOfBirth).toISOString().split('T')[0] : ''}
-                                                    onChange={handleChange}
-                                                    error={Boolean(touched.dateOfBirth && errors.dateOfBirth)}
-                                                    helperText={touched.dateOfBirth && errors.dateOfBirth}
-                                                    variant="outlined"
-                                                    sx={{
-                                                        '& .MuiOutlinedInput-root': {
-                                                            borderRadius: {
-                                                                xs: '8px',
-                                                                md: '12px'
-                                                            },
-                                                            transition: 'all 0.2s ease',
-                                                            fontSize: {
-                                                                xs: '14px',
-                                                                md: '16px'
-                                                            },
-                                                            '&:hover': {
-                                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                                            },
-                                                            '&.Mui-focused': {
-                                                                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                            }
-                                                        },
-                                                        '& .MuiInputLabel-root': {
-                                                            fontSize: {
-                                                                xs: '14px',
-                                                                md: '16px'
-                                                            }
-                                                        }
-                                                    }}
-                                                    InputLabelProps={{
-                                                        shrink: true,
-                                                    }}
-                                                    InputProps={{
-                                                        startAdornment: (
-                                                            <InputAdornment position="start">
-                                                                <CalendarToday sx={{
-                                                                    color: '#20c997',
-                                                                    fontSize: {
-                                                                        xs: '18px',
-                                                                        md: '20px'
-                                                                    }
-                                                                }} />
-                                                            </InputAdornment>
-                                                        ),
-                                                    }}
-                                                />
-                                            </Grid>
-                                        )}
-
-                                        {/* National ID for Owner/Employee */}
-                                        {(userType === 'OWNER' || userType === 'EMPLOYEE') && (
-                                            <Grid size={{xs:12, sm:6, md:4}}>
-                                                <StyledTextField
-                                                    fullWidth
-                                                    label="Aadhar or PAN Number"
-                                                    name="nationalIdNumber"
-                                                    value={values.nationalIdNumber}
-                                                    onChange={handleChange}
-                                                    error={Boolean((touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber)}
-                                                    helperText={(touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber}
-                                                    variant="outlined"
-                                                    placeholder="Enter your Aadhar or PAN number"
-                                                    disabled={user?.userType !== 'OWNER'}
-                                                    sx={{
-                                                        '& .MuiOutlinedInput-root': {
-                                                            borderRadius: {
-                                                                xs: '8px',
-                                                                md: '12px'
-                                                            },
-                                                            transition: 'all 0.2s ease',
-                                                            fontSize: {
-                                                                xs: '14px',
-                                                                md: '16px'
-                                                            },
-                                                            '&:hover': {
-                                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                                            },
-                                                            '&.Mui-focused': {
-                                                                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                            },
-                                                            '&.Mui-disabled': {
-                                                                backgroundColor: '#f8f9fa',
-                                                                opacity: 0.7
-                                                            }
-                                                        },
-                                                        '& .MuiInputLabel-root': {
-                                                            fontSize: {
-                                                                xs: '14px',
-                                                                md: '16px'
-                                                            }
-                                                        }
-                                                    }}
-                                                    InputProps={{
-                                                        startAdornment: (
-                                                            <InputAdornment position="start">
-                                                                <Badge sx={{
-                                                                    color: '#6610f2',
-                                                                    fontSize: {
-                                                                        xs: '18px',
-                                                                        md: '20px'
-                                                                    }
-                                                                }} />
-                                                            </InputAdornment>
-                                                        ),
-                                                    }}
-                                                />
-                                            </Grid>
-                                        )}
-                                    </Grid>
-                                </Box>
-
-                                {/* Contact Information Section */}
-                                <Box sx={{
-                                    marginBottom: {
-                                        xs: '24px',
-                                        md: '40px'
-                                    }
-                                }}>
-                                    <Typography variant="h6" sx={{
-                                        fontWeight: 600,
-                                        marginBottom: {
-                                            xs: '16px',
-                                            md: '20px'
-                                        },
-                                        color: '#495057',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 1,
-                                        fontSize: {
-                                            xs: '1.1rem',
-                                            md: '1.25rem'
-                                        },
-                                        justifyContent: {
-                                            xs: 'center',
-                                            sm: 'flex-start'
-                                        }
-                                    }}>
-                                        <Phone sx={{ color: '#28a745' }} />
-                                        Contact Information
-                                    </Typography>
-
-                                    <Grid container spacing={{
-                                        xs: 2,
-                                        md: 3
-                                    }}>
-                                        <Grid size={{xs:12, sm:6}}>
-                                            <StyledTextField
-                                                fullWidth
-                                                label="Phone Number"
-                                                name="phoneNumber"
-                                                value={values.phoneNumber}
-                                                onChange={handleChange}
-                                                error={Boolean((touched.phoneNumber || values.phoneNumber) && errors.phoneNumber)}
-                                                helperText={(touched.phoneNumber || values.phoneNumber) && errors.phoneNumber}
-                                                variant="outlined"
-                                                placeholder="Enter your phone number"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: {
-                                                            xs: '8px',
-                                                            md: '12px'
-                                                        },
-                                                        transition: 'all 0.2s ease',
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        },
-                                                        '&:hover': {
-                                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                                        },
-                                                        '&.Mui-focused': {
-                                                            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                        }
-                                                    },
-                                                    '& .MuiInputLabel-root': {
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        }
-                                                    }
-                                                }}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            <Phone sx={{
-                                                                color: '#28a745',
-                                                                fontSize: {
-                                                                    xs: '18px',
-                                                                    md: '20px'
-                                                                }
-                                                            }} />
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid size={{xs:12, sm:6}}>
-                                            <StyledTextField
-                                                fullWidth
-                                                label="Email"
-                                                name="email"
-                                                value={values.email}
-                                                onChange={handleChange}
-                                                error={Boolean((touched.email || values.email) && errors.email)}
-                                                helperText={(touched.email || values.email) && errors.email}
-                                                variant="outlined"
-                                                placeholder="Enter your email"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: {
-                                                            xs: '8px',
-                                                            md: '12px'
-                                                        },
-                                                        transition: 'all 0.2s ease',
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        },
-                                                        '&:hover': {
-                                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                                        },
-                                                        '&.Mui-focused': {
-                                                            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                        }
-                                                    },
-                                                    '& .MuiInputLabel-root': {
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        }
-                                                    }
-                                                }}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start">
-                                                            <Email sx={{
-                                                                color: '#dc3545',
-                                                                fontSize: {
-                                                                    xs: '18px',
-                                                                    md: '20px'
-                                                                }
-                                                            }} />
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
-                                        </Grid>
-                                        <Grid size={{xs:12}}>
-                                            <StyledTextField
-                                                fullWidth
-                                                label="Address"
-                                                name="address"
-                                                value={values.address}
-                                                onChange={handleChange}
-                                                error={Boolean((touched.address || values.address) && errors.address)}
-                                                helperText={(touched.address || values.address) && errors.address}
-                                                variant="outlined"
-                                                multiline
-                                                rows={3}
-                                                placeholder="Enter your full address"
-                                                sx={{
-                                                    '& .MuiOutlinedInput-root': {
-                                                        borderRadius: {
-                                                            xs: '8px',
-                                                            md: '12px'
-                                                        },
-                                                        transition: 'all 0.2s ease',
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        },
-                                                        '&:hover': {
-                                                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                                                        },
-                                                        '&.Mui-focused': {
-                                                            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                        }
-                                                    },
-                                                    '& .MuiInputLabel-root': {
-                                                        fontSize: {
-                                                            xs: '14px',
-                                                            md: '16px'
-                                                        }
-                                                    }
-                                                }}
-                                                InputProps={{
-                                                    startAdornment: (
-                                                        <InputAdornment position="start" sx={{ alignSelf: 'flex-start', marginTop: '12px' }}>
-                                                            <LocationOn sx={{
-                                                                color: '#fd7e14',
-                                                                fontSize: {
-                                                                    xs: '18px',
-                                                                    md: '20px'
-                                                                }
-                                                            }} />
-                                                        </InputAdornment>
-                                                    ),
-                                                }}
-                                            />
-                                        </Grid>
-                                    </Grid>
-                                </Box>
-
-                                {/* Employment Details for Employee */}
-                                {userType === 'EMPLOYEE' && (
+                            return (
+                                <Form>
+                                    {/* Basic Information Section */}
                                     <Box sx={{
                                         marginBottom: {
                                             xs: '24px',
@@ -952,26 +540,25 @@ const UpdateUserProfile = () => {
                                                 sm: 'flex-start'
                                             }
                                         }}>
-                                            <Work sx={{ color: '#ff6b35' }} />
-                                            Employment Details
+                                            <Person sx={{ color: '#4fc3f7' }} />
+                                            Basic Information
                                         </Typography>
 
                                         <Grid container spacing={{
                                             xs: 2,
                                             md: 3
                                         }}>
-                                            <Grid size={{xs:12, sm:6}}>
+                                            <Grid size={{xs:12, sm:6, md:4}}>
                                                 <StyledTextField
                                                     fullWidth
-                                                    label="Designation"
-                                                    name="designation"
-                                                    value={values.designation}
+                                                    label="First Name"
+                                                    name="firstName"
+                                                    value={values.firstName}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.designation || values.designation) && errors.designation)}
-                                                    helperText={(touched.designation || values.designation) && errors.designation}
+                                                    error={Boolean((touched.firstName || values.firstName) && errors.firstName)}
+                                                    helperText={(touched.firstName || values.firstName) && errors.firstName}
                                                     variant="outlined"
-                                                    placeholder="Enter designation"
-                                                    disabled={user?.userType !== 'OWNER'}
+                                                    placeholder="Enter your first name"
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
                                                             borderRadius: {
@@ -988,10 +575,6 @@ const UpdateUserProfile = () => {
                                                             },
                                                             '&.Mui-focused': {
                                                                 boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                            },
-                                                            '&.Mui-disabled': {
-                                                                backgroundColor: '#f8f9fa',
-                                                                opacity: 0.7
                                                             }
                                                         },
                                                         '& .MuiInputLabel-root': {
@@ -1004,8 +587,8 @@ const UpdateUserProfile = () => {
                                                     InputProps={{
                                                         startAdornment: (
                                                             <InputAdornment position="start">
-                                                                <WorkOutline sx={{
-                                                                    color: '#ff6b35',
+                                                                <Person sx={{
+                                                                    color: '#7f8c8d',
                                                                     fontSize: {
                                                                         xs: '18px',
                                                                         md: '20px'
@@ -1016,18 +599,17 @@ const UpdateUserProfile = () => {
                                                     }}
                                                 />
                                             </Grid>
-                                            <Grid size={{xs:12, sm:6}}>
+                                            <Grid size={{xs:12, sm:6, md:4}}>
                                                 <StyledTextField
                                                     fullWidth
-                                                    label="Salary"
-                                                    name="salary"
-                                                    value={values.salary}
+                                                    label="Last Name"
+                                                    name="lastName"
+                                                    value={values.lastName}
                                                     onChange={handleChange}
-                                                    error={Boolean((touched.salary || values.salary) && errors.salary)}
-                                                    helperText={(touched.salary || values.salary) && errors.salary}
+                                                    error={Boolean((touched.lastName || values.lastName) && errors.lastName)}
+                                                    helperText={(touched.lastName || values.lastName) && errors.lastName}
                                                     variant="outlined"
-                                                    placeholder="Enter salary"
-                                                    disabled={user?.userType !== 'OWNER'}
+                                                    placeholder="Enter your last name"
                                                     sx={{
                                                         '& .MuiOutlinedInput-root': {
                                                             borderRadius: {
@@ -1044,10 +626,6 @@ const UpdateUserProfile = () => {
                                                             },
                                                             '&.Mui-focused': {
                                                                 boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
-                                                            },
-                                                            '&.Mui-disabled': {
-                                                                backgroundColor: '#f8f9fa',
-                                                                opacity: 0.7
                                                             }
                                                         },
                                                         '& .MuiInputLabel-root': {
@@ -1060,8 +638,406 @@ const UpdateUserProfile = () => {
                                                     InputProps={{
                                                         startAdornment: (
                                                             <InputAdornment position="start">
-                                                                <CurrencyRupee sx={{
-                                                                    color: '#ffc107',
+                                                                <Person sx={{
+                                                                    color: '#7f8c8d',
+                                                                    fontSize: {
+                                                                        xs: '18px',
+                                                                        md: '20px'
+                                                                    }
+                                                                }} />
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                />
+                                            </Grid>
+                                            <Grid size={{xs:12, sm:6, md:4}}>
+                                                <StyledTextField
+                                                    fullWidth
+                                                    select
+                                                    label="Gender"
+                                                    name="gender"
+                                                    value={values.gender}
+                                                    onChange={handleChange}
+                                                    error={Boolean(touched.gender && errors.gender)}
+                                                    helperText={touched.gender && errors.gender}
+                                                    variant="outlined"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            borderRadius: {
+                                                                xs: '8px',
+                                                                md: '12px'
+                                                            },
+                                                            transition: 'all 0.2s ease',
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            },
+                                                            '&:hover': {
+                                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                            },
+                                                            '&.Mui-focused': {
+                                                                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                            }
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            }
+                                                        }
+                                                    }}
+                                                    SelectProps={{
+                                                        displayEmpty: true,
+                                                        MenuProps: StyledMenuProps
+                                                    }}
+                                                    InputProps={{
+                                                        startAdornment: (
+                                                            <InputAdornment position="start">
+                                                                {getGenderIcon(values.gender)}
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                >
+                                                    <MenuItem value="">--select--</MenuItem>
+                                                    <MenuItem value="Male">Male</MenuItem>
+                                                    <MenuItem value="Female">Female</MenuItem>
+                                                    <MenuItem value="Transgender">Transgender</MenuItem>
+                                                    <MenuItem value="Other">Other</MenuItem>
+                                                    <MenuItem value="prefer-not-to-say">Prefer not to say</MenuItem>
+                                                </StyledTextField>
+                                            </Grid>
+
+                                            {/* Date of Birth for Owner/Employee */}
+                                            {(userType === 'OWNER' || userType === 'EMPLOYEE') && (
+                                                <Grid size={{xs:12, sm:6, md:4}}>
+                                                    <StyledTextField
+                                                        fullWidth
+                                                        label="Date of Birth"
+                                                        name="dateOfBirth"
+                                                        type="date"
+                                                        value={values.dateOfBirth ? new Date(values.dateOfBirth).toISOString().split('T')[0] : ''}
+                                                        onChange={handleChange}
+                                                        error={Boolean(touched.dateOfBirth && errors.dateOfBirth)}
+                                                        helperText={touched.dateOfBirth && errors.dateOfBirth}
+                                                        variant="outlined"
+                                                        sx={{
+                                                            '& .MuiOutlinedInput-root': {
+                                                                borderRadius: {
+                                                                    xs: '8px',
+                                                                    md: '12px'
+                                                                },
+                                                                transition: 'all 0.2s ease',
+                                                                fontSize: {
+                                                                    xs: '14px',
+                                                                    md: '16px'
+                                                                },
+                                                                '&:hover': {
+                                                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                                },
+                                                                '&.Mui-focused': {
+                                                                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                                }
+                                                            },
+                                                            '& .MuiInputLabel-root': {
+                                                                fontSize: {
+                                                                    xs: '14px',
+                                                                    md: '16px'
+                                                                }
+                                                            }
+                                                        }}
+                                                        InputLabelProps={{
+                                                            shrink: true,
+                                                        }}
+                                                        InputProps={{
+                                                            startAdornment: (
+                                                                <InputAdornment position="start">
+                                                                    <CalendarToday sx={{
+                                                                        color: '#20c997',
+                                                                        fontSize: {
+                                                                            xs: '18px',
+                                                                            md: '20px'
+                                                                        }
+                                                                    }} />
+                                                                </InputAdornment>
+                                                            ),
+                                                        }}
+                                                    />
+                                                </Grid>
+                                            )}
+
+                                            {/* National ID for Owner/Employee */}
+                                            {(userType === 'OWNER' || userType === 'EMPLOYEE') && (
+                                                <Grid size={{xs:12, sm:6, md:4}}>
+                                                    <StyledTextField
+                                                        fullWidth
+                                                        label="Aadhar or PAN Number"
+                                                        name="nationalIdNumber"
+                                                        value={values.nationalIdNumber}
+                                                        onChange={handleChange}
+                                                        error={Boolean((touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber)}
+                                                        helperText={(touched.nationalIdNumber || values.nationalIdNumber) && errors.nationalIdNumber}
+                                                        variant="outlined"
+                                                        placeholder="Enter your Aadhar or PAN number"
+                                                        disabled={user?.userType !== 'OWNER'}
+                                                        sx={{
+                                                            '& .MuiOutlinedInput-root': {
+                                                                borderRadius: {
+                                                                    xs: '8px',
+                                                                    md: '12px'
+                                                                },
+                                                                transition: 'all 0.2s ease',
+                                                                fontSize: {
+                                                                    xs: '14px',
+                                                                    md: '16px'
+                                                                },
+                                                                '&:hover': {
+                                                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                                },
+                                                                '&.Mui-focused': {
+                                                                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                                },
+                                                                '&.Mui-disabled': {
+                                                                    backgroundColor: '#f8f9fa',
+                                                                    opacity: 0.7
+                                                                }
+                                                            },
+                                                            '& .MuiInputLabel-root': {
+                                                                fontSize: {
+                                                                    xs: '14px',
+                                                                    md: '16px'
+                                                                }
+                                                            }
+                                                        }}
+                                                        InputProps={{
+                                                            startAdornment: (
+                                                                <InputAdornment position="start">
+                                                                    <Badge sx={{
+                                                                        color: '#6610f2',
+                                                                        fontSize: {
+                                                                            xs: '18px',
+                                                                            md: '20px'
+                                                                        }
+                                                                    }} />
+                                                                </InputAdornment>
+                                                            ),
+                                                        }}
+                                                    />
+                                                </Grid>
+                                            )}
+                                        </Grid>
+                                    </Box>
+
+                                    {/* Contact Information Section */}
+                                    <Box sx={{
+                                        marginBottom: {
+                                            xs: '24px',
+                                            md: '40px'
+                                        }
+                                    }}>
+                                        <Typography variant="h6" sx={{
+                                            fontWeight: 600,
+                                            marginBottom: {
+                                                xs: '16px',
+                                                md: '20px'
+                                            },
+                                            color: '#495057',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: 1,
+                                            fontSize: {
+                                                xs: '1.1rem',
+                                                md: '1.25rem'
+                                            },
+                                            justifyContent: {
+                                                xs: 'center',
+                                                sm: 'flex-start'
+                                            }
+                                        }}>
+                                            <Phone sx={{ color: '#28a745' }} />
+                                            Contact Information
+                                        </Typography>
+
+                                        <Grid container spacing={{
+                                            xs: 2,
+                                            md: 3
+                                        }}>
+                                            <Grid size={{xs:12, sm:6}}>
+                                                <StyledTextField
+                                                    fullWidth
+                                                    label="Phone Number"
+                                                    name="phoneNumber"
+                                                    value={values.phoneNumber}
+                                                    onChange={handleChange}
+                                                    error={Boolean((touched.phoneNumber || values.phoneNumber) && errors.phoneNumber)}
+                                                    helperText={(touched.phoneNumber || values.phoneNumber) && errors.phoneNumber}
+                                                    variant="outlined"
+                                                    placeholder="Enter your phone number"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            borderRadius: {
+                                                                xs: '8px',
+                                                                md: '12px'
+                                                            },
+                                                            transition: 'all 0.2s ease',
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            },
+                                                            '&:hover': {
+                                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                            },
+                                                            '&.Mui-focused': {
+                                                                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                            }
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            }
+                                                        }
+                                                    }}
+                                                    InputProps={{
+                                                        startAdornment: (
+                                                            <InputAdornment position="start">
+                                                                <Phone sx={{
+                                                                    color: '#28a745',
+                                                                    fontSize: {
+                                                                        xs: '18px',
+                                                                        md: '20px'
+                                                                    }
+                                                                }} />
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                />
+                                            </Grid>
+                                            {isPhoneOtpRequired && (
+                                                <Grid size={{xs:12, sm:6}}>
+                                                    <OTPField
+                                                        label="Phone OTP"
+                                                        name="phoneOtp"
+                                                        value={values.phoneOtp}
+                                                        onChange={handleChange}
+                                                        error={Boolean((touched.phoneOtp || values.phoneOtp) && errors.phoneOtp)}
+                                                        helperText={(touched.phoneOtp || values.phoneOtp) && errors.phoneOtp}
+                                                        verificationType="phone"
+                                                        phoneNumber={values.phoneNumber}
+                                                        onOtpResponse={response => handleOtpResponse(response, { setFieldError })}
+                                                    />
+                                                </Grid>
+                                            )}
+
+                                            <Grid size={{xs:12, sm:6}}>
+                                                <StyledTextField
+                                                    fullWidth
+                                                    label="Email"
+                                                    name="email"
+                                                    value={values.email}
+                                                    onChange={handleChange}
+                                                    error={Boolean((touched.email || values.email) && errors.email)}
+                                                    helperText={(touched.email || values.email) && errors.email}
+                                                    variant="outlined"
+                                                    placeholder="Enter your email"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            borderRadius: {
+                                                                xs: '8px',
+                                                                md: '12px'
+                                                            },
+                                                            transition: 'all 0.2s ease',
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            },
+                                                            '&:hover': {
+                                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                            },
+                                                            '&.Mui-focused': {
+                                                                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                            }
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            }
+                                                        }
+                                                    }}
+                                                    InputProps={{
+                                                        startAdornment: (
+                                                            <InputAdornment position="start">
+                                                                <Email sx={{
+                                                                    color: '#dc3545',
+                                                                    fontSize: {
+                                                                        xs: '18px',
+                                                                        md: '20px'
+                                                                    }
+                                                                }} />
+                                                            </InputAdornment>
+                                                        ),
+                                                    }}
+                                                />
+                                            </Grid>
+                                            {isEmailOtpRequired && (
+                                                <Grid size={{xs:12, sm:6}}>
+                                                    <OTPField
+                                                        label="Email OTP"
+                                                        name="emailOtp"
+                                                        value={values.emailOtp}
+                                                        onChange={handleChange}
+                                                        error={Boolean((touched.emailOtp || values.emailOtp) && errors.emailOtp)}
+                                                        helperText={(touched.emailOtp || values.emailOtp) && errors.emailOtp}
+                                                        verificationType="email"
+                                                        email={values.email}
+                                                        onOtpResponse={response => handleOtpResponse(response, { setFieldError })}
+                                                    />
+                                                </Grid>
+                                            )}
+
+                                            <Grid size={{xs:12}}>
+                                                <StyledTextField
+                                                    fullWidth
+                                                    label="Address"
+                                                    name="address"
+                                                    value={values.address}
+                                                    onChange={handleChange}
+                                                    error={Boolean((touched.address || values.address) && errors.address)}
+                                                    helperText={(touched.address || values.address) && errors.address}
+                                                    variant="outlined"
+                                                    multiline
+                                                    rows={3}
+                                                    placeholder="Enter your full address"
+                                                    sx={{
+                                                        '& .MuiOutlinedInput-root': {
+                                                            borderRadius: {
+                                                                xs: '8px',
+                                                                md: '12px'
+                                                            },
+                                                            transition: 'all 0.2s ease',
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            },
+                                                            '&:hover': {
+                                                                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                            },
+                                                            '&.Mui-focused': {
+                                                                boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                            }
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            fontSize: {
+                                                                xs: '14px',
+                                                                md: '16px'
+                                                            }
+                                                        }
+                                                    }}
+                                                    InputProps={{
+                                                        startAdornment: (
+                                                            <InputAdornment position="start" sx={{ alignSelf: 'flex-start', marginTop: '12px' }}>
+                                                                <LocationOn sx={{
+                                                                    color: '#fd7e14',
                                                                     fontSize: {
                                                                         xs: '18px',
                                                                         md: '20px'
@@ -1074,126 +1050,277 @@ const UpdateUserProfile = () => {
                                             </Grid>
                                         </Grid>
                                     </Box>
-                                )}
 
-                                {/* Action Buttons */}
-                                <Divider sx={{
-                                    my: {
-                                        xs: 3,
-                                        md: 4
-                                    },
-                                    borderColor: 'rgba(0, 0, 0, 0.08)',
-                                    borderWidth: '1px'
-                                }} />
+                                    {/* Employment Details for Employee */}
+                                    {userType === 'EMPLOYEE' && (
+                                        <Box sx={{
+                                            marginBottom: {
+                                                xs: '24px',
+                                                md: '40px'
+                                            }
+                                        }}>
+                                            <Typography variant="h6" sx={{
+                                                fontWeight: 600,
+                                                marginBottom: {
+                                                    xs: '16px',
+                                                    md: '20px'
+                                                },
+                                                color: '#495057',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: 1,
+                                                fontSize: {
+                                                    xs: '1.1rem',
+                                                    md: '1.25rem'
+                                                },
+                                                justifyContent: {
+                                                    xs: 'center',
+                                                    sm: 'flex-start'
+                                                }
+                                            }}>
+                                                <Work sx={{ color: '#ff6b35' }} />
+                                                Employment Details
+                                            </Typography>
 
-                                <Box sx={{
-                                    display: 'flex',
-                                    gap: {
-                                        xs: 2,
-                                        md: 3
-                                    },
-                                    justifyContent: 'center',
-                                    flexWrap: 'wrap',
-                                    marginTop: {
-                                        xs: '24px',
-                                        md: '32px'
-                                    },
-                                    flexDirection: {
-                                        xs: 'column',
-                                        sm: 'row'
-                                    }
-                                }}>
-                                    <Button
-                                        type="submit"
-                                        variant="contained"
-                                        startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Save />}
-                                        disabled={isSubmitting || !dirty}
-                                        fullWidth={isMobile}
-                                        sx={{
-                                            borderRadius: {
-                                                xs: '8px',
-                                                md: '12px'
-                                            },
-                                            textTransform: 'none',
-                                            fontWeight: 600,
-                                            padding: {
-                                                xs: '12px 24px',
-                                                md: '14px 32px'
-                                            },
-                                            fontSize: {
-                                                xs: '0.9rem',
-                                                md: '1rem'
-                                            },
-                                            minWidth: {
-                                                xs: 'auto',
-                                                sm: '180px'
-                                            },
-                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                                            boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                                                boxShadow: '0 12px 32px rgba(102, 126, 234, 0.4)',
-                                                transform: 'translateY(-2px)'
-                                            },
-                                            '&:active': {
-                                                transform: 'translateY(0px)'
-                                            },
-                                            '&:disabled': {
-                                                background: '#cccccc',
-                                                boxShadow: 'none',
-                                                transform: 'none'
-                                            }
-                                        }}
-                                    >
-                                        {isSubmitting ? 'Updating Profile...' : 'Update Profile'}
-                                    </Button>
-                                    <Button
-                                        variant="outlined"
-                                        startIcon={<Cancel />}
-                                        onClick={() => {
-                                            navigate(-1);
-                                        }}
-                                        disabled={isSubmitting}
-                                        fullWidth={isMobile}
-                                        sx={{
-                                            borderRadius: {
-                                                xs: '8px',
-                                                md: '12px'
-                                            },
-                                            textTransform: 'none',
-                                            fontWeight: 600,
-                                            padding: {
-                                                xs: '12px 24px',
-                                                md: '14px 32px'
-                                            },
-                                            fontSize: {
-                                                xs: '0.9rem',
-                                                md: '1rem'
-                                            },
-                                            borderColor: '#dc3545',
-                                            color: '#dc3545',
-                                            minWidth: {
-                                                xs: 'auto',
-                                                sm: '140px'
-                                            },
-                                            transition: 'all 0.2s ease',
-                                            '&:hover': {
-                                                borderColor: '#c82333',
-                                                backgroundColor: 'rgba(220, 53, 69, 0.04)',
-                                                transform: 'translateY(-1px)',
-                                                boxShadow: '0 4px 12px rgba(220, 53, 69, 0.2)'
-                                            },
-                                            '&:active': {
-                                                transform: 'translateY(0px)'
-                                            }
-                                        }}
-                                    >
-                                        Cancel
-                                    </Button>
-                                </Box>
-                            </Form>
-                        )}
+                                            <Grid container spacing={{
+                                                xs: 2,
+                                                md: 3
+                                            }}>
+                                                <Grid size={{xs:12, sm:6}}>
+                                                    <StyledTextField
+                                                        fullWidth
+                                                        label="Designation"
+                                                        name="designation"
+                                                        value={values.designation}
+                                                        onChange={handleChange}
+                                                        error={Boolean((touched.designation || values.designation) && errors.designation)}
+                                                        helperText={(touched.designation || values.designation) && errors.designation}
+                                                        variant="outlined"
+                                                        placeholder="Enter designation"
+                                                        disabled={user?.userType !== 'OWNER'}
+                                                        sx={{
+                                                            '& .MuiOutlinedInput-root': {
+                                                                borderRadius: {
+                                                                    xs: '8px',
+                                                                    md: '12px'
+                                                                },
+                                                                transition: 'all 0.2s ease',
+                                                                fontSize: {
+                                                                    xs: '14px',
+                                                                    md: '16px'
+                                                                },
+                                                                '&:hover': {
+                                                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                                },
+                                                                '&.Mui-focused': {
+                                                                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                                },
+                                                                '&.Mui-disabled': {
+                                                                    backgroundColor: '#f8f9fa',
+                                                                    opacity: 0.7
+                                                                }
+                                                            },
+                                                            '& .MuiInputLabel-root': {
+                                                                fontSize: {
+                                                                    xs: '14px',
+                                                                    md: '16px'
+                                                                }
+                                                            }
+                                                        }}
+                                                        InputProps={{
+                                                            startAdornment: (
+                                                                <InputAdornment position="start">
+                                                                    <WorkOutline sx={{
+                                                                        color: '#ff6b35',
+                                                                        fontSize: {
+                                                                            xs: '18px',
+                                                                            md: '20px'
+                                                                        }
+                                                                    }} />
+                                                                </InputAdornment>
+                                                            ),
+                                                        }}
+                                                    />
+                                                </Grid>
+                                                <Grid size={{xs:12, sm:6}}>
+                                                    <StyledTextField
+                                                        fullWidth
+                                                        label="Salary"
+                                                        name="salary"
+                                                        value={values.salary}
+                                                        onChange={handleChange}
+                                                        error={Boolean((touched.salary || values.salary) && errors.salary)}
+                                                        helperText={(touched.salary || values.salary) && errors.salary}
+                                                        variant="outlined"
+                                                        placeholder="Enter salary"
+                                                        disabled={user?.userType !== 'OWNER'}
+                                                        sx={{
+                                                            '& .MuiOutlinedInput-root': {
+                                                                borderRadius: {
+                                                                    xs: '8px',
+                                                                    md: '12px'
+                                                                },
+                                                                transition: 'all 0.2s ease',
+                                                                fontSize: {
+                                                                    xs: '14px',
+                                                                    md: '16px'
+                                                                },
+                                                                '&:hover': {
+                                                                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                                                                },
+                                                                '&.Mui-focused': {
+                                                                    boxShadow: '0 4px 20px rgba(102, 126, 234, 0.15)',
+                                                                },
+                                                                '&.Mui-disabled': {
+                                                                    backgroundColor: '#f8f9fa',
+                                                                    opacity: 0.7
+                                                                }
+                                                            },
+                                                            '& .MuiInputLabel-root': {
+                                                                fontSize: {
+                                                                    xs: '14px',
+                                                                    md: '16px'
+                                                                }
+                                                            }
+                                                        }}
+                                                        InputProps={{
+                                                            startAdornment: (
+                                                                <InputAdornment position="start">
+                                                                    <CurrencyRupee sx={{
+                                                                        color: '#ffc107',
+                                                                        fontSize: {
+                                                                            xs: '18px',
+                                                                            md: '20px'
+                                                                        }
+                                                                    }} />
+                                                                </InputAdornment>
+                                                            ),
+                                                        }}
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </Box>
+                                    )}
+
+                                    {/* Action Buttons */}
+                                    <Divider sx={{
+                                        my: {
+                                            xs: 3,
+                                            md: 4
+                                        },
+                                        borderColor: 'rgba(0, 0, 0, 0.08)',
+                                        borderWidth: '1px'
+                                    }} />
+
+                                    <Box sx={{
+                                        display: 'flex',
+                                        gap: {
+                                            xs: 2,
+                                            md: 3
+                                        },
+                                        justifyContent: 'center',
+                                        flexWrap: 'wrap',
+                                        marginTop: {
+                                            xs: '24px',
+                                            md: '32px'
+                                        },
+                                        flexDirection: {
+                                            xs: 'column',
+                                            sm: 'row'
+                                        }
+                                    }}>
+                                        <Button
+                                            type="submit"
+                                            variant="contained"
+                                            startIcon={isSubmitting ? <CircularProgress size={20} color="inherit" /> : <Save />}
+                                            disabled={isSubmitting || !dirty}
+                                            fullWidth={isMobile}
+                                            sx={{
+                                                borderRadius: {
+                                                    xs: '8px',
+                                                    md: '12px'
+                                                },
+                                                textTransform: 'none',
+                                                fontWeight: 600,
+                                                padding: {
+                                                    xs: '12px 24px',
+                                                    md: '14px 32px'
+                                                },
+                                                fontSize: {
+                                                    xs: '0.9rem',
+                                                    md: '1rem'
+                                                },
+                                                minWidth: {
+                                                    xs: 'auto',
+                                                    sm: '180px'
+                                                },
+                                                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                                boxShadow: '0 8px 24px rgba(102, 126, 234, 0.3)',
+                                                transition: 'all 0.2s ease',
+                                                '&:hover': {
+                                                    background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
+                                                    boxShadow: '0 12px 32px rgba(102, 126, 234, 0.4)',
+                                                    transform: 'translateY(-2px)'
+                                                },
+                                                '&:active': {
+                                                    transform: 'translateY(0px)'
+                                                },
+                                                '&:disabled': {
+                                                    background: '#cccccc',
+                                                    boxShadow: 'none',
+                                                    transform: 'none'
+                                                }
+                                            }}
+                                        >
+                                            {isSubmitting ? 'Updating Profile...' : 'Update Profile'}
+                                        </Button>
+                                        <Button
+                                            variant="outlined"
+                                            startIcon={<Cancel />}
+                                            onClick={() => {
+                                                navigate(-1);
+                                            }}
+                                            disabled={isSubmitting}
+                                            fullWidth={isMobile}
+                                            sx={{
+                                                borderRadius: {
+                                                    xs: '8px',
+                                                    md: '12px'
+                                                },
+                                                textTransform: 'none',
+                                                fontWeight: 600,
+                                                padding: {
+                                                    xs: '12px 24px',
+                                                    md: '14px 32px'
+                                                },
+                                                fontSize: {
+                                                    xs: '0.9rem',
+                                                    md: '1rem'
+                                                },
+                                                borderColor: '#dc3545',
+                                                color: '#dc3545',
+                                                minWidth: {
+                                                    xs: 'auto',
+                                                    sm: '140px'
+                                                },
+                                                transition: 'all 0.2s ease',
+                                                '&:hover': {
+                                                    borderColor: '#c82333',
+                                                    backgroundColor: 'rgba(220, 53, 69, 0.04)',
+                                                    transform: 'translateY(-1px)',
+                                                    boxShadow: '0 4px 12px rgba(220, 53, 69, 0.2)'
+                                                },
+                                                '&:active': {
+                                                    transform: 'translateY(0px)'
+                                                }
+                                            }}
+                                        >
+                                            Cancel
+                                        </Button>
+                                    </Box>
+                                </Form>
+                            );
+                        }}
                     </Formik>
                 </Paper>
 

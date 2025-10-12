@@ -12,6 +12,8 @@ import StyledMenuProps from "../../utils/form-styling/StyledSelectMenu.jsx";
 import AuthUtils from "../../utils/AuthUtils.jsx";
 import ProfileUtils from "../../utils/ProfileUtils.jsx";
 import {usePrivacyPolicy} from "../../utils/PrivacyPolicyContext.jsx";
+import * as Yup from "yup";
+import OTPField from "../../utils/form-styling/OTPField.jsx";
 
 const Register = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -23,6 +25,7 @@ const Register = () => {
     const isEmployeeRegistration = location.pathname === '/employee-register';
 
     const isAuthenticated = AuthUtils.isAuthenticated();
+    const isOwner = AuthUtils.getUserData()?.userType;
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -37,6 +40,14 @@ const Register = () => {
     const accessedBy = isOwnerRegistration ? 'Owner' :
         isEmployeeRegistration ? 'Employee' :
             'Customer';
+
+    const isOtpRequired = !isAuthenticated || !isOwner;
+
+    const handleOtpResponse = (response, { setFieldError }) => {
+        if (response?.error) {
+            ProfileUtils.handleOtpFieldError(response.errorMessage, setFieldError, "register");
+        }
+    };
 
     const handleRegister = async (values, { setFieldError }) => {
         if (!values.agreedToTerms) {
@@ -65,6 +76,13 @@ const Register = () => {
                     },
                     userCredentialDTO: userCredentialDTO
                 };
+                if (isOtpRequired) {
+                    customerCredentialDTO.customerDTO = {
+                        ...customerCredentialDTO.customerDTO,
+                        phoneNumberOtp: values.phoneOtp,
+                        emailOtp: values.emailOtp
+                    };
+                }
                 await customer(customerCredentialDTO).unwrap();
             }
 
@@ -82,6 +100,13 @@ const Register = () => {
                     },
                     userCredentialDTO: userCredentialDTO
                 };
+                if (isOtpRequired) {
+                    ownerCredentialDTO.ownerDTO = {
+                        ...ownerCredentialDTO.ownerDTO,
+                        phoneNumberOtp: values.phoneOtp,
+                        emailOtp: values.emailOtp
+                    };
+                }
                 await owner(ownerCredentialDTO).unwrap();
             }
 
@@ -101,23 +126,68 @@ const Register = () => {
                     },
                     userCredentialDTO: userCredentialDTO
                 };
+                if (isOtpRequired) {
+                    employeeCredentialDTO.employeeDTO = {
+                        ...employeeCredentialDTO.employeeDTO,
+                        phoneNumberOtp: values.phoneOtp,
+                        emailOtp: values.emailOtp
+                    };
+                }
                 await employee(employeeCredentialDTO).unwrap();
             }
 
             toast.success(isAuthenticated ? `${accessedBy} registered successful.` : "Registration successful. Please login");
             navigate(isAuthenticated ? `/${accessedBy.toLowerCase()}-list` : '/login');
-        } catch (error) {
-            (error.status === 400 || error.status === 409)
-                ? ProfileUtils.handleDuplicateFieldError(error, setFieldError)
-                : toast.error("Registration failed. Please try again.");
+        }
+        catch (error) {
+            const errorMessage = error?.data?.message;
+
+            if(error.status === 409) {
+                ProfileUtils.handleDuplicateFieldError(errorMessage, setFieldError);
+            }
+            else if(error.status === 400) {
+                if(errorMessage.includes("Duplicate")) {
+                    ProfileUtils.handleDuplicateFieldError(errorMessage, setFieldError);
+                }
+                else if(errorMessage.includes("OTP")) {
+                    ProfileUtils.handleOtpFieldError(errorMessage, setFieldError, "register");
+                }
+            }
+            else {
+                toast.error("Registration failed. Please try again.");
+            }
         }
     }
 
-    const initialValues = {
+    let initialValues = {
         ...ProfileUtils.getInitialValues(accessedBy.toUpperCase(), null, false),
-        agreedToTerms: false
+        agreedToTerms: false,
+
     };
+    if (isOtpRequired) {
+        initialValues = {
+            ...initialValues,
+            phoneOtp: '',
+            emailOtp: '',
+        };
+    }
+
     const validationSchema = ProfileUtils.getValidationSchema(accessedBy.toUpperCase(), false);
+    const getValidationSchema = () => {
+        const baseSchema = validationSchema.fields;
+
+        if(isOtpRequired) {
+            baseSchema.phoneOtp = Yup.string()
+                .matches(/^\d{6}$/, 'OTP must be 6 digits')
+                .required('Phone OTP is required');
+
+            baseSchema.emailOtp = Yup.string()
+                .matches(/^\d{6}$/, 'OTP must be 6 digits')
+                .required('Email OTP is required');
+        }
+
+        return Yup.object().shape(baseSchema);
+    };
 
     return(
         <Box sx={{
@@ -184,7 +254,7 @@ const Register = () => {
                 </Box>
                 <Formik
                     initialValues={initialValues}
-                    validationSchema={validationSchema}
+                    validationSchema={getValidationSchema()}
                     onSubmit={handleRegister}
                     validateOnChange={true}
                     validateOnBlur={true}
@@ -332,6 +402,20 @@ const Register = () => {
                                     ),
                                 }}
                             />
+                            { isOtpRequired && (
+                                <OTPField
+                                    label="Phone OTP"
+                                    name="phoneOtp"
+                                    value={values.phoneOtp}
+                                    onChange={handleChange}
+                                    error={Boolean((touched.phoneOtp || values.phoneOtp) && errors.phoneOtp)}
+                                    helperText={(touched.phoneOtp || values.phoneOtp) && errors.phoneOtp}
+                                    verificationType="phone"
+                                    phoneNumber={values.phoneNumber}
+                                    onOtpResponse={ response => handleOtpResponse(response, { setFieldError })}
+                                />
+                            )}
+
                             <StyledTextField
                                 fullWidth
                                 label="Email"
@@ -350,6 +434,20 @@ const Register = () => {
                                     ),
                                 }}
                             />
+                            { isOtpRequired && (
+                                <OTPField
+                                    label="Email OTP"
+                                    name="emailOtp"
+                                    value={values.emailOtp}
+                                    onChange={handleChange}
+                                    error={Boolean((touched.emailOtp || values.emailOtp) && errors.emailOtp)}
+                                    helperText={(touched.emailOtp || values.emailOtp) && errors.emailOtp}
+                                    verificationType="email"
+                                    email={values.email}
+                                    onOtpResponse={response => handleOtpResponse(response, { setFieldError })}
+                                />
+                            )}
+
                             <StyledTextField
                                 fullWidth
                                 label="Address"

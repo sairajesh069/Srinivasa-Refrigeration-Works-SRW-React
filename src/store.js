@@ -6,6 +6,7 @@ import {accountRecoveryApi} from "./reducers/accountRecoveryApi.js";
 import {userProfileApi} from "./reducers/userProfileApi.js";
 import {complaintApi} from "./reducers/complaintApi.js";
 import {notificationApi} from "./reducers/notificationApi.js";
+import {otpApi} from "./reducers/otpApi.js";
 
 const store = configureStore({
     reducer: {
@@ -15,7 +16,8 @@ const store = configureStore({
         [accountRecoveryApi.reducerPath]: accountRecoveryApi.reducer,
         [userProfileApi.reducerPath]: userProfileApi.reducer,
         [complaintApi.reducerPath]: complaintApi.reducer,
-        [notificationApi.reducerPath]: notificationApi.reducer
+        [notificationApi.reducerPath]: notificationApi.reducer,
+        [otpApi.reducerPath]: otpApi.reducer
     },
     middleware: getDefaultMiddleware => {
         return getDefaultMiddleware({
@@ -33,7 +35,8 @@ const store = configureStore({
             .concat(accountRecoveryApi.middleware)
             .concat(userProfileApi.middleware)
             .concat(complaintApi.middleware)
-            .concat(notificationApi.middleware);
+            .concat(notificationApi.middleware)
+            .concat(otpApi.middleware);
     }
 });
 

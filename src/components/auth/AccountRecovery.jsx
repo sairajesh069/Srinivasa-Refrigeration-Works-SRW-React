@@ -8,6 +8,8 @@ import {useState} from "react";
 import {useUsernameRecoveryMutation, useUserValidationMutation, usePasswordResetMutation} from "../../reducers/accountRecoveryApi.js";
 import {toast} from "react-toastify";
 import {useNavigate, useLocation} from "react-router-dom";
+import OTPField from "../../utils/form-styling/OTPField.jsx";
+import ProfileUtils from "../../utils/ProfileUtils.jsx";
 
 const AccountRecovery = () => {
     const [showPassword, setShowPassword] = useState(false);
@@ -27,6 +29,8 @@ const AccountRecovery = () => {
     const [usernameRecovery, { isLoading: isUsernameRecoveryLoading }] = useUsernameRecoveryMutation();
     const [userValidation, { isLoading: isUserValidationLoading }] = useUserValidationMutation();
     const [passwordReset, { isLoading: isPasswordResetLoading }] = usePasswordResetMutation();
+
+    const [otpResponse, setOtpResponse] = useState("");
 
     const togglePasswordVisibility = () => {
         setShowPassword(!showPassword);
@@ -58,7 +62,10 @@ const AccountRecovery = () => {
         const baseSchema = {
             phoneNumber: Yup.string()
                 .matches(/^\d{10}$/, 'Phone number must be 10 digits')
-                .required('Phone number is required')
+                .required('Phone number is required'),
+            otp: Yup.string()
+                .matches(/^\d{6}$/, 'OTP must be 6 digits')
+                .required('OTP is required')
         };
 
         if (isUserValidation || isPasswordReset) {
@@ -81,7 +88,10 @@ const AccountRecovery = () => {
     };
 
     const getInitialValues = () => {
-        const baseValues = { phoneNumber: '' };
+        const baseValues = {
+            phoneNumber: '',
+            otp: ''
+        };
 
         if (isUserValidation || isPasswordReset) {
             baseValues.loginId = '';
@@ -107,9 +117,23 @@ const AccountRecovery = () => {
         setValidationResponse("");
     };
 
-    const handleAccountRecovery = async values => {
+    const handleOtpResponse = (response) => {
+        if(response && !validationResponse) {
+            if (response.success) {
+                setOtpResponse(response.data?.message);
+                setIsValidationError(false);
+            }
+            else {
+                setOtpResponse(response.errorMessage);
+                setIsValidationError(true);
+            }
+        }
+    };
+
+    const handleAccountRecovery = async (values, { setFieldError }) => {
         const accountRecoveryDTO = {
             phoneNumber: values.phoneNumber,
+            otp: values.otp,
             loginId: values.loginId?.toLowerCase(),
             password: values.password
         };
@@ -121,11 +145,13 @@ const AccountRecovery = () => {
 
             if (isUsernameRecovery) {
                 response = await usernameRecovery(accountRecoveryDTO).unwrap();
+                setOtpResponse("");
                 setValidationResponse(response?.message);
                 setIsValidationError(false);
             }
             else if (isUserValidation) {
                 response = await userValidation(accountRecoveryDTO).unwrap();
+                setOtpResponse("");
                 setIsUserValidated(true);
                 setValidationResponse(response?.message);
                 setIsValidationError(false);
@@ -140,10 +166,18 @@ const AccountRecovery = () => {
             toast.success(pageConfig?.successMessage);
         }
         catch (error) {
-            if (error.data?.status === 404 && (isUsernameRecovery || isUserValidation)) {
-                setValidationResponse(error.data?.message);
+            setOtpResponse("");
+
+            const errorStatus = error.data?.status;
+            if ((errorStatus === 404 || errorStatus === 400) && (isUsernameRecovery || isUserValidation)) {
+                const errorMessage = error.data?.message;
+                setValidationResponse(`${errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)}`);
                 setIsUserValidated(false);
                 setIsValidationError(true);
+                if(errorStatus === 400 && errorMessage.includes("OTP")) {
+                    ProfileUtils.handleOtpFieldError(errorMessage, setFieldError, "accountRecovery");
+                    return;
+                }
             }
 
             if(isPasswordReset) {
@@ -364,7 +398,6 @@ const AccountRecovery = () => {
                                 variant="outlined"
                                 placeholder="Enter your phone number"
                                 disabled={isLoading}
-                                sx={{ marginBottom: validationResponse ? "8px" : "24px" }}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
@@ -374,7 +407,24 @@ const AccountRecovery = () => {
                                 }}
                             />
 
+                            <OTPField
+                                label="OTP"
+                                name="otp"
+                                value={values.otp}
+                                onChange={handleChange}
+                                error={Boolean((touched.otp || values.otp) && errors.otp)}
+                                helperText={(touched.otp || values.otp) && errors.otp}
+                                phoneNumber={values.phoneNumber}
+                                verificationType="phone"
+                                customMarginBottom={validationResponse && '8px'}
+                                onOtpResponse={handleOtpResponse}
+                            />
+
                             {/* Response Messages */}
+                            {(isUsernameRecovery || isUserValidation) && otpResponse &&
+                                renderResponse(otpResponse, isValidationError)
+                            }
+
                             {isUsernameRecovery && validationResponse &&
                                 renderResponse(validationResponse, isValidationError, true)
                             }

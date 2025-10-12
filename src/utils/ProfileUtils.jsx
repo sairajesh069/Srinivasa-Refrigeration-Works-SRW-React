@@ -218,8 +218,7 @@ const ProfileUtils = {
         );
     },
 
-    handleDuplicateFieldError: (error, setFieldError) => {
-        const errorMessage = error.data.message;
+    handleDuplicateFieldError: (errorMessage, setFieldError) => {
         if(!errorMessage.startsWith("Duplicate value")) {
             const duplicateField = errorMessage.slice(10).trim();
             if(ProfileUtils.uniqueFields[duplicateField]) {
@@ -228,6 +227,31 @@ const ProfileUtils = {
             }
         }
         toast.error(errorMessage);
+    },
+
+    otpErrors: identifierType => ({
+        [`Maximum ${identifierType} verification OTP generation limit reached. Please try again after 1 hour.`]: "OTP limit reached. Try again after 1 hour.",
+        [`OTP for ${identifierType} verification is required.`]: "OTP is required.",
+        [`Invalid ${identifierType} verification OTP format.`]: "OTP must be a 6 digit number.",
+        [`OTP for ${identifierType} verification has been expired or does not exist. Please request a new OTP.`]: "OTP has expired or does not exist. Please request a new one.",
+        [`Incorrect ${identifierType} verification OTP.`]: "Incorrect OTP. Please try again."
+    }),
+
+    handleOtpFieldError: (errorMessage, setFieldError, requestFrom) => {
+        const identifierType = errorMessage.includes("phone number") ? "phone number" : "email";
+
+        const errorMap = ProfileUtils.otpErrors(identifierType);
+        const userFriendlyMessage = errorMap[errorMessage];
+
+        let fieldName = "otp";
+        if(requestFrom === "register" || requestFrom === "profileUpdate") {
+            fieldName = identifierType === "phone number" ? "phoneOtp" : "emailOtp";
+        }
+
+        if (userFriendlyMessage) {
+            setFieldError(fieldName, userFriendlyMessage);
+        }
+        toast.error(userFriendlyMessage);
     },
 
     getTimeUntilExpiry: (expiresIn, timestamp) => {
