@@ -107,6 +107,7 @@ const AccountRecovery = () => {
 
     const handleFieldChange = (event, handleChange, { setFieldValue }) => {
         handleChange(event);
+        setOtpResponse("");
         if (isPasswordReset) {
             setFieldValue('password', '');
             setFieldValue('confirmPassword', '');
@@ -117,14 +118,17 @@ const AccountRecovery = () => {
         setValidationResponse("");
     };
 
-    const handleOtpResponse = (response) => {
+    const handleOtpResponse = (response, { setFieldError, setFieldTouched }) => {
         if(response && !validationResponse) {
             if (response.success) {
                 setOtpResponse(response.data?.message);
                 setIsValidationError(false);
             }
             else {
-                setOtpResponse(response.errorMessage);
+                const errorMessage = response.errorMessage;
+                setOtpResponse(errorMessage);
+                ProfileUtils.handleOtpFieldError(errorMessage, setFieldError, "accountRecovery");
+                setFieldTouched('otp', true, false);
                 setIsValidationError(true);
             }
         }
@@ -143,15 +147,14 @@ const AccountRecovery = () => {
         try {
             let response;
 
+            setOtpResponse("");
             if (isUsernameRecovery) {
                 response = await usernameRecovery(accountRecoveryDTO).unwrap();
-                setOtpResponse("");
                 setValidationResponse(response?.message);
                 setIsValidationError(false);
             }
             else if (isUserValidation) {
                 response = await userValidation(accountRecoveryDTO).unwrap();
-                setOtpResponse("");
                 setIsUserValidated(true);
                 setValidationResponse(response?.message);
                 setIsValidationError(false);
@@ -171,7 +174,9 @@ const AccountRecovery = () => {
             const errorStatus = error.data?.status;
             if ((errorStatus === 404 || errorStatus === 400) && (isUsernameRecovery || isUserValidation)) {
                 const errorMessage = error.data?.message;
-                setValidationResponse(`${errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)}`);
+                errorMessage.includes("OTP")
+                    ? setOtpResponse(`${errorMessage.charAt(0).toUpperCase() + errorMessage.slice(1)}`)
+                    : setValidationResponse(errorMessage);
                 setIsUserValidated(false);
                 setIsValidationError(true);
                 if(errorStatus === 400 && errorMessage.includes("OTP")) {
@@ -363,7 +368,7 @@ const AccountRecovery = () => {
                     validateOnBlur={true}
                     validateOnMount={false}
                 >
-                    {({ values, handleChange, errors, touched, setFieldValue }) => (
+                    {({ values, handleChange, errors, touched, setFieldValue, setFieldError, setFieldTouched }) => (
                         <Form>
                             {(isPasswordReset || isUserValidation) && (
                                 <StyledTextField
@@ -417,7 +422,7 @@ const AccountRecovery = () => {
                                 phoneNumber={values.phoneNumber}
                                 verificationType="phone"
                                 customMarginBottom={validationResponse && '8px'}
-                                onOtpResponse={handleOtpResponse}
+                                onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                             />
 
                             {/* Response Messages */}

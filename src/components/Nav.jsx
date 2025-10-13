@@ -13,6 +13,8 @@ const Nav = () => {
     const [logoutDialogOpen, setLogoutDialogOpen] = useState(false);
 
     const { isAuthenticated, user, isLoggingOut, logout } = useAuth();
+    const userType = user?.userType;
+    const formattedUserType = userType?.charAt(0) + userType?.slice(1).toLowerCase();
 
     const navigate = useNavigate();
     const theme = useTheme();
@@ -258,7 +260,7 @@ const Nav = () => {
                     {getDisplayName()}
                 </Typography>
                 <Typography variant="caption" sx={{ color: 'rgba(255, 255, 255, 0.7)' }}>
-                    {user?.userType?.toLowerCase() || 'user'}
+                    {formattedUserType || 'User'}
                 </Typography>
             </Box>
             <Divider sx={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', my: 1 }} />
@@ -624,7 +626,7 @@ const Nav = () => {
                                             {getDisplayName()}
                                         </Typography>
                                         <Chip
-                                            label={user?.userType?.toLowerCase() || 'user'}
+                                            label={formattedUserType || 'User'}
                                             size="small"
                                             sx={{
                                                 backgroundColor: 'rgba(79, 195, 247, 0.2)',

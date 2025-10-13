@@ -43,9 +43,11 @@ const Register = () => {
 
     const isOtpRequired = !isAuthenticated || !isOwner;
 
-    const handleOtpResponse = (response, { setFieldError }) => {
+    const handleOtpResponse = (response, { setFieldError, setFieldTouched }) => {
         if (response?.error) {
+            const fieldName = response.type === 'phone' ? 'phoneOtp' : 'emailOtp';
             ProfileUtils.handleOtpFieldError(response.errorMessage, setFieldError, "register");
+            setFieldTouched(fieldName, true, false);
         }
     };
 
@@ -260,7 +262,7 @@ const Register = () => {
                     validateOnBlur={true}
                     validateOnMount={true}
                 >
-                    {({ values, handleChange, errors, touched, setFieldError, setFieldValue }) => (
+                    {({ values, handleChange, errors, touched, setFieldError, setFieldValue, setFieldTouched }) => (
                         <Form>
                             <Typography sx={{
                                 color: '#2c3e50',
@@ -412,7 +414,7 @@ const Register = () => {
                                     helperText={(touched.phoneOtp || values.phoneOtp) && errors.phoneOtp}
                                     verificationType="phone"
                                     phoneNumber={values.phoneNumber}
-                                    onOtpResponse={ response => handleOtpResponse(response, { setFieldError })}
+                                    onOtpResponse={ response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                                 />
                             )}
 
@@ -444,7 +446,7 @@ const Register = () => {
                                     helperText={(touched.emailOtp || values.emailOtp) && errors.emailOtp}
                                     verificationType="email"
                                     email={values.email}
-                                    onOtpResponse={response => handleOtpResponse(response, { setFieldError })}
+                                    onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                                 />
                             )}
 

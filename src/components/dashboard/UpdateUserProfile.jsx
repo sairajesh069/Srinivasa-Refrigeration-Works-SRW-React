@@ -64,9 +64,11 @@ const UpdateUserProfile = () => {
 
     const isOwner = user?.userType === "OWNER";
 
-    const handleOtpResponse = (response, { setFieldError }) => {
+    const handleOtpResponse = (response, { setFieldError, setFieldTouched }) => {
         if (response?.error) {
+            const fieldName = response.type === 'phone' ? 'phoneOtp' : 'emailOtp';
             ProfileUtils.handleOtpFieldError(response.errorMessage, setFieldError, "profileUpdate");
+            setFieldTouched(fieldName, true, false);
         }
     };
 
@@ -505,7 +507,7 @@ const UpdateUserProfile = () => {
                             }
                         }}
                     >
-                        {({ dirty, values, handleChange, errors, touched, setFieldValue, setFieldError}) => {
+                        {({ dirty, values, handleChange, errors, touched, setFieldError, setFieldTouched }) => {
 
                             const isPhoneChangedLocal = userData.phoneNumber !== values.phoneNumber;
                             const isEmailChangedLocal = userData.email !== values.email;
@@ -923,7 +925,7 @@ const UpdateUserProfile = () => {
                                                         helperText={(touched.phoneOtp || values.phoneOtp) && errors.phoneOtp}
                                                         verificationType="phone"
                                                         phoneNumber={values.phoneNumber}
-                                                        onOtpResponse={response => handleOtpResponse(response, { setFieldError })}
+                                                        onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                                                     />
                                                 </Grid>
                                             )}
@@ -990,7 +992,7 @@ const UpdateUserProfile = () => {
                                                         helperText={(touched.emailOtp || values.emailOtp) && errors.emailOtp}
                                                         verificationType="email"
                                                         email={values.email}
-                                                        onOtpResponse={response => handleOtpResponse(response, { setFieldError })}
+                                                        onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                                                     />
                                                 </Grid>
                                             )}
