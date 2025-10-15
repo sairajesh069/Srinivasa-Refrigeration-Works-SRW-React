@@ -237,14 +237,14 @@ const ProfileUtils = {
         [`Incorrect ${identifierType} verification OTP.`]: "Incorrect OTP. Please try again."
     }),
 
-    handleOtpFieldError: (errorMessage, setFieldError, requestFrom) => {
+    handleOtpFieldError: (errorMessage, setFieldError, otpPurpose) => {
         const identifierType = errorMessage.includes("phone number") ? "phone number" : "email";
 
         const errorMap = ProfileUtils.otpErrors(identifierType);
         const userFriendlyMessage = errorMap[errorMessage];
 
         let fieldName = "otp";
-        if(requestFrom === "register" || requestFrom === "profileUpdate") {
+        if(otpPurpose === "register" || otpPurpose === "profileUpdate") {
             fieldName = identifierType === "phone number" ? "phoneOtp" : "emailOtp";
         }
 

@@ -16,6 +16,7 @@ const OTPField = ({
                       phoneNumber = '',
                       email = '',
                       verificationType,
+                      purpose,
                       customMarginBottom = '',
                       sx = {},
                       onOtpResponse
@@ -26,6 +27,7 @@ const OTPField = ({
 
     const isPhoneOTP = verificationType.toLowerCase() === 'phone';
     const identifier = isPhoneOTP ? phoneNumber : email;
+    const identifierType = isPhoneOTP ? 'phone' : 'email';
     const prevIdentifierRef = useRef(identifier);
     const intervalRef = useRef(null);
 
@@ -60,14 +62,19 @@ const OTPField = ({
         if (cooldown > 0 || isLoading) return;
 
         try {
-            const response = await sendOtp(isPhoneOTP ? phoneNumber : email).unwrap();
+            const otpGenerationDTO = {
+                userIdentifier: identifier,
+                otpPurpose: purpose,
+                identifierType: identifierType === "phone" ? "PHONE_NUMBER" : "EMAIL",
+            };
+            const response = await sendOtp(otpGenerationDTO).unwrap();
 
             if (onOtpResponse) {
                 onOtpResponse({
                     success: true,
                     data: response,
-                    identifier: isPhoneOTP ? phoneNumber : email,
-                    type: isPhoneOTP ? 'phone' : 'email'
+                    identifier: identifier,
+                    type: identifierType
                 });
             }
 
@@ -98,8 +105,8 @@ const OTPField = ({
                     success: false,
                     error: error,
                     errorMessage: errorMessage,
-                    identifier: isPhoneOTP ? phoneNumber : email,
-                    type: isPhoneOTP ? 'phone' : 'email'
+                    identifier: identifier,
+                    type: identifierType
                 });
             }
         }

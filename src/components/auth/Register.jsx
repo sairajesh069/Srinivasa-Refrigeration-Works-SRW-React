@@ -413,6 +413,7 @@ const Register = () => {
                                     error={Boolean((touched.phoneOtp || values.phoneOtp) && errors.phoneOtp)}
                                     helperText={(touched.phoneOtp || values.phoneOtp) && errors.phoneOtp}
                                     verificationType="phone"
+                                    purpose="USER_REGISTER"
                                     phoneNumber={values.phoneNumber}
                                     onOtpResponse={ response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                                 />
@@ -445,6 +446,7 @@ const Register = () => {
                                     error={Boolean((touched.emailOtp || values.emailOtp) && errors.emailOtp)}
                                     helperText={(touched.emailOtp || values.emailOtp) && errors.emailOtp}
                                     verificationType="email"
+                                    purpose="USER_REGISTER"
                                     email={values.email}
                                     onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                                 />

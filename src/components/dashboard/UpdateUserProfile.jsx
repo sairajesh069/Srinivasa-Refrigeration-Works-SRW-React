@@ -924,6 +924,7 @@ const UpdateUserProfile = () => {
                                                         error={Boolean((touched.phoneOtp || values.phoneOtp) && errors.phoneOtp)}
                                                         helperText={(touched.phoneOtp || values.phoneOtp) && errors.phoneOtp}
                                                         verificationType="phone"
+                                                        purpose="PROFILE_UPDATE"
                                                         phoneNumber={values.phoneNumber}
                                                         onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                                                     />
@@ -991,6 +992,7 @@ const UpdateUserProfile = () => {
                                                         error={Boolean((touched.emailOtp || values.emailOtp) && errors.emailOtp)}
                                                         helperText={(touched.emailOtp || values.emailOtp) && errors.emailOtp}
                                                         verificationType="email"
+                                                        purpose="PROFILE_UPDATE"
                                                         email={values.email}
                                                         onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                                                     />

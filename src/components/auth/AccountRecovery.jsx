@@ -421,6 +421,7 @@ const AccountRecovery = () => {
                                 helperText={(touched.otp || values.otp) && errors.otp}
                                 phoneNumber={values.phoneNumber}
                                 verificationType="phone"
+                                purpose="ACCOUNT_RECOVERY"
                                 customMarginBottom={validationResponse && '8px'}
                                 onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
                             />

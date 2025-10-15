@@ -17,6 +17,8 @@ import {useSearchParams} from "react-router";
 import ComplaintUtils from "../../utils/ComplaintUtils.jsx";
 import {useFetchComplaintQuery, useFetchTechniciansQuery, useUpdateComplaintMutation} from "../../reducers/complaintApi.js";
 import Unauthorized from "../exceptions/Unauthorized.jsx";
+import OTPField from "../../utils/form-styling/OTPField.jsx";
+import ProfileUtils from "../../utils/ProfileUtils.jsx";
 
 const UpdateComplaint = () => {
     const { user, isLoggingOut } = useAuth();
@@ -45,6 +47,10 @@ const UpdateComplaint = () => {
     const isComplaintOwner = complaint?.bookedById === user?.userId;
     const isAssignedTechnician = complaint?.technicianDetails?.employeeId === user?.userId;
     const isResolved = complaint?.status === 'RESOLVED';
+
+    const getIsOtpRequired = statusValue => {
+        return isEmployee && !isResolved && statusValue === 'RESOLVED';
+    };
 
     const { data: techniciansData, isLoading: isFetchTechniciansLoading,
         isError: isFetchTechniciansError } = useFetchTechniciansQuery("update-complaint", {
@@ -80,6 +86,15 @@ const UpdateComplaint = () => {
                 .oneOf(["PENDING", "IN_PROGRESS", "RESOLVED"], 'Please select a valid complaint status');
         }
 
+        baseExtraFields.otp = Yup.string()
+            .when('status', {
+                is: status => isEmployee && !isResolved && status === 'RESOLVED',
+                then: schema => schema
+                    .matches(/^\d{6}$/, 'OTP must be 6 digits')
+                    .required('OTP is required'),
+                otherwise: schema => schema.notRequired()
+            });
+
         return ComplaintUtils.getValidationSchema(true, baseExtraFields);
     }, [isOwner, isEmployee, technicianIds]);
 
@@ -97,7 +112,14 @@ const UpdateComplaint = () => {
 
     const [updateComplaint] = useUpdateComplaintMutation();
 
-    const handleSubmit = async values => {
+    const handleOtpResponse = (response, { setFieldError, setFieldTouched }) => {
+        if (response?.error) {
+            ProfileUtils.handleOtpFieldError(response.errorMessage, setFieldError, "complaintClosure");
+            setFieldTouched('otp', true, false);
+        }
+    };
+
+    const handleSubmit = async (values, { setFieldError }) => {
 
         const complaintDTO = {
             complaintId: complaintId,
@@ -128,6 +150,7 @@ const UpdateComplaint = () => {
             },
             createdAt: complaint?.createdAt,
             updatedAt: complaint?.updatedAt,
+            closedAt: complaint?.closedAt,
             reopenedAt: complaint?.reopenedAt,
             complaintState: complaint?.complaintState,
             technicianFeedback: values.technicianFeedback || '',
@@ -135,14 +158,26 @@ const UpdateComplaint = () => {
             initialAssigneeId: complaint?.technicianDetails?.employeeId || ''
         };
 
+        if(getIsOtpRequired(values.status)) {
+            complaintDTO.otp = values.otp || '';
+        }
         setIsSubmitting(true);
+
         try {
             await updateComplaint(complaintDTO).unwrap();
             toast.success('Complaint updated successfully!');
             navigate(-1);
-        } catch (err) {
-            toast.error('Failed to update complaint');
-        } finally {
+        }
+        catch (error) {
+            const errorMessage = error?.data?.message;
+            if(error.status === 400 && errorMessage.includes("OTP")) {
+                    ProfileUtils.handleOtpFieldError(errorMessage, setFieldError, "complaintUpdate");
+            }
+            else {
+                toast.error('Failed to update complaint');
+            }
+        }
+        finally {
             setIsSubmitting(false);
         }
     };
@@ -183,6 +218,7 @@ const UpdateComplaint = () => {
         bookedById: complaint?.bookedById || '',
         customerName: complaint?.customerName || '',
         contactNumber: complaint?.contactNumber?.slice(3) || '',
+        otp: '',
         email: !(complaint?.email === 'N/A' && (isComplaintOwner || isOwner)) ? complaint?.email : '',
         address: {
             doorNumber: complaint?.address?.doorNumber || '',
@@ -359,7 +395,7 @@ const UpdateComplaint = () => {
                     onSubmit={handleSubmit}
                     enableReinitialize={true}
                 >
-                    {({ dirty, values, handleChange, errors, touched, setFieldValue, setValues }) => (
+                    {({ dirty, values, handleChange, errors, touched, setFieldValue, setValues, setFieldError, setFieldTouched }) => (
                         <Form>
                             {/* Basic Information */}
                             <Paper sx={{
@@ -1227,6 +1263,22 @@ const UpdateComplaint = () => {
                                                     }}
                                                 />
                                             </Grid>
+                                            {getIsOtpRequired(values.status) && (
+                                                <Grid size={{ xs: 12, sm: 6 }}>
+                                                    <OTPField
+                                                        label="OTP"
+                                                        name="otp"
+                                                        value={values.otp}
+                                                        onChange={handleChange}
+                                                        error={Boolean((touched.otp || values.otp) && errors.otp)}
+                                                        helperText={(touched.otp || values.otp) && errors.otp}
+                                                        verificationType="phone"
+                                                        purpose="COMPLAINT_CLOSURE"
+                                                        phoneNumber={values.contactNumber}
+                                                        onOtpResponse={response => handleOtpResponse(response, { setFieldError, setFieldTouched })}
+                                                    />
+                                                </Grid>
+                                            )}
                                         </Grid>
                                     </Collapse>
                                 </CardContent>
