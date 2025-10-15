@@ -707,7 +707,7 @@ const DisplayComplaints = () => {
                                         </Box>
 
                                         {/* Complaint State Toggle */}
-                                        {(user?.userType !== 'CUSTOMER' && (complaint.complaintState === 'CLOSED' || complaint.complaintState === 'REOPENED')) &&
+                                        {(user?.userType === 'OWNER' && (complaint.complaintState === 'CLOSED' || complaint.complaintState === 'REOPENED')) &&
                                             <Box sx={{ mb: 2 }}>
                                                 <FormControlLabel
                                                     control={
